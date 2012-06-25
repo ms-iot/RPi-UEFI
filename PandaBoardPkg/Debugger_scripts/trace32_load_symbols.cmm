@@ -24,7 +24,6 @@
   AREA.View SYMBOL
   AREA.Select SYMBOL
 
-  // Removed by OD
   // SYS.Option BE OFF
  
   ;Added based on suggestion from Lauterbach support.
@@ -49,7 +48,6 @@
    
   WINPAGE.SELECT P000
 
-  //Removed by OD
   //Enable semihosting
   // System.Option.BigEndian OFF
 
@@ -179,8 +177,8 @@ load_symbol_file:
     GOSUB get_file_string &stringOffset
     ENTRY &filestring
 
-	// Added by OD
-	&filestring="y:"+string.mid("&filestring", 32., string.len("&filestring"))
+    // the below has to be customized per your environment
+    &filestring="y:"+string.mid("&filestring", 32., string.len("&filestring"))
 
     PRINT "&filestring 0x" &load_address
     TDIAG Data.load.elf &filestring &load_address /nocode /noclear
