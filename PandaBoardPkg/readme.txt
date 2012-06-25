@@ -42,16 +42,16 @@ git clone git://git.linaro.org/arm/uefi/uefi.git linaro-uefi-2012.01
 cd linaro-uefi-2012.01
 git checkout linaro-uefi-2012.01
 
-#Apply base tools patches from ARM pkg
-cd edk2
-patch -p1 < ArmPlatformPkg/Documentation/patches/BaseTools-Pending-Patches.patch
-
-#Apply PandaBoardPkg patch for fixing SD card driver
-patch -p1 < PandaBoardPkg/patches/0001-fixes-sd-card-identification-on-panda.patch
-
 # Link Panda pkgs to EDK2
 ln -s $PANDA_UEFI/omap-edk2/PandaBoardPkg $PANDA_UEFI/linaro-uefi-2012.01/edk2
 ln -s $PANDA_UEFI/omap-edk2/Omap44xxPkg $PANDA_UEFI/linaro-uefi-2012.01/edk2
+
+#Apply PandaBoardPkg patch for fixing SD card driver
+patch -p1 <PandaBoardPkg/patches/0001-fixes-sd-card-identification-on-panda.patch
+
+#Apply base tools patches from ARM pkg
+cd edk2; patch -p1 < ArmPlatformPkg/Documentation/patches/BaseTools-Pending-Patches.patch
+[accept changes, push enter on default choice]
 
 # Build
 cd PandaBoardPkg
@@ -64,12 +64,29 @@ Running EDK2 on Panda
 
     1. UEFI EBL shell
 
-If you just intend to see how UEFI boots up and make a try with EBL, you
+-If you just intend to see how UEFI boots up and make a try with EBL, you
 can just do a raw copy of the firmware image to an SD card (e.g. /dev/sdc):
 
     dd if=$PANDA_UEFI/linaro-uefi-2012.01/edk2/Build/PandaBoard/RELEASE_ARMGCC/FV/MLO of=/dev/sdc
 
-Plug and play.
+-Open your favorite serial terminal e.g. 
+    minicom -b 115200 -D /dev/ttyS0 -8 --color=on -w -o
+
+-Plug serial and power cables.
+
+-After few seconds, you should see following boot menu:
+
+    The default boot selection will start in   1 seconds
+    ERROR: Did not find Linux kernel.
+    [1] Linux from SD
+    [2] EBL
+    [3] Boot Manager
+Start: 
+
+[Type 2 for starting EBL.]
+
+More info on EBL:
+    http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=EDK_Boot_Loader_(EBL)_WiKi
 
 Alternatively, you can drop the MLO file to a fresh FAT32 formatted SD card.
 More information on how to format an SD card here:
@@ -93,6 +110,15 @@ OMAP DPLLs, system clocks, and initlization of external SDRAM).
 This tool is tracked in the following tree: git://gitorious.org/omap-romcode/chtool.git
 
 The version of chtool present in PandaBoardPkg is v0.4.
+
+Resources
+=========
+
+Beagle Board - TI OMAP3
+    http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=BeagleBoardPkg
+
+ArmPlatformPkg - Generic package for ARM platforms
+    http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=ArmPlatformPkg
 
 To do/next steps
 ======================
