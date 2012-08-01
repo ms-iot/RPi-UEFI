@@ -618,8 +618,8 @@ struct BOOT_MAIN_ENTRY {
   CONST CHAR16* Description;
   EFI_STATUS (*Callback) (IN LIST_ENTRY *BootOptionsList);
 } BootMainEntries[] = {
-    { L"Shell", BootShell },
     { L"Boot Manager", BootMenuManager },
+    { L"Shell", BootShell },
 };
 
 
@@ -630,6 +630,7 @@ BootMenuMain (
 {
   LIST_ENTRY                    BootOptionsList;
   UINTN                         OptionCount;
+  UINTN                         HardCodedOptionCount;
   UINTN                         BootOptionCount;
   EFI_STATUS                    Status;
   LIST_ENTRY*                   Entry;
@@ -637,6 +638,7 @@ BootMenuMain (
   UINTN                         BootOptionSelected;
   UINTN                         Index;
   UINTN                         BootMainEntryCount;
+  CHAR8                         BootOptionSelectedStr[32];
 
   BootOption              = NULL;
   BootMainEntryCount = sizeof(BootMainEntries) / sizeof(struct BOOT_MAIN_ENTRY);
@@ -713,16 +715,25 @@ BootMenuMain (
     BootOptionCount = OptionCount-1;
 
     // Display the hardcoded Boot entries
+    Print(L"-----------------------\n");
     for (Index = 0; Index < BootMainEntryCount; Index++) {
-      Print(L"[%d] %s\n",OptionCount,BootMainEntries[Index]);
+      Print(L"[%c] %s\n", ('a'+Index), BootMainEntries[Index]);
       OptionCount++;
     }
+    HardCodedOptionCount=Index;
 
     // Request the boot entry from the user
     BootOptionSelected = 0;
     while (BootOptionSelected == 0) {
       Print(L"Start: ");
-      Status = GetHIInputInteger (&BootOptionSelected);
+      Status = GetHIInputAscii (BootOptionSelectedStr,8);
+
+      if (BootOptionSelectedStr[0]-'0' <= OptionCount) {
+        BootOptionSelected = BootOptionSelectedStr[0] - '0';
+      } else if (BootOptionSelectedStr[0]-'a' <= HardCodedOptionCount) {
+        BootOptionSelected = BootOptionCount + 1 + BootOptionSelectedStr[0] - 'a';
+      }
+
       if (EFI_ERROR(Status) || (BootOptionSelected == 0) || (BootOptionSelected > OptionCount)) {
         Print(L"Invalid input (max %d)\n",(OptionCount-1));
         BootOptionSelected = 0;
