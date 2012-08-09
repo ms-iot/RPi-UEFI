@@ -60,6 +60,7 @@
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   
   EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
+  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   
@@ -338,6 +339,7 @@
   # ARM Gic base addresses
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x48241000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x48240100
+  gArmTokenSpaceGuid.PcdGicNumInterrupts|160
   
   gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x80000000
   gEmbeddedTokenSpaceGuid.PcdMemorySize|0x08000000
