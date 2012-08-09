@@ -65,6 +65,7 @@ PandaBoardGetRevision (
   VOID
   )
 {
+#if 0
   UINT32 OldPinDir;
   UINT32 Revision;
 
@@ -77,6 +78,9 @@ PandaBoardGetRevision (
   MmioWrite32 (GPIO6_BASE + GPIO_OE, OldPinDir);
   
   return (PANDABOARD_REVISION)((Revision >> 11) & 0x7);
+#endif
+
+  return 0;
 }
 
 /**
@@ -120,6 +124,7 @@ ArmPlatformNormalInitialize (
   VOID
   )
 {
+#if 0
   PANDABOARD_REVISION Revision;
 
   Revision = PandaBoardGetRevision();
@@ -137,6 +142,12 @@ ArmPlatformNormalInitialize (
   // Clear IRQs
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
   ArmDataSyncronizationBarrier ();
+#endif
+
+  // Make sure GPMC region region 0 is disabled
+  // Not doing so makes gpmc_init hang early in kernel init
+  MmioAnd32 (GPMC_CONFIG7_0, ~CSVALID);
+
 }
 
 /**
@@ -150,7 +161,8 @@ ArmPlatformInitializeSystemMemory (
   VOID
   )
 {
-  // We do not need to initialize the System Memory on RTSM
+  // Nothing done here, handled by the ROM Configuration Header
+
 }
 
 EFI_STATUS
