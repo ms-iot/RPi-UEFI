@@ -1,0 +1,27 @@
+From e6b3ca0f765545b94e74de75d67b3c830f354c70 Mon Sep 17 00:00:00 2001
+From: Olivier Deprez <o-deprez@ti.com>
+Date: Thu, 9 Aug 2012 16:12:40 +0200
+Subject: [PATCH] remove ASSERT because serial not yet initialized
+
+In CEntryPoint, this ASSERT statement calls serial print functions when serial port has not been initialized yet
+This is causing board hand on panda board.
+---
+ArmPlatformPkg/PrePi/PrePi.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/ArmPlatformPkg/PrePi/PrePi.c b/ArmPlatformPkg/PrePi/PrePi.c
+index 11396d1..05385cc 100755
+--- a/ArmPlatformPkg/PrePi/PrePi.c
++++ b/ArmPlatformPkg/PrePi/PrePi.c
+@@ -209,7 +209,7 @@ CEntryPoint (
+   }
+   
+   // Write VBAR - The Vector table must be 32-byte aligned
+-  ASSERT (((UINT32)PrePiVectorTable & ((1 << 5)-1)) == 0);
++  //ASSERT (((UINT32)PrePiVectorTable & ((1 << 5)-1)) == 0);
+   ArmWriteVBar ((UINT32)PrePiVectorTable);
+ 
+   // If not primary Jump to Secondary Main
+-- 
+1.7.0.4
+
