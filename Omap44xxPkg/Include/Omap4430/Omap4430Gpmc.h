@@ -15,7 +15,7 @@
 #ifndef __OMAP4430GPMC_H__
 #define __OMAP4430GPMC_H__
 
-#define GPMC_BASE             (0x6E000000)
+#define GPMC_BASE             (0x50000000)
 
 //GPMC NAND definitions.
 #define GPMC_SYSCONFIG        (GPMC_BASE + 0x10)
