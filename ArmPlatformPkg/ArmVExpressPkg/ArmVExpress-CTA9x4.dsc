@@ -32,8 +32,8 @@
 !ifndef EDK2_ARMVE_STANDALONE
   DEFINE EDK2_ARMVE_STANDALONE=1
 !endif
-!if $(EDK2_ARMVE_STANDALONE) == 1
-  OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4-Standalone
+!ifdef $(EDK2_OUT_DIR)
+  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)
 !else
   OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4
 !endif
