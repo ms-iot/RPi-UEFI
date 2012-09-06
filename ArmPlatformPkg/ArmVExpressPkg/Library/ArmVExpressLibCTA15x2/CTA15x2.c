@@ -141,3 +141,30 @@ ArmPlatformGetPlatformPpiList (
   *PpiList = gPlatformPpiTable;
 }
 
+/**
+  Initialize the Secure peripherals and memory regions
+
+  If Trustzone is supported by your platform then this function makes the required initialization
+  of the secure peripherals and memory regions.
+
+**/
+VOID
+ArmPlatformSecTrustzoneInit (
+  IN  UINTN                     MpId
+  )
+{
+}
+
+ /**
+  This function is called by the ArmPlatformPkg/PrePi or ArmPlatformPkg/PlatformPei
+  in the PEI phase.
+
+**/
+RETURN_STATUS
+ArmPlatformInitialize (
+  IN  UINTN                     MpId
+  )
+{
+  return RETURN_SUCCESS;
+}
+
