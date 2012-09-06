@@ -53,7 +53,7 @@
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
-  ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA15x2/ArmVExpressSecLib.inf
+  ArmPlatformSecLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA15x2/ArmVExpressSecLib.inf
 
   # Uncomment to turn on GDB stub in SEC. 
   #DebugAgentLib|EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
@@ -154,8 +154,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
-  gArmPlatformTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth|32
-  gArmPlatformTokenSpaceGuid.PcdUartDefaultTimeout|1000000
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x1C170000
@@ -208,8 +206,12 @@
   #
   # SEC
   #
-  ArmPlatformPkg/Sec/Sec.inf
-  
+  ArmPlatformPkg/Sec/Sec.inf {
+    <LibraryClasses>
+      # Use the implementation which set the Secure bits
+      ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+  }
+
   #
   # PEI Phase modules
   #
