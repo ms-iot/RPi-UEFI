@@ -29,7 +29,6 @@
 [LibraryClasses]
   IoLib
   ArmLib
-  MemoryAllocationLib
   PL341DmcLib
   PL301AxiLib
   L2X0CacheLib
