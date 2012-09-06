@@ -24,6 +24,7 @@
 
 GCC_ASM_EXPORT(ArmPlatformSecBootAction)
 GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
+GCC_ASM_EXPORT(ArmPlatformSecBootMemoryInit)
 
 /**
   Call at the beginning of the platform boot up
@@ -452,4 +453,18 @@ waitloop_14:
 
 	bx      lr
 	// end of dmc_init
+
+/**
+  Initialize the memory where the initial stacks will reside
+
+  This memory can contain the initial stacks (Secure and Secure Monitor stacks).
+  In some platform, this region is already initialized and the implementation of this function can
+  do nothing. This memory can also represent the Secure RAM.
+  This function is called before the satck has been set up. Its implementation must ensure the stack
+  pointer is not used (probably required to use assembly language)
+
+**/
+ASM_PFX(ArmPlatformSecBootMemoryInit):
+        bx    lr
+
 
