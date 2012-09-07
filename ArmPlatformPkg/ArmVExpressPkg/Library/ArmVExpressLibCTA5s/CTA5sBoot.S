@@ -84,6 +84,19 @@ ASM_PFX(ArmPlatformSecBootAction):
 
 **/
 ASM_PFX(ArmPlatformInitializeBootMemory):
+  bx    lr
+
+/**
+  Initialize the memory where the initial stacks will reside
+
+  This memory can contain the initial stacks (Secure and Secure Monitor stacks).
+  In some platform, this region is already initialized and the implementation of this function can
+  do nothing. This memory can also represent the Secure RAM.
+  This function is called before the satck has been set up. Its implementation must ensure the stack
+  pointer is not used (probably required to use assembly language)
+
+**/
+ASM_PFX(ArmPlatformSecBootMemoryInit):
   mov   r5, lr
 
   //
@@ -123,16 +136,4 @@ ASM_PFX(ArmPlatformInitializeBootMemory):
 
   bx     r5
 
-/**
-  Initialize the memory where the initial stacks will reside
-
-  This memory can contain the initial stacks (Secure and Secure Monitor stacks).
-  In some platform, this region is already initialized and the implementation of this function can
-  do nothing. This memory can also represent the Secure RAM.
-  This function is called before the satck has been set up. Its implementation must ensure the stack
-  pointer is not used (probably required to use assembly language)
-
-**/
-ASM_PFX(ArmPlatformSecBootMemoryInit):
-        bx    lr
 
