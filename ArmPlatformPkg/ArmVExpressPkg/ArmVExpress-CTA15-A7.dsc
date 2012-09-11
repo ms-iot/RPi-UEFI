@@ -21,7 +21,11 @@
   PLATFORM_GUID                  = 0b511920-978d-4b34-acc0-3d9f8e6f9d81
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
+!ifdef $(EDK2_OUT_DIR)
+  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)
+!else
   OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA15-A7
+!endif
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
