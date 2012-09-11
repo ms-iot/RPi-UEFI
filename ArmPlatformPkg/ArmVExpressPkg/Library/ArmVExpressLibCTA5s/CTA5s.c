@@ -111,11 +111,15 @@ ArmPlatformGetBootMode (
   in the PEI phase.
 
 **/
-VOID
-ArmPlatformNormalInitialize (
-  VOID
+RETURN_STATUS
+ArmPlatformInitialize (
+  IN  UINTN                     MpId
   )
 {
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return RETURN_SUCCESS;
+  }
+
   // Configure periodic timer (TIMER0) for 1MHz operation
   MmioOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER0_TIMCLK);
   // Configure 1MHz clock
@@ -124,6 +128,8 @@ ArmPlatformNormalInitialize (
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER2_EN, SP810_SYS_CTRL_TIMER2_TIMCLK);
   // Configure SP810 to use 1MHz clock and disable
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
+
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -186,18 +192,5 @@ ArmPlatformSecTrustzoneInit (
   IN  UINTN                     MpId
   )
 {
-}
-
- /**
-  This function is called by the ArmPlatformPkg/PrePi or ArmPlatformPkg/PlatformPei
-  in the PEI phase.
-
-**/
-RETURN_STATUS
-ArmPlatformInitialize (
-  IN  UINTN                     MpId
-  )
-{
-  return RETURN_SUCCESS;
 }
 
