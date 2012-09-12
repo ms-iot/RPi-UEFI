@@ -90,6 +90,7 @@
   # Samsung specific
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
+  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   GdbSerialLib|SamsungPlatformPkg/ExynosPkg/Library/GdbSerialLib/GdbSerialLib.inf
 
   # iky for usb host
