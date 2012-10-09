@@ -28,6 +28,7 @@
   IoLib
 
 [Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
  # ArmPlatformPkg/ArmPlatformPkg.dec
   SamsungPlatformPkg/ExynosPkg/ExynosPkg.dec
