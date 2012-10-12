@@ -22,6 +22,7 @@
 
 GCC_ASM_EXPORT(ArmPlatformIsBootMemoryInitialized)
 GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
+GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 
 /**
   Called at the early stage of the Boot phase to know if the memory has already been initialized
@@ -52,6 +53,14 @@ ASM_PFX(ArmPlatformIsBootMemoryInitialized):
 **/
 ASM_PFX(ArmPlatformInitializeBootMemory):
   // We must need to go into this function
+  bx    lr
+
+
+//UINTN
+//ArmPlatformGetCorePosition (
+//  IN UINTN MpId
+//  );
+ASM_PFX(ArmPlatformGetCorePosition):
   bx    lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
