@@ -34,6 +34,7 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   ArmPlatformLib|PandaBoardPkg/Library/PandaBoardLib/PandaBoardLib.inf
   ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
+  ArmPlatformStackLib|ArmPlatformPkg/Library/ArmPlatformStackLib/ArmPlatformStackLib.inf
   
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
@@ -79,7 +80,7 @@
   
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
-  #CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
+  CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   
   SerialPortLib|Omap44xxPkg/Library/SerialPortLib/SerialPortLib.inf
@@ -261,6 +262,7 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"PandaEdk2"
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|4
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
@@ -339,7 +341,6 @@
   # ARM Gic base addresses
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x48241000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x48240100
-  gArmTokenSpaceGuid.PcdGicNumInterrupts|160
   
   gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x80000000
   gEmbeddedTokenSpaceGuid.PcdMemorySize|0x08000000
