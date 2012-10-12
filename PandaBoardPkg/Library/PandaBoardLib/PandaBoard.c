@@ -119,9 +119,9 @@ ArmPlatformGetBootMode (
   For example, some L2x0 requires to be initialized in Secure World
 
 **/
-VOID
-ArmPlatformNormalInitialize (
-  VOID
+RETURN_STATUS
+ArmPlatformInitialize (
+  IN  UINTN                     MpId
   )
 {
 #if 0
@@ -148,6 +148,7 @@ ArmPlatformNormalInitialize (
   // Not doing so makes gpmc_init hang early in kernel init
   MmioAnd32 (GPMC_CONFIG7_0, ~CSVALID);
 
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -198,3 +199,18 @@ ArmPlatformGetPlatformPpiList (
   *PpiListSize = sizeof(gPlatformPpiTable);
   *PpiList = gPlatformPpiTable;
 }
+
+/**
+  Initialize the Secure peripherals and memory regions
+
+  If Trustzone is supported by your platform then this function makes the required initialization
+  of the secure peripherals and memory regions.
+
+**/
+VOID
+ArmPlatformSecTrustzoneInit (
+  IN  UINTN                     MpId
+  )
+{
+}
+
