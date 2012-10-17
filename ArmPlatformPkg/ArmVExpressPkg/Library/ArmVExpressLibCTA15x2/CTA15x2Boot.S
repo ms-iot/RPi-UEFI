@@ -74,6 +74,23 @@ ASM_PFX(ArmPlatformSecBootMemoryInit):
 **/
 smc_init:
 
+	//
+	// Disable loop buffer for A15
+	//
+	MRC     p15, 0, r2, c0, c0, 0
+	MOV     r1, r2, lsr #4
+	LDR     r0, =0xFFF
+	AND     r1, r1, r0
+	LDR     r0, =0xC0F                      // See if A15
+	CMP     r1, r0
+	BNE     smc_init2                       // Go if not
+
+	MRC     p15, 0, r1, c1, c0, 1           // Read Aux Ctrl Reg
+	ORR     r1, r1, #(1 << 1)               // Set Bit 1
+	MCR     p15, 0, r1, c1, c0, 1           // and write it back
+
+smc_init2:
+
 	LDR     r0, = ARM_VE_SMC_CTRL_BASE
 	LDR     r2, = ARM_VE_SMB_PERIPH_BASE
 
@@ -465,6 +482,15 @@ waitloop_14:
 	LDR     r3, =0
 	STR     r3, [r2, #PHY_PTM_SQU_TRAINING]
 
+	// For Test Chip Change Program architected timer frequency
+	MRC     p15, 0, r0, c0, c1, 1           // CPUID_EXT_PFR1
+	LSR     r0, r0, #16
+	ANDS    r0, r0, #1                      // Check generic timer support
+	BEQ     exit
+	LDR     r0, = 600000000                 // 600MHz timer frequency
+	MCR     p15, 0, r0, c14, c0, 0          // CNTFRQ
+
+exit:
 	bx      lr
 	// end of dmc_init
 
