@@ -158,6 +158,13 @@ smc_init2:
 	LDR     r1, = 0x03C00000
 	STR     r1, [r0, #PL350_SMC_DIRECT_CMD_OFFSET]
 
+	// Set refresh period
+        LDR     r1, = 0x1
+        STR     r1, [r0, #0x20]
+
+        LDR     r1, = 0x1
+        STR     r1, [r0, #0x24]
+
 	// page mode setup for VRAM
 	LDR     r0, = 0x00FFFFFC
 	ADD     r0, r0, r2
