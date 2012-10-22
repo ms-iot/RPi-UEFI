@@ -51,39 +51,6 @@ ARM_CORE_INFO mVersatileExpressMpCoreInfoCTA5s[] = {
   },
 };
 
-// DDR2 timings
-PL341_DMC_CONFIG DDRTimings = {
-  .MaxChip   = 1,
-  .IsUserCfg = FALSE,
-  .User0Cfg = 0x7C924924,
-  .User2Cfg = (TC_UIOLHXC_VALUE << TC_UIOLHNC_SHIFT) | (TC_UIOLHXC_VALUE << TC_UIOLHPC_SHIFT) | (0x1 << TC_UIOHOCT_SHIFT) | (0x1 << TC_UIOHSTOP_SHIFT),
-  .HasQos    = FALSE,
-  .RefreshPeriod  = 0x3D0,
-  .CasLatency  = 0xA,
-  .WriteLatency  = 0x3,
-  .t_mrd    = 0x2,
-  .t_ras    = 0xC,
-  .t_rc   = 0xF,
-  .t_rcd    = 0x104,
-  .t_rfc    = 0x1022,
-  .t_rp   = 0x104,
-  .t_rrd    = 0x2,
-  .t_wr   = 0x4,
-  .t_wtr    = 0x2,
-  .t_xp   = 0x2,
-  .t_xsr    = 0xC8,
-  .t_esr    = 0x4,
-  .MemoryCfg   = DMC_MEMORY_CONFIG_ACTIVE_CHIP_1 | DMC_MEMORY_CONFIG_BURST_4 |
-                        DMC_MEMORY_CONFIG_ROW_ADDRESS_14 | DMC_MEMORY_CONFIG_COLUMN_ADDRESS_10,
-  .MemoryCfg2  = DMC_MEMORY_CFG2_BANK_BITS_3 | DMC_MEMORY_CFG2_MEM_WIDTH_64,
-  .MemoryCfg3  = 0x00000001,
-  .ChipCfg0    = 0x000180C0,
-  .ChipCfg1    = 0x0000FF00,
-  .t_faw    = 0x00000407,
-  .ModeReg = DDR2_MR_BURST_LENGTH_4 | DDR2_MR_CAS_LATENCY_5 | DDR2_MR_WR_CYCLES_3,
-  .ExtModeReg = 0x47,
-};
-
 /**
   Return the current Boot Mode
 
@@ -111,15 +78,11 @@ ArmPlatformGetBootMode (
   in the PEI phase.
 
 **/
-RETURN_STATUS
-ArmPlatformInitialize (
-  IN  UINTN                     MpId
+VOID
+ArmPlatformNormalInitialize (
+  VOID
   )
 {
-  if (!IS_PRIMARY_CORE(MpId)) {
-    return RETURN_SUCCESS;
-  }
-
   // Configure periodic timer (TIMER0) for 1MHz operation
   MmioOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER0_TIMCLK);
   // Configure 1MHz clock
@@ -128,8 +91,6 @@ ArmPlatformInitialize (
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER2_EN, SP810_SYS_CTRL_TIMER2_TIMCLK);
   // Configure SP810 to use 1MHz clock and disable
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
-
-  return RETURN_SUCCESS;
 }
 
 /**
@@ -143,7 +104,7 @@ ArmPlatformInitializeSystemMemory (
   VOID
   )
 {
-  PL341DmcInit(ARM_VE_DMC_BASE, &DDRTimings);
+  // Memory is initialised in CTA5sBoot.S
 }
 
 EFI_STATUS
@@ -192,5 +153,18 @@ ArmPlatformSecTrustzoneInit (
   IN  UINTN                     MpId
   )
 {
+}
+
+ /**
+  This function is called by the ArmPlatformPkg/PrePi or ArmPlatformPkg/PlatformPei
+  in the PEI phase.
+
+**/
+RETURN_STATUS
+ArmPlatformInitialize (
+  IN  UINTN                     MpId
+  )
+{
+  return RETURN_SUCCESS;
 }
 
