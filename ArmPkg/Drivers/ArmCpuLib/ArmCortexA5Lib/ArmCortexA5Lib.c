@@ -15,6 +15,8 @@
 #include <Base.h>
 #include <Library/ArmLib.h>
 #include <Library/ArmCpuLib.h>
+#include <Library/ArmV7ArchTimerLib.h>
+#include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 
@@ -33,9 +35,10 @@ ArmCpuSetup (
 
   // If MPCore then Enable the SCU
   if (ArmIsMpCore()) {
-    // Signals the Cortex-A5 processor is taking part in coherency
+    // Turn on SMP coherency
     ArmSetAuxCrBit (A5_FEATURE_SMP);
   }
+
 }
 
 
