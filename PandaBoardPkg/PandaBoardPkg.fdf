@@ -28,10 +28,10 @@
 
 [FD.PandaBoard_EFI]
 BaseAddress   = 0x80008000|gArmTokenSpaceGuid.PcdFdBaseAddress  #The base address of the FLASH Device.
-Size          = 0x00080000|gArmTokenSpaceGuid.PcdFdSize         #The size in bytes of the FLASH Device
+Size          = 0x00100000|gArmTokenSpaceGuid.PcdFdSize         #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x1
-NumBlocks     = 0x80000
+NumBlocks     = 0x100000
 
 ################################################################################
 #
@@ -49,12 +49,12 @@ NumBlocks     = 0x80000
 #
 ################################################################################
 !if $(EDK2_SECOND_STAGE_BOOTOLADER) == 1
-0x00000000|0x00080000
+0x00000000|0x00100000
 !else
 # 512 bytes of configuration header & 8 bytes of image header
 0x00000000|0x00000208
 
-0x00000208|0x0007FDF8
+0x00000208|0x000FFDF8
 !endif
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
@@ -125,7 +125,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # Nand Flash
   #
-  INF Omap44xxPkg/Flash/Flash.inf
+  #INF Omap44xxPkg/Flash/Flash.inf
 
   #
   # MMC/SD
@@ -142,9 +142,6 @@ READ_LOCK_STATUS   = TRUE
   # SoC Drivers
   #
   INF Omap44xxPkg/Gpio/Gpio.inf
-
-#  INF Omap44xxPkg/InterruptDxe/InterruptDxe.inf
-  
   INF Omap44xxPkg/TimerDxe/TimerDxe.inf 
   INF Omap44xxPkg/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
@@ -165,16 +162,15 @@ READ_LOCK_STATUS   = TRUE
   # USB Support
   #
 
-  INF Omap44xxPkg/PciEmulation/PciEmulation.inf
-
-  INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-  INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  #INF Omap44xxPkg/PciEmulation/PciEmulation.inf
+  #INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  #INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  #INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   #
   # UEFI application (Shell Embedded Boot Loader) 
   #  
-  INF EmbeddedPkg/Ebl/Ebl.inf
+  INF ShellBinPkg/UefiShell/UefiShell.inf
 
   #
   # Bds
@@ -299,4 +295,11 @@ READ_LOCK_STATUS   = TRUE
   FILE APPLICATION = $(NAMED_GUID) {
     UI     STRING ="$(MODULE_NAME)" Optional         
     PE32   PE32                         $(INF_OUTPUT)/$(MODULE_NAME).efi
+  }
+
+[Rule.Common.UEFI_APPLICATION.BINARY]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
