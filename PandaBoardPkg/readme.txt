@@ -1,12 +1,28 @@
 
+Overview
+=========
+
+The Panda packages are hosted on http://gitorious.org/omap-romcode/omap-edk2
+This repository contains the latest developments concerning UEFI on PandaBoard.
+Contact: o-deprez@ti.com
+
+Patches from omap-edk2 tree are regularly merged on need basis to
+http://git.linaro.org/gitweb?p=arm/uefi/uefi-next.git by ARM LT team.
+
 History
 ========
 
-PANDA_EDK2_080912 
+11/09/2012 PANDA_EDK2_110912
+    Rebased to uefi-next commit-id 99af201b87a6048c26f372e3f75a46d291b2f683
+    Fix build.sh removing tmp.bin temporary file
+    Fix SerialPollGetControl with returning correct Control parm
+    Comment out Semihostfs from PandaBoardPkg.fdf
+
+08/09/2012 PANDA_EDK2_080912
 	Rebased to linaro-uefi-2012.04 label
 	Boots linux "OMAP Ubuntu Core" kernel
 
-PANDA_EDK2_062512
+06/25/2012 PANDA_EDK2_062512
 	First drop able to boot EBL
 
 Environment setup
@@ -46,36 +62,8 @@ Note: the build was done an Ubuntu 10.04 machine.
 Building
 =========
 
-	1. Clone PandaBoardPkg/Omap44xxPkg
-
-cd $PANDA_UEFI
-git clone git://gitorious.org/omap-romcode/omap-edk2.git
-cd omap-edk2
-git checkout PANDA_EDK2_080912
-
-	2. Clone EDK2 from linaro
-
-cd $PANDA_UEFI
-git clone git://git.linaro.org/arm/uefi/uefi.git linaro-uefi-2012.04
-cd linaro-uefi-2012.04
-git checkout linaro-uefi-2012.04
-
-	3. Link Panda pkgs to EDK2
-
-ln -s $PANDA_UEFI/omap-edk2/PandaBoardPkg $PANDA_UEFI/linaro-uefi-2012.04/edk2
-ln -s $PANDA_UEFI/omap-edk2/Omap44xxPkg $PANDA_UEFI/linaro-uefi-2012.04/edk2
-
-	4. Apply PandaBoardPkg patch for fixing SD card driver
-
-patch -p1 <PandaBoardPkg/patches/0001-fixes-sd-card-identification-on-panda.patch
-patch -p1 <PandaBoardPkg/patches/0001-remove-ASSERT-because-serial-not-yet-initialized.patch
-
-	5. Apply base tools patches from ARM pkg
-
-cd edk2; patch -p1 < ArmPlatformPkg/Documentation/patches/BaseTools-Pending-Patches.patch
-[accept changes, push enter on default choice]
-
-	6. Build
+Build information is found on uefi-next summary page:
+http://git.linaro.org/gitweb?p=arm/uefi/uefi-next.git;a=summary
 
 cd PandaBoardPkg
 ./build.sh RELEASE
@@ -91,7 +79,7 @@ Running EDK2 on Panda
 If you just intend to see how UEFI boots up and make a try with EBL, you
 can just do a raw copy of the firmware image to an SD card (e.g. /dev/sdc):
 
-    dd if=$PANDA_UEFI/linaro-uefi-2012.04/edk2/Build/PandaBoard/RELEASE_ARMGCC/FV/MLO of=/dev/sdc
+    dd if=edk2/Build/PandaBoard/RELEASE_ARMGCC/FV/MLO of=/dev/sdc
 
 Open your favorite serial terminal e.g. 
     minicom -b 115200 -D /dev/ttyS0 -8 --color=on -w -o
@@ -143,7 +131,7 @@ More information on how to format an SD card here:
 *http://www.omappedia.com/wiki/SD_Configuration
 
 5. Drop following files in FAT32 partition:
-	$PANDA_UEFI/linaro-uefi-2012.04/edk2/Build/PandaBoard/RELEASE_ARMGCC/FV/MLO
+	edk2/Build/PandaBoard/RELEASE_ARMGCC/FV/MLO
 	linux/arch/arm/boot/zImage generated at step 1
 
 6. Insert SD card and boot up Panda board.
@@ -159,9 +147,9 @@ PandaBoard ES Rev B1  - EBL (PANDA_EDK2_062512)
 chtool
 =======
 
-The PandaBoardPkg/Tools contains a tool called chtool for creating a Configuration Header
-block for use with the ROM Code boot sequence (in this port it serves as configuration of
-OMAP DPLLs, system clocks, and initlization of external SDRAM).
+The PandaBoardPkg/Tools directory contains a tool called chtool for creating
+a Configuration Header block for use with the ROM Code boot sequence (in this port
+it serves as configuration of OMAP DPLLs, system clocks, and initlization of external SDRAM).
 
 This tool is tracked in the following tree: git://gitorious.org/omap-romcode/chtool.git
 
