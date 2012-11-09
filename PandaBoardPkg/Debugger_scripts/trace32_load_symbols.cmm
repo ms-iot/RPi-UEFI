@@ -178,7 +178,7 @@ load_symbol_file:
     ENTRY &filestring
 
     // the below has to be customized per your environment
-    &filestring="y:"+string.mid("&filestring", 32., string.len("&filestring"))
+    &filestring="x:"+string.mid("&filestring", 36., string.len("&filestring"))
 
     PRINT "&filestring 0x" &load_address
     TDIAG Data.load.elf &filestring &load_address /nocode /noclear
