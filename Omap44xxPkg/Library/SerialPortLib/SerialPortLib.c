@@ -183,6 +183,13 @@ SerialPortGetControl (
   OUT UINT32                  *Control
   )
 {
+  if (SerialPortPoll ()) {
+    // If a character is pending don't set EFI_SERIAL_INPUT_BUFFER_EMPTY
+    *Control = EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
+  } else {
+    *Control = EFI_SERIAL_INPUT_BUFFER_EMPTY | EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
+  }
+
   return RETURN_SUCCESS;
 }
 
