@@ -145,6 +145,7 @@ rm -f $FLASH_BOOT
 #
 $WORKSPACE/PandaBoardPkg/Tools/mkheader.pl $BUILD_ROOT/FV/PANDABOARD_EFI.fd $FLASH_BOOT
 $GENERATE_IMAGE -p OMAP4 -i $WORKSPACE/PandaBoardPkg/ConfigurationHeader.dat -O $FLASH_BOOT
+rm $WORKSPACE/PandaBoardPkg/tmp.bin
 cp $FLASH_BOOT $BUILD_ROOT/FV/MLO
 
 echo Creating debugger scripts
