@@ -14,7 +14,7 @@
 
 #include "PciEmulation.h"
 
-EMBEDDED_EXTERNAL_DEVICE   *gTPS65950;
+EMBEDDED_EXTERNAL_DEVICE   *gTWL6030;
 
 #define HOST_CONTROLLER_OPERATION_REG_SIZE  0x44
 
@@ -81,27 +81,27 @@ ConfigureUSBHost (
   MmioWrite32 (GPIO5_BASE + GPIO_SETDATAOUT, BIT19);
 
   // Get the Power IC protocol
-  Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
+  Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTWL6030);
   ASSERT_EFI_ERROR (Status);  
 
   // Power the USB PHY
   Data = VAUX_DEV_GRP_P1;
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VAUX2_DEV_GRP), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VAUX2_DEV_GRP), 1, &Data);
   ASSERT_EFI_ERROR(Status);
 
   Data = VAUX_DEDICATED_18V;
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VAUX2_DEDICATED), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VAUX2_DEDICATED), 1, &Data);
   ASSERT_EFI_ERROR (Status);  
 
   // Enable power to the USB hub
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
+  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
   ASSERT_EFI_ERROR (Status);
 
   // LEDAON controls the power to the USB host, PWM is disabled
   Data &= ~LEDAPWM;
   Data |= LEDAON;
 
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
   ASSERT_EFI_ERROR (Status);
 }
 
