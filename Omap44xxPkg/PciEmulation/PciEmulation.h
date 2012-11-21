@@ -17,7 +17,7 @@
 
 #include <PiDxe.h>
 
-#include <TPS65950.h>
+#include <TWL6030.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
