@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef __TPS65950_H__
-#define __TPS65950_H__
+#ifndef __TWL6030_H__
+#define __TWL6030_H__
 
 #define EXTERNAL_DEVICE_REGISTER_TO_SLAVE_ADDRESS(x)     (((x) >> 8) & 0xFF)
 #define EXTERNAL_DEVICE_REGISTER_TO_REGISTER(x)          ((x) & 0xFF)
@@ -27,21 +27,19 @@
 #define I2C_ADDR_GRP_ID5      0x12
 
 // MMC definitions.
-#define VMMC1_DEV_GRP         0x82
-#define DEV_GRP_P1            BIT5
+#define VMMC_CFG_GRP          0x98
+#define DEV_GRP_APP           BIT0
 
-#define VMMC1_DEDICATED_REG   0x85 
-#define VSEL_1_85V            0x0
-#define VSEL_2_85V            0x1
-#define VSEL_3_00V            0x2
-#define VSEL_3_15V            0x3
+#define VMMC_CFG_STATE        0x9A
+#define VMMC_CFG_STATE_OFF    0xE0
+#define VMMC_CFG_STATE_ON     0xE1
 
-#define TPS65950_GPIO_CTRL    0xaa  //I2C_ADDR_GRP_ID2
-#define CARD_DETECT_ENABLE    (BIT2 | BIT0) // GPIO ON + GPIO CD1 enabled
+#define VMMC_CFG_VOLTAGE      0x9B
+#define VSEL_3_00V            0x15
 
-
-#define GPIODATAIN1           0x98  //I2C_ADDR_GRP_ID2
-#define CARD_DETECT_BIT       BIT0
+#define MMCCTRL               0xEE
+#define CARD_DET_STS_MMC      BIT0
+#define CARD_DET_CFG          BIT3
 
 // LEDEN register
 #define LEDEN                 0xEE
@@ -77,4 +75,4 @@
 #define GPIODATADIR1          0x9B
 #define SETGPIODATAOUT1       0xA4
 
-#endif //__TPS65950_H__
+#endif //__TWL6030_H__
