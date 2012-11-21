@@ -147,20 +147,16 @@
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80000000
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000
   
-  gOmap44xxTokenSpaceGuid.PcdOmap44xxGpmcOffset|0x6E000000
+  gOmap44xxTokenSpaceGuid.PcdOmap44xxGpmcOffset|0x50000000
   gOmap44xxTokenSpaceGuid.PcdOmap44xxMMCHS1Base|0x4809C000
 
-  # Console  
+  # Console
   gOmap44xxTokenSpaceGuid.PcdOmap44xxConsoleUart|3
   
   # Timers
   gOmap44xxTokenSpaceGuid.PcdOmap44xxArchTimer|3
   gOmap44xxTokenSpaceGuid.PcdOmap44xxFreeTimer|4
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
-
-#  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|77
-#  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|13000000
-
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|26
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|38400000
    
@@ -178,12 +174,8 @@
   Omap44xxPkg/Library/Omap44xxTimerLib/Omap44xxTimerLib.inf  
   Omap44xxPkg/Library/OmapLib/OmapLib.inf
   Omap44xxPkg/Library/OmapDmaLib/OmapDmaLib.inf
-  
-  Omap44xxPkg/Flash/Flash.inf
-  Omap44xxPkg/MMCHSDxe/MMCHS.inf
   Omap44xxPkg/SmbusDxe/Smbus.inf
   Omap44xxPkg/Gpio/Gpio.inf
-  Omap44xxPkg/InterruptDxe/InterruptDxe.inf
   Omap44xxPkg/TimerDxe/TimerDxe.inf 
   Omap44xxPkg/TPS65950Dxe/TPS65950.inf
   
