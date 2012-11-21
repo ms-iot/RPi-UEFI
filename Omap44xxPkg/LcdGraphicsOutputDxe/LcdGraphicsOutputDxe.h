@@ -27,7 +27,7 @@
 #include <Guid/GlobalVariable.h>
 
 #include <Omap4430/Omap4430.h>
-#include <TPS65950.h>
+#include <TWL6030.h>
 
 typedef struct {
   VENDOR_DEVICE_PATH            Guid;
