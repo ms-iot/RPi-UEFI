@@ -13,16 +13,16 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = TPS65950
+  BASE_NAME                      = TWL6030
   FILE_GUID                      = 71fe861a-5450-48b6-bfb0-b93522616f99
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
-  ENTRY_POINT                    = TPS65950Initialize
+  ENTRY_POINT                    = TWL6030Initialize
 
 
 [Sources.common]
-  TPS65950.c
+  TWL6030.c
 
 [Packages]
   MdePkg/MdePkg.dec
