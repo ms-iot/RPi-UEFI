@@ -29,12 +29,12 @@
 
 
 //CONTROL_PBIAS_LITE
-#define CONTROL_PBIAS_LITE    0x48002520
-#define PBIASLITEVMODE0       BIT0
-#define PBIASLITEPWRDNZ0      BIT1
-#define PBIASSPEEDCTRL0       BIT2
-#define PBIASLITEVMODE1       BIT8
-#define PBIASLITEWRDNZ1       BIT9
+#define CONTROL_PBIAS_LITE    0x4a100600
+#define PBIASVMODE3V          BIT21
+#define PBIASLITEPWRDNZ       BIT22
+#define PBIASVMODEERR         BIT23
+#define PBIASHIZ              BIT25
+#define PBIASPWRDNZ           BIT26
 
 #endif // __OMAP4430_H__
 
