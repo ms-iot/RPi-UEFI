@@ -14,7 +14,7 @@
 
 #include <Uefi.h>
 
-#include <TPS65950.h>
+#include <TWL6030.h>
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -101,7 +101,7 @@ EMBEDDED_EXTERNAL_DEVICE ExternalDevice = {
 };
 
 EFI_STATUS
-TPS65950Initialize (
+TWL6030Initialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
