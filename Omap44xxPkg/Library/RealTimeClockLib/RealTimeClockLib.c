@@ -24,10 +24,10 @@
 #include <Protocol/EmbeddedExternalDevice.h>
 
 #include <Omap4430/Omap4430.h>
-#include <TPS65950.h>
+#include <TWL6030.h>
 
 
-EMBEDDED_EXTERNAL_DEVICE   *gTPS65950;
+EMBEDDED_EXTERNAL_DEVICE   *gTWL6030;
 INT16                      TimeZone = EFI_UNSPECIFIED_TIMEZONE;
 
 /**
@@ -64,34 +64,34 @@ LibGetTime (
   ZeroMem(Time, sizeof(EFI_TIME));
 
   // Latch values
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, RTC_CTRL_REG), 1, &Data);
+  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, RTC_CTRL_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
   Data |= BIT6;
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, RTC_CTRL_REG), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, RTC_CTRL_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
 
   // Read registers
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, YEARS_REG), 1, &Data);
+  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, YEARS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
   Time->Year = 2000 + ((Data >> 4) & 0xF) * 10 + (Data & 0xF);
 
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, MONTHS_REG), 1, &Data);
+  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, MONTHS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
   Time->Month = ((Data >> 4) & 0x1) * 10 + (Data & 0xF);
 
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, DAYS_REG), 1, &Data);
+  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, DAYS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
   Time->Day = ((Data >> 4) & 0x3) * 10 + (Data & 0xF);
 
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, HOURS_REG), 1, &Data);
+  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, HOURS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
   Time->Hour = ((Data >> 4) & 0x3) * 10 + (Data & 0xF);
 
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, MINUTES_REG), 1, &Data);
+  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, MINUTES_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
   Time->Minute = ((Data >> 4) & 0x7) * 10 + (Data & 0xF);
 
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, SECONDS_REG), 1, &Data);
+  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, SECONDS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
   Time->Second = ((Data >> 4) & 0x7) * 10 + (Data & 0xF);
 
@@ -153,27 +153,27 @@ LibSetTime (
   OldTpl = gBS->RaiseTPL(TPL_NOTIFY);
 
   Data = Time->Year - 2000;
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, YEARS_REG), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, YEARS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
 
   Data = ((Time->Month / 10) << 4) | (Time->Month % 10);
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, MONTHS_REG), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, MONTHS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
 
   Data = ((Time->Day / 10) << 4) | (Time->Day % 10);
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, DAYS_REG), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, DAYS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
 
   Data = ((Time->Hour / 10) << 4) | (Time->Hour % 10);
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, HOURS_REG), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, HOURS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
 
   Data = ((Time->Minute / 10) << 4) | (Time->Minute % 10);
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, MINUTES_REG), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, MINUTES_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
 
   Data = ((Time->Second / 10) << 4) | (Time->Second % 10);
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, SECONDS_REG), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, SECONDS_REG), 1, &Data);
   if (Status != EFI_SUCCESS) goto EXIT;
 
   TimeZone = Time->TimeZone;
@@ -256,13 +256,13 @@ LibRtcInitialize (
   EFI_TPL       OldTpl;
 #endif
 
-  Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
+  Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTWL6030);
   ASSERT_EFI_ERROR(Status);
 
 #if 0
   OldTpl = gBS->RaiseTPL(TPL_NOTIFY);
   Data = 1;
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, RTC_CTRL_REG), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, RTC_CTRL_REG), 1, &Data);
   ASSERT_EFI_ERROR(Status);
   gBS->RestoreTPL(OldTpl);
 #endif
