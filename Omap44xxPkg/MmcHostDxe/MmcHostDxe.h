@@ -35,7 +35,7 @@
 #include <Protocol/MmcHost.h>
 
 #include <Omap4430/Omap4430.h>
-#include <TPS65950.h>
+#include <TWL6030.h>
 
 #define MAX_RETRY_COUNT  (100*5)
 
