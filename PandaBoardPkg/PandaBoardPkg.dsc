@@ -77,6 +77,7 @@
 #  PeCoffExtraActionLib|ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf
   PeCoffExtraActionLib|ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
 #  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
+
   
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
@@ -85,7 +86,7 @@
   
   SerialPortLib|Omap44xxPkg/Library/SerialPortLib/SerialPortLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
-  
+
   RealTimeClockLib|Omap44xxPkg/Library/RealTimeClockLib/RealTimeClockLib.inf
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -192,6 +193,7 @@
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
+  DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -262,7 +264,7 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"PandaEdk2"
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0
-  gArmPlatformTokenSpaceGuid.PcdCoreCount|4
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|2
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
@@ -342,9 +344,6 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x48241000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x48240100
   
-  gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x80000000
-  gEmbeddedTokenSpaceGuid.PcdMemorySize|0x08000000
-
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x08000000
 
@@ -367,12 +366,10 @@
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
 
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from SD"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(1,MBR,0x00000000,0x3F,0x2348A)/zImage"
-
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyO2,115200n8 mem=456M@0x80000000 root=/dev/mmcblk0p2 rw rootdelay=2 init=/linuxrc vram='10M' omapfb.vram='0:4M' earlyprintk loglevel=7"
-	
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(1,MBR,0xB663049F,0x3F,0x13986)/zImage"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|3
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(1,MBR,0xB663049F,0x3F,0x13986)/omap4-panda.dtb"
 
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi();VenHw(E68088EF-D1A4-4336-C1DB-4D3A204730A6)"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"
@@ -381,7 +378,7 @@
   # ARM OS Loader
   #
   # PandaBoard machine type required for ARM Linux: 
-  gArmTokenSpaceGuid.PcdArmMachineType|2160
+  gArmTokenSpaceGuid.PcdArmMachineType|2791
 
 ################################################################################
 #
@@ -420,8 +417,7 @@
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf  
   EmbeddedPkg/SerialDxe/SerialDxe.inf
-  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
- 
+  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf 
 #
 # This version uses semi-hosting console  
 #  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf {
@@ -432,11 +428,6 @@
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
-
-  #
-  # Semi-hosting filesystem
-  #
-  ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
   
   #
   # FAT filesystem + GPT/MBR partitioning
@@ -462,11 +453,6 @@
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   #
-  # Nand Flash
-  #
-  Omap44xxPkg/Flash/Flash.inf
-
-  #
   # MMC/SD
   #
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
@@ -481,15 +467,13 @@
   # SoC Drivers
   #
   Omap44xxPkg/Gpio/Gpio.inf
-#  Omap44xxPkg/InterruptDxe/InterruptDxe.inf
-  
   Omap44xxPkg/TimerDxe/TimerDxe.inf 
   Omap44xxPkg/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
   #
   # Power IC
   #
-  Omap44xxPkg/TPS65950Dxe/TPS65950.inf
+  Omap44xxPkg/TWL6030Dxe/TWL6030.inf
   
   #
   # Application

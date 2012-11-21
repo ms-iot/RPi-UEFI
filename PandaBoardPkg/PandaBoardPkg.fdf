@@ -109,24 +109,12 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf  
   INF EmbeddedPkg/SerialDxe/SerialDxe.inf
-  INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+  INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf  
 
   INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   
-#!if $(TARGET) == RELEASE
-  #
-  # Semi-hosting filesystem
-  #
-#  INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
-#!endif
-  
-  #
-  # Nand Flash
-  #
-  #INF Omap44xxPkg/Flash/Flash.inf
-
   #
   # MMC/SD
   #
@@ -148,7 +136,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # Power IC
   #
-  INF Omap44xxPkg/TPS65950Dxe/TPS65950.inf
+  INF Omap44xxPkg/TWL6030Dxe/TWL6030.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning
@@ -159,7 +147,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   #
-  # USB Support
+  # USB Support (not supported currently)
   #
 
   #INF Omap44xxPkg/PciEmulation/PciEmulation.inf
@@ -170,7 +158,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # UEFI application (Shell Embedded Boot Loader) 
   #  
-  INF ShellBinPkg/UefiShell/UefiShell.inf
+  INF ShellBinPkg/UefiShell/UefiShell.inf 
 
   #
   # Bds
@@ -290,11 +278,18 @@ READ_LOCK_STATUS   = TRUE
     UI           STRING="$(MODULE_NAME)" Optional
   }
 
-
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
     UI     STRING ="$(MODULE_NAME)" Optional         
     PE32   PE32                         $(INF_OUTPUT)/$(MODULE_NAME).efi
+  }
+
+[Rule.Common.UEFI_DRIVER.BINARY]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional      |.depex
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.UEFI_APPLICATION.BINARY]
