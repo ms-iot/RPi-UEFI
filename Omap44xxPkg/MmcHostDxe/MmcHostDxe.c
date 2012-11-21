@@ -15,7 +15,7 @@
 
 #include "MmcHostDxe.h"
 
-EMBEDDED_EXTERNAL_DEVICE   *gTPS65950;
+EMBEDDED_EXTERNAL_DEVICE   *gTWL6030;
 UINT8                      mMaxDataTransferRate = 0;
 UINT32                     mRca = 0;
 BOOLEAN                    mBitModeSet = FALSE;
@@ -250,39 +250,51 @@ InitializeMMCHS (
   VOID
   )
 {
-  // TODO: adapt to Panda
-#if 0
   UINT8      Data;
   EFI_STATUS Status;
-#endif
 
   DEBUG ((DEBUG_BLKIO, "InitializeMMCHS()\n"));
 
-#if 0
-  // Select Device group to belong to P1 device group in Power IC.
-  Data = DEV_GRP_P1;
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VMMC1_DEV_GRP), 1, &Data);
+  // Disconnect PBIAS prior to voltage change 
+  MmioAnd32 (CONTROL_PBIAS_LITE, ~(PBIASPWRDNZ | PBIASLITEPWRDNZ));
+
+  //  Disable VMMC LDO
+  Data = VMMC_CFG_STATE_OFF;
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID1, VMMC_CFG_STATE), 1, &Data);
   ASSERT_EFI_ERROR(Status);
 
-  // Configure voltage regulator for MMC1 in Power IC to output 3.0 voltage.
+  // Wait for stabilization
+  gBS->Stall(500);
+
+  // Configure VMMC LDO to output 3.0 voltage.
   Data = VSEL_3_00V;
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VMMC1_DEDICATED_REG), 1, &Data);
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID1, VMMC_CFG_VOLTAGE), 1, &Data);
   ASSERT_EFI_ERROR(Status);
-  
-  // After ramping up voltage, set VDDS stable bit to indicate that voltage level is stable.
-  MmioOr32 (CONTROL_PBIAS_LITE, (PBIASLITEVMODE0 | PBIASLITEPWRDNZ0 | PBIASSPEEDCTRL0 | PBIASLITEVMODE1 | PBIASLITEWRDNZ1));
 
-  // Enable WP GPIO
-  MmioAndThenOr32 (GPIO1_BASE + GPIO_OE, ~BIT23, BIT23);
+  // Enable VMMC LDO
+  Data = VMMC_CFG_STATE_ON;
+  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID1, VMMC_CFG_STATE), 1, &Data);
+  ASSERT_EFI_ERROR(Status);
+ 
+  // Wait for stabilization
+  gBS->Stall(500);
 
-  // Enable Card Detect
-  Data = CARD_DETECT_ENABLE;
-  gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID2, TPS65950_GPIO_CTRL), 1, &Data);
+  // PBIAS in normal operating mode (not HiZ)
+  MmioAnd32 (CONTROL_PBIAS_LITE, ~PBIASHIZ);
 
+  // Select VMODE=3V and connect VDDS_MMC1 to PBIAS
+  MmioOr32 (CONTROL_PBIAS_LITE, (PBIASVMODE3V|PBIASLITEPWRDNZ));
+
+  // Wait for PBIAS supply detection
+  gBS->Stall(100);
+
+  // Connect pads
+  MmioOr32 (CONTROL_PBIAS_LITE, PBIASPWRDNZ);
+
+  // Stop here if supply detector did not sense 3V
+  ASSERT( !(MmioRead32(CONTROL_PBIAS_LITE) & PBIASVMODEERR) );
+ 
   return Status;
-#endif
-
-  return (1);
 }
 
 BOOLEAN
@@ -290,24 +302,18 @@ MMCIsCardPresent (
   IN EFI_MMC_HOST_PROTOCOL     *This
   )
 {
-  // TODO: adapt to Panda
-  // Always return card present presently
-  return (1);
-
-#if 0
   EFI_STATUS  Status;
   UINT8       Data;
   
   //
-  // Card detect is a GPIO0 on the TPS65950
+  // Card detect is a GPIO0 on the TWL6030
   //
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID2, GPIODATAIN1), 1, &Data);
+  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID1, MMCCTRL), 1, &Data);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
-  return !(Data & CARD_DETECT_BIT);
-#endif
+  return !(Data & CARD_DET_STS_MMC);
 
 }
 
@@ -677,7 +683,7 @@ MMCInitialize (
 
   DEBUG ((DEBUG_BLKIO, "MMCInitialize()\n"));
 
-  Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
+  Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTWL6030);
   ASSERT_EFI_ERROR(Status);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
