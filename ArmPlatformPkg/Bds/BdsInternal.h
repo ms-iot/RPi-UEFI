@@ -38,6 +38,11 @@
 #define BOOT_DEVICE_OPTION_MAX        300
 #define BOOT_DEVICE_ADDRESS_MAX       (sizeof(L"0x0000000000000000"))
 
+// Length of the buffer used to hold the user input for the main menu
+// This includes the NULL terminator
+// 1 chars + NULL gives room for up to 9 boot device configs
+#define BOOT_OPTION_LEN   2
+
 #define ARM_BDS_OPTIONAL_DATA_SIGNATURE   SIGNATURE_32('a', 'b', 'o', 'd')
 
 #define IS_ARM_BDS_BOOTENTRY(ptr)  (ReadUnaligned32 ((CONST UINT32*)&((ARM_BDS_LOADER_OPTIONAL_DATA*)((ptr)->OptionalData))->Header.Signature) == ARM_BDS_OPTIONAL_DATA_SIGNATURE)
@@ -48,16 +53,20 @@
 typedef enum {
     BDS_LOADER_EFI_APPLICATION = 0,
     BDS_LOADER_KERNEL_LINUX_ATAG,
-    BDS_LOADER_KERNEL_LINUX_FDT,
+    BDS_LOADER_KERNEL_LINUX_GLOBAL_FDT,
+    BDS_LOADER_KERNEL_LINUX_LOCAL_FDT,
 } ARM_BDS_LOADER_TYPE;
 
 typedef struct {
   UINT16                     CmdLineSize;
   UINT16                     InitrdSize;
 
+  UINT16                     FdtLocalSize;
+
   // These following fields have variable length and are packed:
   //CHAR8                      *CmdLine;
   //EFI_DEVICE_PATH_PROTOCOL   *InitrdPathList;
+  //EFI_DEVICE_PATH_PROTOCOL   *FdtLocalPathList;
 } ARM_BDS_LINUX_ARGUMENTS;
 
 typedef union {
