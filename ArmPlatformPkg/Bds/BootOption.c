@@ -33,6 +33,7 @@ BootOptionStart (
   UINTN                                 CmdLineSize;
   UINTN                                 InitrdSize;
   EFI_DEVICE_PATH*                      Initrd;
+  UINTN                                 FdtLocalSize;
   UINT16                                LoadOptionIndexSize;
 
   if (IS_ARM_BDS_BOOTENTRY (BootOption)) {
@@ -59,7 +60,7 @@ BootOptionStart (
       Status = BdsBootLinuxAtag (BootOption->FilePathList,
                                  Initrd, // Initrd
                                  (CHAR8*)(LinuxArguments + 1)); // CmdLine
-    } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_FDT) {
+    } else if ((LoaderType == BDS_LOADER_KERNEL_LINUX_GLOBAL_FDT) || (LoaderType == BDS_LOADER_KERNEL_LINUX_LOCAL_FDT)) {
       LinuxArguments = &(OptionalData->Arguments.LinuxArguments);
       CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
       InitrdSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->InitrdSize);
@@ -70,17 +71,27 @@ BootOptionStart (
         Initrd = NULL;
       }
 
-      // Get the default FDT device path
-      Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
-      ASSERT_EFI_ERROR(Status);
-      DefaultFdtDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdFdtDevicePath));
+      if (LoaderType == BDS_LOADER_KERNEL_LINUX_LOCAL_FDT) {
+        FdtLocalSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->FdtLocalSize);
 
-      // Get the FDT device path
-      FdtDevicePathSize = GetDevicePathSize (DefaultFdtDevicePath);
-      Status = GetEnvironmentVariable ((CHAR16 *)L"Fdt", &gArmGlobalVariableGuid,
-                 DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
-      ASSERT_EFI_ERROR(Status);
+        if (FdtLocalSize > 0) {
+          FdtDevicePath = GetAlignedDevicePath ((EFI_DEVICE_PATH*)((UINTN)(LinuxArguments + 1) + CmdLineSize + InitrdSize));
+        } else {
+          FdtDevicePath = NULL;
+        }
+      } else  {
+        // Get the default FDT device path
+        Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
+        ASSERT_EFI_ERROR(Status);
+        DefaultFdtDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdFdtDevicePath));
 
+        // Get the FDT device path
+        FdtDevicePathSize = GetDevicePathSize (DefaultFdtDevicePath);
+        Status = GetEnvironmentVariable ((CHAR16 *)L"Fdt", &gArmGlobalVariableGuid,
+                   DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
+        ASSERT_EFI_ERROR(Status);
+        FreePool (DefaultFdtDevicePath);
+      }
       Status = BdsBootLinuxFdt (BootOption->FilePathList,
                                 Initrd, // Initrd
                                 (CHAR8*)(LinuxArguments + 1),
@@ -159,6 +170,7 @@ BootOptionSetFields (
   UINT16                        FilePathListLength;
   UINT8*                        EfiLoadOptionPtr;
   UINT8*                        InitrdPathListPtr;
+  UINT8*                        FdtLocalPathListPtr;
   UINTN                         OptionalDataSize;
   ARM_BDS_LINUX_ARGUMENTS*      DestLinuxArguments;
   ARM_BDS_LINUX_ARGUMENTS*      SrcLinuxArguments;
@@ -170,8 +182,8 @@ BootOptionSetFields (
 
   BootDescriptionSize = StrSize (BootDescription);
   BootOptionalDataSize = sizeof(ARM_BDS_LOADER_OPTIONAL_DATA_HEADER);
-  if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
-    BootOptionalDataSize += sizeof(ARM_BDS_LINUX_ARGUMENTS) + BootArguments->LinuxArguments.CmdLineSize + BootArguments->LinuxArguments.InitrdSize;
+  if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_GLOBAL_FDT) || (BootType == BDS_LOADER_KERNEL_LINUX_LOCAL_FDT)) {
+    BootOptionalDataSize += sizeof(ARM_BDS_LINUX_ARGUMENTS) + BootArguments->LinuxArguments.CmdLineSize + BootArguments->LinuxArguments.InitrdSize + BootArguments->LinuxArguments.FdtLocalSize;
   }
 
   // Compute the size of the FilePath list
@@ -213,12 +225,13 @@ BootOptionSetFields (
 
   OptionalDataSize = sizeof(ARM_BDS_LOADER_OPTIONAL_DATA_HEADER);
 
-  if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
+  if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_GLOBAL_FDT) || (BootType == BDS_LOADER_KERNEL_LINUX_LOCAL_FDT)) {
     SrcLinuxArguments = &(BootArguments->LinuxArguments);
     DestLinuxArguments = &((ARM_BDS_LOADER_OPTIONAL_DATA*)EfiLoadOptionPtr)->Arguments.LinuxArguments;
 
     WriteUnaligned16 ((UINT16 *)&(DestLinuxArguments->CmdLineSize), SrcLinuxArguments->CmdLineSize);
     WriteUnaligned16 ((UINT16 *)&(DestLinuxArguments->InitrdSize), SrcLinuxArguments->InitrdSize);
+    WriteUnaligned16 ((UINT16 *)&(DestLinuxArguments->FdtLocalSize), SrcLinuxArguments->FdtLocalSize);
     OptionalDataSize += sizeof (ARM_BDS_LINUX_ARGUMENTS);
 
     if (SrcLinuxArguments->CmdLineSize > 0) {
@@ -229,6 +242,11 @@ BootOptionSetFields (
     if (SrcLinuxArguments->InitrdSize > 0) {
       InitrdPathListPtr = (UINT8*)((UINTN)(DestLinuxArguments + 1) + SrcLinuxArguments->CmdLineSize);
       CopyMem (InitrdPathListPtr, (VOID*)((UINTN)(SrcLinuxArguments + 1) + SrcLinuxArguments->CmdLineSize), SrcLinuxArguments->InitrdSize);
+    }
+
+    if (SrcLinuxArguments->FdtLocalSize > 0) {
+      FdtLocalPathListPtr = (UINT8*)((UINTN)(DestLinuxArguments + 1) + SrcLinuxArguments->CmdLineSize + SrcLinuxArguments->InitrdSize);
+      CopyMem (FdtLocalPathListPtr, (VOID*)((UINTN)(SrcLinuxArguments + 1) + SrcLinuxArguments->CmdLineSize + SrcLinuxArguments->InitrdSize), SrcLinuxArguments->FdtLocalSize);
     }
   }
   BootOption->OptionalDataSize = OptionalDataSize;
