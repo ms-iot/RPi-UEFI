@@ -136,6 +136,8 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|0|UINT32|0x00000010
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L""|VOID*|0x00000011
   
+  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L""|VOID*|0x0000002E
+
   ## Timeout value for displaying progressing bar in before boot OS.
   #  According to UEFI 2.0 spec, the default TimeOut should be 0xffff.
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x0000001A
