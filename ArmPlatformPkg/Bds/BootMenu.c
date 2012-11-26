@@ -639,6 +639,9 @@ BootMenuMain (
   UINTN                         Index;
   UINTN                         BootMainEntryCount;
   CHAR8                         BootOptionSelectedStr[32];
+  EFI_DEVICE_PATH_PROTOCOL*     DefaultFdtDevicePath;
+  UINTN                         FdtDevicePathSize;
+
 
   BootOption              = NULL;
   BootMainEntryCount = sizeof(BootMainEntries) / sizeof(struct BOOT_MAIN_ENTRY);
@@ -713,6 +716,33 @@ BootMenuMain (
       OptionCount++;
     }
     BootOptionCount = OptionCount-1;
+
+    // Display the global FDT config
+    Print(L"-----------------------\n");
+      {
+        EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL*   EfiDevicePathFromTextProtocol;
+        EFI_DEVICE_PATH_PROTOCOL*             FdtDevicePath;
+        EFI_DEVICE_PATH_TO_TEXT_PROTOCOL*     DevicePathToTextProtocol;
+        CHAR16*                               DevicePathTxt;
+
+        // Get the default FDT device path
+        Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
+        ASSERT_EFI_ERROR(Status);
+        DefaultFdtDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdFdtDevicePath));
+
+        // Get the FDT device path
+        FdtDevicePathSize = GetDevicePathSize (DefaultFdtDevicePath);
+        Status = GetEnvironmentVariable ((CHAR16 *)L"Fdt", &gArmGlobalVariableGuid, DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
+
+        // Convert FdtDevicePath to text
+        if (EFI_ERROR(Status)) {
+          DevicePathTxt = L"not configured";
+        } else {
+          Status = gBS->LocateProtocol (&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
+          DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText ( FdtDevicePath, TRUE, TRUE );
+        }
+        Print(L"Global FDT Config\n\t- %s\n", DevicePathTxt);
+      }
 
     // Display the hardcoded Boot entries
     Print(L"-----------------------\n");
