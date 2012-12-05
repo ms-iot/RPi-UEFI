@@ -1,0 +1,101 @@
+#/** @file
+# Arm RealView EB package.
+#
+# Copyright (c) 2012, Samsung Electronics Co. All rights reserved.<BR>
+#
+#    This program and the accompanying materials are licensed and made available under
+#    the terms and conditions of the BSD License which accompanies this distribution.
+#    The full text of the license may be found at
+#    http://opensource.org/licenses/bsd-license.php
+#
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = ExynosPkg
+  PACKAGE_GUID                   = ec1a4982-4a00-47e7-8df5-69c8ce895427
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[Guids.common]
+  gExynosPkgTokenSpaceGuid    =  { 0x70b6655a, 0x7a03, 0x11e0, { 0xbe, 0x19, 0x00, 0x26, 0xb9, 0x73, 0x3e, 0x2c} }
+
+[PcdsFeatureFlag.common]
+
+[PcdsFixedAtBuild.common]
+
+  #
+  # Samsung
+  #
+  # Framebuffer Base Address and size
+  gExynosPkgTokenSpaceGuid.PcdFrameBufferBase|0|UINT32|0x4E000000
+  gExynosPkgTokenSpaceGuid.PcdFrameBufferSize|0|UINT32|0x00400000
+
+  # Memory Partition : Shared memory 1MB (0x4000_0000 -- 0x4010_0000)
+  gExynosPkgTokenSpaceGuid.PcdSmemBaseAddress|0|UINT32|0x40000000
+  gExynosPkgTokenSpaceGuid.PcdSmemSize|0|UINT32|0x00100000
+
+ # Memory Partition : EMMC DMA buffer Address and Size 1MB (0x4030_0000 -- 0x4040_0000)
+  gExynosPkgTokenSpaceGuid.PcdEmmcDMABufferBase|0|UINT32|0x40300000
+#  gExynosPkgTokenSpaceGuid.PcdEmmcDMABufferSize|0|UINT32|0x00100000
+
+  ## iRam Base Address and size.
+  gExynosPkgTokenSpaceGuid.PcdiRamBootBase|0|UINT32|0x00020000
+  gExynosPkgTokenSpaceGuid.PcdiRamBootSize|0|UINT32|0x00020001
+
+  gExynosPkgTokenSpaceGuid.PcdiRamStackBase|0|UINT32|0x00020002
+  gExynosPkgTokenSpaceGuid.PcdiRamStackSize|0|UINT32|0x00020003
+
+  gExynosPkgTokenSpaceGuid.PcdMpSharedArgsBase|0x8ff00000|UINT32|0x00000020
+  gExynosPkgTokenSpaceGuid.PcdMpSharedArgsSize|0x00100000|UINT32|0x00000021
+
+  gExynosPkgTokenSpaceGuid.PcdPeiServicePtrAddr|0|UINT32|0x00000003
+  gExynosPkgTokenSpaceGuid.PcdConsoleUartBase|0|UINT32|0x00000004
+  gExynosPkgTokenSpaceGuid.PcdWinDebugUartBase|0|UINT32|0x00000005
+  gExynosPkgTokenSpaceGuid.PcdCmuBase|0|UINT32|0x00000006
+  gExynosPkgTokenSpaceGuid.PcdPWMTimerBase|0|UINT32|0x00000007
+  gExynosPkgTokenSpaceGuid.PcdPmuBase|0|UINT32|0x00000008
+  gExynosPkgTokenSpaceGuid.PcdGdbUartBase|0|UINT32|0x00000009
+  gExynosPkgTokenSpaceGuid.PcdGpioPart1Base|0|UINT32|0x0000000A
+  gExynosPkgTokenSpaceGuid.PcdGpioPart2Base|0|UINT32|0x0000000B
+  gExynosPkgTokenSpaceGuid.PcdGpioPart3Base|0|UINT32|0x0000000C
+  gExynosPkgTokenSpaceGuid.PcdGpioPart4Base|0|UINT32|0x0000000D
+  gExynosPkgTokenSpaceGuid.PcdSdMmcBase|0|UINT32|0x0000000E
+  gExynosPkgTokenSpaceGuid.PcdSysBase|0|UINT32|0x0000000F
+  gExynosPkgTokenSpaceGuid.PcdFIMD1Base|0|UINT32|0x00000010
+  gExynosPkgTokenSpaceGuid.PcdGICBase|0|UINT32|0x00000011
+  gExynosPkgTokenSpaceGuid.PcdTZPCBase|0|UINT32|0x00000012
+  gExynosPkgTokenSpaceGuid.PcdDSIM1Base|0|UINT32|0x00000013
+  gExynosPkgTokenSpaceGuid.PcdSMC911XBase|0|UINT32|0x00000014
+  gExynosPkgTokenSpaceGuid.PcdRtcBase|0|UINT32|0x00000015
+  gExynosPkgTokenSpaceGuid.PcdExynos5250Evt1|FALSE|BOOLEAN|0x00000016
+  gExynosPkgTokenSpaceGuid.PcdSdMmcCH0Base|0|UINT32|0x00000017
+  gExynosPkgTokenSpaceGuid.PcdCryptoBase|0|UINT32|0x00000018
+
+
+  #
+  # SMBIOS related
+  #
+  gExynosPkgTokenSpaceGuid.PcdProcessorInfoSockInfoStr|"Samsung Exynos5250"|VOID*|0x00000A00
+  # Following can be changed by OEM's as it suits their products
+  gExynosPkgTokenSpaceGuid.PcdSystemMfrStr|"Samsung's OEM"|VOID*|0x00000A01
+  gExynosPkgTokenSpaceGuid.PcdSystemProductNameStr|"Exynos5250 Product"|VOID*|0x00000A02
+  gExynosPkgTokenSpaceGuid.PcdSystemProductFamilyStr|"Exynos5250 Product Family"|VOID*|0x00000A03
+
+
+# Samsung specific GUID = be26dd4f-9d02-413c-aa4f-dcd4aa334122
+[Protocols.common]
