@@ -1,0 +1,150 @@
+From 011bc2be4b3f2a5a5413511d7380b6fe3632d0f5 Mon Sep 17 00:00:00 2001
+From: Shivamurthy Shastri <shiva.murthy@samsung.com>
+Date: Wed, 5 Dec 2012 14:44:57 +0530
+Subject: [PATCH] The patch created to incorporate auto boot feature for
+ arndale board.
+
+Signed-off-by: Shivamurthy Shastri <shiva.murthy@samsung.com>
+---
+ ArmPlatformPkg/Bds/BootOption.c | 71 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 67 insertions(+), 4 deletions(-)
+
+diff --git a/ArmPlatformPkg/Bds/BootOption.c b/ArmPlatformPkg/Bds/BootOption.c
+index 289d36a..468050d 100644
+--- a/ArmPlatformPkg/Bds/BootOption.c
++++ b/ArmPlatformPkg/Bds/BootOption.c
+@@ -14,6 +14,11 @@
+ 
+ #include "BdsInternal.h"
+ 
++#include <Library/DxeServicesTableLib.h>
++#include <Protocol/BlockIo.h>
++#include <Guid/DebugImageInfoTable.h>
++#include <Protocol/DevicePathToText.h>
++
+ extern EFI_HANDLE mImageHandle;
+ 
+ EFI_STATUS
+@@ -22,26 +27,61 @@ BootOptionStart (
+   )
+ {
+   EFI_STATUS                            Status;
+-  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL*   EfiDevicePathFromTextProtocol;
++  //EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL*   EfiDevicePathFromTextProtocol;
+   UINT32                                LoaderType;
+   ARM_BDS_LOADER_OPTIONAL_DATA*         OptionalData;
+   ARM_BDS_LINUX_ARGUMENTS*              LinuxArguments;
+   EFI_DEVICE_PATH_PROTOCOL*             FdtDevicePath;
+-  EFI_DEVICE_PATH_PROTOCOL*             DefaultFdtDevicePath;
+-  UINTN                                 FdtDevicePathSize;
++  //EFI_DEVICE_PATH_PROTOCOL*             DefaultFdtDevicePath;
++  //UINTN                                 FdtDevicePathSize;
+   UINTN                                 CmdLineSize;
+   UINTN                                 InitrdSize;
+   EFI_DEVICE_PATH*                      Initrd;
+   UINT16                                LoadOptionIndexSize;
+ 
++  UINTN                     HandleCount;
++  EFI_HANDLE                *HandleBuffer;
++  UINTN                     Index;
++  //CHAR16*                   String;
++  //EFI_DEVICE_PATH_PROTOCOL* DevicePathProtocol;
++  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL*  DevicePathToTextProtocol;
++  EFI_DEVICE_PATH_PROTOCOL  *LoadImageDevicePath;
++  EFI_DEVICE_PATH_PROTOCOL  *FileSystemDevicePath;
++
+   if (IS_ARM_BDS_BOOTENTRY (BootOption)) {
+     Status = EFI_UNSUPPORTED;
+     OptionalData = BootOption->OptionalData;
+     LoaderType = ReadUnaligned32 ((CONST UINT32*)&OptionalData->Header.LoaderType);
+ 
++    BdsConnectAllDrivers();
++
++    Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
++      if (EFI_ERROR (Status)) {
++        AsciiPrint ("Did not find the DevicePathToTextProtocol.\n");
++        return Status;
++      }
++
++      Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &HandleCount, &HandleBuffer);
++      if (EFI_ERROR (Status)) {
++        AsciiPrint ("No device path found\n");
++        return Status;
++      }
++
++      /*for (Index = 0; Index < HandleCount; Index++) {
++          Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID **)&DevicePathProtocol);
++          String = DevicePathToTextProtocol->ConvertDevicePathToText(DevicePathProtocol,TRUE,TRUE);
++          Print (L"[0x%X] %s\n",(UINT32)HandleBuffer[Index], String);
++      }*/
++
++     for (Index = 0; Index < HandleCount; Index++) {
++         //Get the device path
++         FileSystemDevicePath = DevicePathFromHandle(HandleBuffer[Index]);
++         if (FileSystemDevicePath == NULL) {
++                continue;
++         }
++
+     if (LoaderType == BDS_LOADER_EFI_APPLICATION) {
+       // Need to connect every drivers to ensure no dependencies are missing for the application
+-      BdsConnectAllDrivers();
+ 
+       Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList, 0, NULL);
+     } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) {
+@@ -55,9 +95,18 @@ BootOptionStart (
+         Initrd = NULL;
+       }
+ 
++      //Check if zImage file on SD-MMC.
++      LoadImageDevicePath = FileDevicePath(HandleBuffer[Index], L"uImage");
++      Status = BdsBootLinuxAtag (LoadImageDevicePath, Initrd, (CHAR8*)(LinuxArguments + 1));
++      if (EFI_ERROR(Status)) {
++      	continue;
++      }
++
++#if 0
+       Status = BdsBootLinuxAtag (BootOption->FilePathList,
+                                  Initrd, // Initrd
+                                  (CHAR8*)(LinuxArguments + 1)); // CmdLine
++#endif
+     } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_FDT) {
+       LinuxArguments = &(OptionalData->Arguments.LinuxArguments);
+       CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
+@@ -69,6 +118,7 @@ BootOptionStart (
+         Initrd = NULL;
+       }
+ 
++#if 0
+       // Get the default FDT device path
+       Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
+       ASSERT_EFI_ERROR(Status);
+@@ -78,13 +128,26 @@ BootOptionStart (
+       FdtDevicePathSize = GetDevicePathSize (DefaultFdtDevicePath);
+       Status = GetEnvironmentVariable ((CHAR16 *)L"Fdt", DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
+       ASSERT_EFI_ERROR(Status);
++#endif
++
++      //Check if zImage file on SD-MMC.
++      LoadImageDevicePath = FileDevicePath(HandleBuffer[Index], L"uImage");
++      FdtDevicePath = FileDevicePath(HandleBuffer[Index], L"exynos5250-arndale.dtb");
++      Status = BdsBootLinuxFdt (LoadImageDevicePath, Initrd, (CHAR8*)(LinuxArguments + 1), FdtDevicePath);
++      FreePool (FdtDevicePath);
++      if (EFI_ERROR(Status)) {
++        continue;
++      }
++     }
+ 
++#if 0
+       Status = BdsBootLinuxFdt (BootOption->FilePathList,
+                                 Initrd, // Initrd
+                                 (CHAR8*)(LinuxArguments + 1),
+                                 FdtDevicePath);
+ 
+       FreePool (FdtDevicePath);
++#endif
+     }
+   } else {
+     // Set BootCurrent variable
+-- 
+1.8.0
+
