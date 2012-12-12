@@ -15,7 +15,7 @@
 
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
-  PACKAGE_NAME                   = SamsungPlatformPkg
+  PACKAGE_NAME                   = SamsungPlatformPkgOrigen
   PACKAGE_GUID                   = ec1a4982-4a00-47e7-8df5-69c8ce895427
   PACKAGE_VERSION                = 0.1
 

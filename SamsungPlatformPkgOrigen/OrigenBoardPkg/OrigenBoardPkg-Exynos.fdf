@@ -168,7 +168,7 @@ READ_LOCK_STATUS   = TRUE
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   INF   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
-  INF SamsungPlatformPkg/ExynosPkg/TimerDxe/TimerDxe.inf
+  INF SamsungPlatformPkgOrigen/ExynosPkg/TimerDxe/TimerDxe.inf
 
   #
   # ACPI Support
@@ -177,8 +177,8 @@ READ_LOCK_STATUS   = TRUE
   #
   # Samsung specific Driver
   #
-  INF SamsungPlatformPkg/ExynosPkg/SDHCDxe/SDHCDxe.inf
-  INF SamsungPlatformPkg/ExynosPkg/Gpio/Gpio.inf
+  INF SamsungPlatformPkgOrigen/ExynosPkg/SDHCDxe/SDHCDxe.inf
+  INF SamsungPlatformPkgOrigen/ExynosPkg/Gpio/Gpio.inf
   #
   # PCI EMULATION
   #

@@ -26,8 +26,8 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  SamsungPlatformPkg/ExynosPkg/ExynosPkg.dec
-  SamsungPlatformPkg/SamsungPlatformPkg.dec
+  SamsungPlatformPkgOrigen/ExynosPkg/ExynosPkg.dec
+  SamsungPlatformPkgOrigen/SamsungPlatformPkg.dec
 
 [LibraryClasses]
   IoLib

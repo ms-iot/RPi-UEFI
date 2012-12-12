@@ -28,7 +28,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  SamsungPlatformPkg/SmdkBoardPkg/SmdkBoardPkg.dec
+  SamsungPlatformPkgOrigen/SmdkBoardPkg/SmdkBoardPkg.dec
 
 [LibraryClasses]
   BaseLib

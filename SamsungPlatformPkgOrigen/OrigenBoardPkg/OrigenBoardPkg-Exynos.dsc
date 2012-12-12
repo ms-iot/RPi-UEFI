@@ -25,7 +25,7 @@
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = SamsungPlatformPkg/OrigenBoardPkg/OrigenBoardPkg-Exynos.fdf
+  FLASH_DEFINITION               = SamsungPlatformPkgOrigen/OrigenBoardPkg/OrigenBoardPkg-Exynos.fdf
 
 [LibraryClasses.common]
 !if $(TARGET) == RELEASE
@@ -36,12 +36,12 @@
   UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
 !endif
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
-  ArmPlatformLib|SamsungPlatformPkg/SmdkBoardPkg/Library/SmdkBoardLib/SmdkBoardLib.inf
+  ArmPlatformLib|SamsungPlatformPkgOrigen/SmdkBoardPkg/Library/SmdkBoardLib/SmdkBoardLib.inf
   ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
-  EfiResetSystemLib|SamsungPlatformPkg/ExynosPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  EfiResetSystemLib|SamsungPlatformPkgOrigen/ExynosPkg/Library/ResetSystemLib/ResetSystemLib.inf
   EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
@@ -78,20 +78,20 @@
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
-  DebugAgentTimerLib|SamsungPlatformPkg/SmdkBoardPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
+  DebugAgentTimerLib|SamsungPlatformPkgOrigen/SmdkBoardPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
   EblAddExternalCommandLib|EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  SerialPortLib|SamsungPlatformPkg/ExynosPkg/Library/SerialPortLib/SerialPortLib.inf
-  TimerLib|SamsungPlatformPkg/ExynosPkg/Library/TimerLib/TimerLib.inf
+  SerialPortLib|SamsungPlatformPkgOrigen/ExynosPkg/Library/SerialPortLib/SerialPortLib.inf
+  TimerLib|SamsungPlatformPkgOrigen/ExynosPkg/Library/TimerLib/TimerLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
   # Samsung specific
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
-  GdbSerialLib|SamsungPlatformPkg/ExynosPkg/Library/GdbSerialLib/GdbSerialLib.inf
+  GdbSerialLib|SamsungPlatformPkgOrigen/ExynosPkg/Library/GdbSerialLib/GdbSerialLib.inf
 
   # iky for usb host
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
@@ -103,7 +103,7 @@
   ArmTrustedMonitorLib|ArmPlatformPkg/Library/ArmTrustedMonitorLibNull/ArmTrustedMonitorLibNull.inf
   ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
   ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Sec/SecArmPlatformGlobalVariableLib.inf
-  ArmPlatformSecLib|SamsungPlatformPkg/SmdkBoardPkg/Library/SmdkBoardLib/SmdkBoardSecLib.inf
+  ArmPlatformSecLib|SamsungPlatformPkgOrigen/SmdkBoardPkg/Library/SmdkBoardLib/SmdkBoardSecLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   # L2 Cache Driver
@@ -206,18 +206,18 @@ DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [BuildOptions]
-  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A9 --thumb --fpu=softvfp -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Include/Platform
-  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A9 -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Include/Platform
+  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A9 --thumb --fpu=softvfp -I$(WORKSPACE)/SamsungPlatformPkgOrigen/ExynosPkg/Include/Platform
+  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A9 -I$(WORKSPACE)/SamsungPlatformPkgOrigen/ExynosPkg/Include/Platform
   RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
-  GCC:*_*_ARM_ARCHCC_FLAGS    == -march=armv7-a -mthumb -mthumb-interwork -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Include/Platform
-  GCC:*_*_ARM_ARCHASM_FLAGS   == -march=armv7-a -mthumb-interwork -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Include/Platform
+  GCC:*_*_ARM_ARCHCC_FLAGS    == -march=armv7-a -mthumb -mthumb-interwork -I$(WORKSPACE)/SamsungPlatformPkgOrigen/ExynosPkg/Include/Platform
+  GCC:*_*_ARM_ARCHASM_FLAGS   == -march=armv7-a -mthumb-interwork -I$(WORKSPACE)/SamsungPlatformPkgOrigen/ExynosPkg/Include/Platform
   GCC:*_*_ARM_CC_FLAGS        =  -Os -mword-relocations -mfpu=vfp -ffixed-r8
   GCC:RELEASE_*_*_CC_FLAGS    =  -DMDEPKG_NDEBUG
 
-  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7 -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Include/Platform
-  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv7 -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Include/Platform
-  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7 -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Include/Platform
+  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7 -I$(WORKSPACE)/SamsungPlatformPkgOrigen/ExynosPkg/Include/Platform
+  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv7 -I$(WORKSPACE)/SamsungPlatformPkgOrigen/ExynosPkg/Include/Platform
+  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7 -I$(WORKSPACE)/SamsungPlatformPkgOrigen/ExynosPkg/Include/Platform
   XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG
 
 
@@ -385,7 +385,7 @@ DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
     <LibraryClasses>
       ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
       ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
-      ArmPlatformLib|SamsungPlatformPkg/SmdkBoardPkg/Library/SmdkBoardLib/SmdkBoardLib.inf
+      ArmPlatformLib|SamsungPlatformPkgOrigen/SmdkBoardPkg/Library/SmdkBoardLib/SmdkBoardLib.inf
       ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
   }
 !else
@@ -439,17 +439,17 @@ DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
-  SamsungPlatformPkg/SmdkBoardPkg/FvbDxe/FvbDxe.inf
-  SamsungPlatformPkg/ExynosPkg/TimerDxe/TimerDxe.inf
+  SamsungPlatformPkgOrigen/SmdkBoardPkg/FvbDxe/FvbDxe.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/TimerDxe/TimerDxe.inf
 
   #
   # Samsung specific Driver
   #
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
-  SamsungPlatformPkg/ExynosPkg/SDHCDxe/SDHCDxe.inf
-  SamsungPlatformPkg/ExynosPkg/Gpio/Gpio.inf{
+  SamsungPlatformPkgOrigen/ExynosPkg/SDHCDxe/SDHCDxe.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/Gpio/Gpio.inf{
     <LibraryClasses>
-       ExynosLib|SamsungPlatformPkg/ExynosPkg/Library/ExynosLib/ExynosLib.inf
+       ExynosLib|SamsungPlatformPkgOrigen/ExynosPkg/Library/ExynosLib/ExynosLib.inf
   }
 
   #

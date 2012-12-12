@@ -31,7 +31,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  SamsungPlatformPkg/SmdkBoardPkg/SmdkBoardPkg.dec
+  SamsungPlatformPkgOrigen/SmdkBoardPkg/SmdkBoardPkg.dec
 
 [LibraryClasses]
   IoLib

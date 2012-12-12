@@ -30,7 +30,7 @@
   ArmPkg/ArmPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  SamsungPlatformPkg/ExynosPkg/ExynosPkg.dec
+  SamsungPlatformPkgOrigen/ExynosPkg/ExynosPkg.dec
 [LibraryClasses]
   ArmLib
   IoLib

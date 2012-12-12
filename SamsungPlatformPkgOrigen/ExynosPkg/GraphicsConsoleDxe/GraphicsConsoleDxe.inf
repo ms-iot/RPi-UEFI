@@ -43,8 +43,8 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  SamsungPlatformPkg/ExynosPkg/ExynosPkg.dec
-  SamsungPlatformPkg/SamsungPlatformPkg.dec
+  SamsungPlatformPkgOrigen/ExynosPkg/ExynosPkg.dec
+  SamsungPlatformPkgOrigen/SamsungPlatformPkg.dec
 
 [LibraryClasses]
   BaseLib

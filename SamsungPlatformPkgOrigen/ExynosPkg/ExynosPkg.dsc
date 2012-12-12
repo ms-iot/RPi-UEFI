@@ -47,7 +47,7 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
 
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
-  TimerLib|SamsungPlatformPkg/ExynosPkg/Library/TimerLib/TimerLib.inf
+  TimerLib|SamsungPlatformPkgOrigen/ExynosPkg/Library/TimerLib/TimerLib.inf
   UncachedMemoryAllocationLib|ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
 
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
@@ -55,7 +55,7 @@
 
 [LibraryClasses.common.DXE_DRIVER]
  DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
- ExynosLib|SamsungPlatformPkg/ExynosPkg/Library/ExynosLib/ExynosLib.inf
+ ExynosLib|SamsungPlatformPkgOrigen/ExynosPkg/Library/ExynosLib/ExynosLib.inf
 
 [LibraryClasses.ARM]
   #
@@ -109,12 +109,12 @@
 #
 ################################################################################
 [Components.common]
-  SamsungPlatformPkg/ExynosPkg/Library/GdbSerialLib/GdbSerialLib.inf
-  SamsungPlatformPkg/ExynosPkg/Library/ResetSystemLib/ResetSystemLib.inf
-  SamsungPlatformPkg/ExynosPkg/Library/SerialPortLib/SerialPortLib.inf
-  SamsungPlatformPkg/ExynosPkg/Library/ExynosLib/ExynosLib.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/Library/GdbSerialLib/GdbSerialLib.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/Library/SerialPortLib/SerialPortLib.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/Library/ExynosLib/ExynosLib.inf
 
-  SamsungPlatformPkg/ExynosPkg/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
-  SamsungPlatformPkg/ExynosPkg/SDHCDxe/SDHCDxe.inf
-  SamsungPlatformPkg/ExynosPkg/TimerDxe/TimerDxe.inf
-  SamsungPlatformPkg/ExynosPkg/Gpio/Gpio.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/SDHCDxe/SDHCDxe.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/TimerDxe/TimerDxe.inf
+  SamsungPlatformPkgOrigen/ExynosPkg/Gpio/Gpio.inf

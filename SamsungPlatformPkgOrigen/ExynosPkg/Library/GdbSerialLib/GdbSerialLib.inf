@@ -28,7 +28,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  SamsungPlatformPkg/ExynosPkg/ExynosPkg.dec
+  SamsungPlatformPkgOrigen/ExynosPkg/ExynosPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
 
 
