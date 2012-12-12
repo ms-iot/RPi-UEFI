@@ -654,8 +654,6 @@ TransferBlock (
   UINTN      Cmd = 0;
   UINTN      CmdInterruptEnable = 0;
   UINTN      CmdArgument = 0;
-  UINT32     SdMmcBaseAddr;
-  SdMmcBaseAddr = PcdGet32(PcdSdMmcBase);
 
   // 1. FIFO reset
   // MSHC_SendCmd do the fifo reset
@@ -757,13 +755,13 @@ DetectCard (
   )
 {
   EFI_STATUS    Status;
-  UINT32     SdMmcBaseAddr;
+  //UINT32     SdMmcBaseAddr;
 
   //DEBUG ((EFI_D_INFO, "===================================\n"));
   DEBUG ((EFI_D_INFO, "===SDHC: Version %a ===\n", DateInformation));
   //DEBUG ((EFI_D_INFO, "===================================\n"));
 
-  SdMmcBaseAddr = PcdGet32(PcdSdMmcBase);
+  //SdMmcBaseAddr = PcdGet32(PcdSdMmcBase);
 
   if (!CardPresent ()) {
     return EFI_NO_MEDIA;
