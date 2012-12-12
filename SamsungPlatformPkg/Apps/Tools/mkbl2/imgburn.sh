@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-IMAGE=../../../../../edk2-git/edk2/Build/Arndale-Exynos/DEBUG_ARMLINUXGCC/FV/ARNDALE_EFI.fd
+IMAGE=../../../../Build/Arndale-Exynos/DEBUG_ARMLINUXGCC/FV/ARNDALE_EFI.fd
 
 if [ $# -ne 2 ]
 then
