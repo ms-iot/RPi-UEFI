@@ -173,7 +173,7 @@ READ_LOCK_STATUS   = TRUE
   #INF EmbeddedPkg/SerialDxe/SerialDxe.inf
 
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
-  INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  #INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 
 !ifdef $(EXYNOS5250_EVT1)
   INF SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/Gic400Dxe/PL390GicDxe.inf
@@ -214,7 +214,7 @@ READ_LOCK_STATUS   = TRUE
   INF SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/PciEmulation/PciEmulation.inf
   #INF SamsungPlatformPkg/ExynosPkg/Exynos5250/OhciDxe/OhciDxe.inf
   INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+  #INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
