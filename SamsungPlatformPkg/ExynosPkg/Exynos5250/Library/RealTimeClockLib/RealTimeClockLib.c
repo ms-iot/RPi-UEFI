@@ -286,7 +286,6 @@ LibRtcInitialize (
   IN EFI_SYSTEM_TABLE                      *SystemTable
   )
 {
-  EFI_STATUS    Status;
   EFI_HANDLE    Handle;
   EFI_TIME      Time;
 
@@ -325,7 +324,7 @@ LibRtcInitialize (
 
   // Install the protocol
   Handle = NULL;
-  Status = gBS->InstallMultipleProtocolInterfaces (
+  gBS->InstallMultipleProtocolInterfaces (
                  &Handle,
                  &gEfiRealTimeClockArchProtocolGuid,  NULL,
                  NULL

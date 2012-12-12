@@ -62,6 +62,7 @@ UINT32 exynos_smc(UINT32 cmd, UINT32 arg1, UINT32 arg2, UINT32 arg3)
 	register UINT32 reg3 __asm__("r3") = arg3;
 
 	__asm__ volatile (
+		".arch_extension sec\n"
 		"smc	0\n"
 		: "+r"(reg0), "+r"(reg1), "+r"(reg2), "+r"(reg3)
 

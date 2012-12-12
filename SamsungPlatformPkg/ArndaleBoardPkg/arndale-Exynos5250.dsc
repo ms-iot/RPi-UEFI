@@ -274,7 +274,7 @@
   #EmbeddedPkg/SerialDxe/SerialDxe.inf
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
-  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  #MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 
   SamsungPlatformPkg/ArndaleBoardPkg/FvbDxe/FvbDxe.inf
   SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/TimerDxe/TimerDxe.inf
@@ -345,7 +345,7 @@
   SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/PciEmulation/PciEmulation.inf
   #SamsungPlatformPkg/ExynosPkg/Exynos5250/OhciDxe/OhciDxe.inf
   MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+  #MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
