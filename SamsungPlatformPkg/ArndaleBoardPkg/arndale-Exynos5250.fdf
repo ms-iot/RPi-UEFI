@@ -196,11 +196,6 @@ READ_LOCK_STATUS   = TRUE
   INF SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/SDHCDxe_EVT1/SDHCDxe.inf
 
   #
-  # Semi-hosting filesystem
-  #
-  INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
-
-  #
   # FAT filesystem + GPT/MBR partitioning
   #
   INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
@@ -239,7 +234,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # UEFI application (Shell Embedded Boot Loader)
   #
-  INF EmbeddedPkg/Ebl/Ebl.inf
+  INF ShellBinPkg/UefiShell/UefiShell.inf 
   #INF SamsungPlatformPkg/Apps/TestApps/HashServicesTest/HashServicesTest.inf
   #INF SamsungPlatformPkg/Apps/TestApps/RngServicesTest/RngServicesTest.inf
 
