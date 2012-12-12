@@ -161,7 +161,7 @@ InitializeMSHC (
   EFI_STATUS    Status;
   EXYNOS_GPIO *Gpio;
   UINT32 CumBaseAddr;
-  UINT32 SdMmcBaseAddr;
+  //UINT32 SdMmcBaseAddr;
   UINT32 i, clock;
   volatile UINT32 ctl_val;
 
@@ -170,7 +170,7 @@ InitializeMSHC (
   ASSERT_EFI_ERROR(Status);
 
   CumBaseAddr = PcdGet32(PcdCmuBase);
-  SdMmcBaseAddr = PcdGet32(PcdSdMmcBase);
+  //SdMmcBaseAddr = PcdGet32(PcdSdMmcBase);
 
   //MmioWrite32((SdMmcBaseAddr + SDHC_SWRST_OFFSET), SRA); 
 
