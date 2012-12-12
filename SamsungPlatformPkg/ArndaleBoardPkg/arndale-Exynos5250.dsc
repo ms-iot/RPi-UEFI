@@ -294,11 +294,6 @@
   }
 
   #
-  # Semi-hosting filesystem
-  #
-  ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
-
-  #
   # Multimedia Card Interface
   #
   SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/eMMCDxe/eMMCDxe.inf
@@ -314,7 +309,6 @@
   #
   # Application
   #
-  EmbeddedPkg/Ebl/Ebl.inf
   #SamsungPlatformPkg/Apps/TestApps/HashServicesTest/HashServicesTest.inf
   #SamsungPlatformPkg/Apps/TestApps/RngServicesTest/RngServicesTest.inf
 
