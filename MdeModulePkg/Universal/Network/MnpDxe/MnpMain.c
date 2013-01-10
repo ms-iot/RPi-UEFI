@@ -79,8 +79,10 @@ MnpGetModeData (
     // Upon successful return of GetStatus(), the Snp->Mode->MediaPresent
     // will be updated to reflect any change of media status
     //
-    Snp->GetStatus (Snp, &InterruptStatus, NULL);
-    CopyMem (SnpModeData, Snp->Mode, sizeof (*SnpModeData));
+    Status = Snp->GetStatus (Snp, &InterruptStatus, NULL);
+    if (!EFI_ERROR (Status)) {
+      CopyMem (SnpModeData, Snp->Mode, sizeof (*SnpModeData));
+    }
   }
 
   if (!Instance->Configured) {
