@@ -53,6 +53,11 @@ fi
 #
 # Pick a default tool type for a given OS if no toolchain already defined
 #
+if [ X"$TOOLCHAIN" != X"" ]
+then
+       TARGET_TOOLS="$TOOLCHAIN"
+fi
+
 if [ -z "${TARGET_TOOLS:-}" ]
 then
   case `uname` in
