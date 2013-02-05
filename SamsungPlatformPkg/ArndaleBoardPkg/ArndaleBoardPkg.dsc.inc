@@ -297,8 +297,8 @@ ArmPlatformSecLib|ArmPlatformPkg/Library/ArmPlatformSecLibNull/ArmPlatformLibNul
   #
   gArmTokenSpaceGuid.PcdArmMachineType|2456
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"SD-MMC Booting"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(3A02E7FE-0649-4FB4-BE4F-A862CA1872A9)/HD(2,MBR,0x000A65DC,0x59B303,0x3B7C)/uImage"
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(3A02E7FE-0649-4FB4-BE4F-A862CA1872A9)/HD(2,MBR,0x000A65DC,0x59B303,0x3B7C)/exynos5250-arndale.dtb"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(3A02E7FE-0649-4FB4-BE4F-A862CA1872A9)/HD(2,MBR,0x00000000,0x59B303,0x3B7C)/uImage"
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(3A02E7FE-0649-4FB4-BE4F-A862CA1872A9)/HD(2,MBR,0x00000000,0x59B303,0x3B7C)/exynos5250-arndale.dtb"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"root=/dev/mmcblk1p1 rw rootwait console=ttySAC2,115200n8 init --no-log"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
 
