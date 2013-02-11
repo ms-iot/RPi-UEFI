@@ -85,12 +85,23 @@ then
 fi
 
 TARGET=DEBUG
-for arg in "$@"
+BUILD_TARGET=DEBUG
+args=($@)
+
+for (( i=0; i<$#; i++ ))
 do
-  if [[ $arg == RELEASE ]]; 
-  then
-    TARGET=RELEASE
-  fi
+	if [[ "${args[$i]}" == "-b" ]]
+	then
+		TARGET=${args[$i+1]}
+		BUILD_TARGET=$TARGET
+		if [[ "$TARGET" == "RELEASE" ]]
+		then
+			BUILD_TARGET="$BUILD_TARGET -D DEBUG_TARGET=RELEASE"
+		fi
+		i=$i+1
+	else
+		other_args="$other_args ${args[$i]}"
+	fi
 done
 
 BUILD_ROOT=$WORKSPACE/Build/PandaBoard/"$TARGET"_"$TARGET_TOOLS"
@@ -109,12 +120,7 @@ fi
 #
 # Build the edk2 PandaBoard code
 #
-if [[ $TARGET == RELEASE ]]; then
-  build -p $WORKSPACE/PandaBoardPkg/PandaBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $TARGET -D DEBUG_TARGET=RELEASE ${2:-} ${3:-} ${4:-} ${5:-} ${6:-} ${7:-} ${8:-}
-else
-  build -p ${WORKSPACE:-}/PandaBoardPkg/PandaBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $TARGET ${1:-} ${2:-} ${3:-} ${4:-} ${5:-} ${6:-} ${7:-} ${8:-}
-fi
-
+build -p $WORKSPACE/PandaBoardPkg/PandaBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $BUILD_TARGET $other_args
 
 for arg in "$@"
 do
