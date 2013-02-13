@@ -123,7 +123,7 @@ MSHC_SendCmd (
   UINTN CmdArgument
   )
 {
-  UINTN MmcStatus;
+  UINTN MmcStatus = 0;
   volatile UINTN RetryCount = 0;
   int cmd_flags = 0;
   int timeout=0;
@@ -580,7 +580,7 @@ ReadBlockData (
   IN  UINTN                         BlockCount
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS Status = EFI_INVALID_PARAMETER;
   UINTN DataSize = This->Media->BlockSize/4;
 
   DEBUG ((EFI_D_INFO, "MSHC::ReadBlockData start \n"));
@@ -606,7 +606,7 @@ WriteBlockData (
   IN  UINTN                         BlockCount  
   )
 {
-    EFI_STATUS Status;
+    EFI_STATUS Status = EFI_INVALID_PARAMETER;
     UINTN DataSize = This->Media->BlockSize/4;
 
     if(MSHC_operation_mode == MSHC_FIFO)
