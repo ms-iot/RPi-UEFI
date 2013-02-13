@@ -529,7 +529,6 @@ DisplayBlt(
   IN  UINTN                                   Delta         OPTIONAL
   )
 {
-  EFI_STATUS Status=EFI_SUCCESS;
   UINT8 *VidBuf, *BltBuf, *VidBuf1;
   UINTN i, j;
 
@@ -604,7 +603,7 @@ DisplayBlt(
       break;
 
     default:
-      ASSERT_EFI_ERROR(Status);
+      ASSERT_EFI_ERROR(EFI_SUCCESS);
   }
 
   return EFI_SUCCESS;
