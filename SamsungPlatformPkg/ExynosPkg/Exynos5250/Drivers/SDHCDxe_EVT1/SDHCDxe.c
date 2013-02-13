@@ -118,7 +118,7 @@ MSHC_SendCmd (
   UINTN CmdArgument
   )
 {
-  UINTN MmcStatus;
+  UINTN MmcStatus = 0;
   volatile UINTN RetryCount = 0;
   int cmd_flags = 0;
   int timeout=0;
@@ -246,13 +246,14 @@ static const UINT8 MultiFactor[16]={0, 10, 12, 13, 15, 20, 26, 30, 35, 40, 45, 5
 
 void PrintCardInfo()
 {
+#if !defined(MDEPKG_NDEBUG)
     UINT8 TransSpeed = gCardInfo.CSDData.TRAN_SPEED;
     
     DEBUG ((EFI_D_INFO, "SDHC::READ_BL_LEN %d\n", gCardInfo.CSDData.READ_BL_LEN));     
     DEBUG ((EFI_D_INFO, "SDHC::CSize %d\n", gCardInfo.CSDData.C_SIZELow2 | (gCardInfo.CSDData.C_SIZEHigh10 << 2)));         
     DEBUG ((EFI_D_INFO, "SDHC::MULTI %d\n", gCardInfo.CSDData.C_SIZE_MULT));         
     DEBUG ((EFI_D_INFO, "SDHC::Speed %d\n", (FreqUnit[TransSpeed&0x7]*MultiFactor[TransSpeed>>3])));         
-
+#endif
 }
 
 
@@ -599,7 +600,7 @@ ReadBlockData (
   IN  UINTN                         BlockCount
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS Status = EFI_INVALID_PARAMETER;
   UINTN DataSize = This->Media->BlockSize/4;
 
   DEBUG ((EFI_D_INFO, "SDHC::ReadBlockData start \n"));
@@ -625,7 +626,7 @@ WriteBlockData (
   IN  UINTN                         BlockCount  
   )
 {
-    EFI_STATUS Status;
+    EFI_STATUS Status = EFI_INVALID_PARAMETER;
     UINTN DataSize = This->Media->BlockSize/4;
 
     if(MSHC_operation_mode == MSHC_FIFO)
