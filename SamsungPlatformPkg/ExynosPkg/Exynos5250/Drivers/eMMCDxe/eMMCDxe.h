@@ -65,7 +65,7 @@ NV data for general purpose : 3400
 #define BLEN_512BYTES	(0x200)
 #define BLKSIZE_1	        (0x1)
 
-#define OM_EMMC 0x28
+#define OM_EMMC 0x8
 
 #define MAX_RETRY_COUNT  (100000)
 #define MMC_REFERENCE_CLK (96000000)

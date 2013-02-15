@@ -840,7 +840,6 @@ DetectCard (
   gSDMMCMedia.MediaId++;
 
   UpdateMSHCClkFrequency(MSHC_CLK_50M);
-  MSHC_EMMC_Boot_Open();    //do not close boot partition
   DEBUG ((EFI_D_INFO, "SD Card Media Change on Handle 0x%08x\n", gImageHandle));
 
   return Status;
