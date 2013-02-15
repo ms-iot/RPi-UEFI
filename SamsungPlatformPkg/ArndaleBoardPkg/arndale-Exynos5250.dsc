@@ -104,8 +104,11 @@
   gArmTokenSpaceGuid.PcdFdSize|0x00200000              # Must be equal to gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize
 
   # System Memory (256MB)
-  gArmTokenSpaceGuid.PcdSystemMemoryBase|0x50000000 #0x40000000
+  gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x50000000
+
+  #FDT offset
+  gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x9000000
 
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
