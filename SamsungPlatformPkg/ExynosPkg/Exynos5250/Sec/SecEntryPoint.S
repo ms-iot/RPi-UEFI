@@ -198,7 +198,7 @@ _CopyFirmware:
   ldr r1, [r0,#0x0]
   bic r2, r1, #0xffffffc1
 
-  cmp r2, #0x28
+  cmp r2, #0x8
   beq _CopyFirmwareEMMC
 
   /* SD/MMC BOOT */
