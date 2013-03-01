@@ -15,151 +15,134 @@
 #ifndef __OMAP4430PRCM_H__
 #define __OMAP4430PRCM_H__
 
-#define CM_FCLKEN1_CORE   (0x48004A00)
-#define CM_FCLKEN3_CORE   (0x48004A08)
-#define CM_ICLKEN1_CORE   (0x48004A10)
-#define CM_ICLKEN3_CORE   (0x48004A18)
-#define CM_CLKEN2_PLL     (0x48004D04)
-#define CM_CLKSEL4_PLL    (0x48004D4C)
-#define CM_CLKSEL5_PLL    (0x48004D50)
-#define CM_FCLKEN_USBHOST  (0x48005400)
-#define CM_ICLKEN_USBHOST  (0x48005410)
-#define CM_CLKSTST_USBHOST (0x4800544c)
+// CONTROL_CORE
 
-//Wakeup clock defintion
-#define CM_FCLKEN_WKUP    (0x48004C00)
-#define CM_ICLKEN_WKUP    (0x48004C10)
+#define CONTROL_CORE_U_BASE                          (0x4A002000)
+#define CONTROL_CORE_ID_CODE                         (CONTROL_CORE_U_BASE+0x204)
+#define CONTROL_CORE_LDOSRAM_IVA_VOLTAGE_CTRL        (CONTROL_CORE_U_BASE+0x320)
+#define CONTROL_CORE_LDOSRAM_MPU_VOLTAGE_CTRL        (CONTROL_CORE_U_BASE+0x324)
+#define CONTROL_CORE_LDOSRAM_CORE_VOLTAGE_CTRL       (CONTROL_CORE_U_BASE+0x328)
 
-//Peripheral clock definition
-#define CM_FCLKEN_PER     (0x48005000)
-#define CM_ICLKEN_PER     (0x48005010)
-#define CM_CLKSEL_PER     (0x48005040)
+#define CONTROL_CORE_LDOSRAM_VOLTAGE_CTRL_VAL               (0x0401040F)
 
-//Reset management definition
-#define PRM_RSTCTRL       (0x48307250)
-#define PRM_RSTST         (0x48307258)
+#define CONTROL_PBIAS_LITE                                  (0x4a100600)
+#define PBIASVMODE3V                                        (BIT21)
+#define PBIASLITEPWRDNZ                                     (BIT22)
+#define PBIASVMODEERR                                       (BIT23)
+#define PBIASHIZ                                            (BIT25)
+#define PBIASPWRDNZ                                         (BIT26)
 
-//CORE clock
-#define CM_FCLKEN1_CORE_EN_I2C1_MASK    BIT15
-#define CM_FCLKEN1_CORE_EN_I2C1_DISABLE (0UL << 15)
-#define CM_FCLKEN1_CORE_EN_I2C1_ENABLE  BIT15
+// PRM
 
-#define CM_ICLKEN1_CORE_EN_I2C1_MASK    BIT15
-#define CM_ICLKEN1_CORE_EN_I2C1_DISABLE (0UL << 15)
-#define CM_ICLKEN1_CORE_EN_I2C1_ENABLE  BIT15
+#define PRM_U_BASE                                          (0x4A307B00)
 
-#define CM_FCLKEN1_CORE_EN_MMC1_MASK    BIT24
-#define CM_FCLKEN1_CORE_EN_MMC1_DISABLE (0UL << 24)
-#define CM_FCLKEN1_CORE_EN_MMC1_ENABLE  BIT24
+#define PRM_RSTCTRL                                         (PRM_U_BASE+0x0)
+#define PRM_RSTST                                           (PRM_U_BASE+0x4)
 
-#define CM_FCLKEN3_CORE_EN_USBTLL_MASK    BIT2
-#define CM_FCLKEN3_CORE_EN_USBTLL_DISABLE (0UL << 2)
-#define CM_FCLKEN3_CORE_EN_USBTLL_ENABLE  BIT2
+#define PRM_RSTST_GLOBAL_COLD_RST_MASK                      (0x1)
 
-#define CM_ICLKEN1_CORE_EN_MMC1_MASK    BIT24
-#define CM_ICLKEN1_CORE_EN_MMC1_DISABLE (0UL << 24)
-#define CM_ICLKEN1_CORE_EN_MMC1_ENABLE  BIT24
+#define PRM_RSTCTRL_RST_GLOBAL_COLD_SW_VAL                  (0x2)
 
-#define CM_ICLKEN3_CORE_EN_USBTLL_MASK    BIT2
-#define CM_ICLKEN3_CORE_EN_USBTLL_DISABLE (0UL << 2)
-#define CM_ICLKEN3_CORE_EN_USBTLL_ENABLE  BIT2
+#define PRM_VC_VAL_BYPASS                                   (PRM_U_BASE+0xA0)
+#define PRM_VC_VAL_BYPASS_REGADDR_POS                       (8)
+#define PRM_VC_VAL_BYPASS_DATA_POS                          (16)
 
-#define CM_CLKEN_FREQSEL_075_100        (0x03UL << 4)
-#define CM_CLKEN_ENABLE                 (7UL << 0)
+#define PRM_VC_CFG_I2C_MODE                                 (PRM_U_BASE+0xA8)
+#define PRM_VC_CFG_I2C_CLK                                  (PRM_U_BASE+0xAC)
 
-#define CM_CLKSEL_PLL_MULT(x)           (((x) & 0x07FF) << 8)
-#define CM_CLKSEL_PLL_DIV(x)            ((((x) - 1) & 0x7F) << 0)
-  
-#define CM_CLKSEL_DIV_120M(x)           (((x) & 0x1F) << 0)
+#define VC_CFG_I2C_MODE_VAL                                 (0x0)
+#define VC_CFG_I2C_CLK_VAL                                  (0x167FFB)
 
-#define CM_FCLKEN_USBHOST_EN_USBHOST2_MASK    BIT1
-#define CM_FCLKEN_USBHOST_EN_USBHOST2_DISABLE (0UL << 1)
-#define CM_FCLKEN_USBHOST_EN_USBHOST2_ENABLE  BIT1
+#define PMIC_SMPS_ID0_SLAVE_ADDR                            (0x12)
+#define PMIC_VCORE3_CFG_FORCE_REGADDR                       (0x61)
+#define PMIC_VCORE1_CFG_FORCE_REGADDR                       (0x55)
+#define PMIC_VCORE2_CFG_FORCE_REGADDR                       (0x5B)
+#define PMIC_VCORE3_CFG_FORCE_VSEL                          (0x28)
+#define PMIC_VCORE1_CFG_FORCE_VSEL_VDD_MPU_4430             (0x32)
+#define PMIC_VCORE1_CFG_FORCE_VSEL_VDD_CORE_4460            (0x28)
+#define PMIC_VCORE2_CFG_FORCE_VSEL                          (0x28)
 
-#define CM_FCLKEN_USBHOST_EN_USBHOST1_MASK    BIT0
-#define CM_FCLKEN_USBHOST_EN_USBHOST1_DISABLE (0UL << 0)
-#define CM_FCLKEN_USBHOST_EN_USBHOST1_ENABLE  BIT0
+#define TPS62361_SLAVE_ADDR                                 (0x60)
+#define TPS62361_SET1_REG_ADDR                              (0x01)
+#define TPS62361_SET1_REG_VAL                               (0x46)
 
-#define CM_ICLKEN_USBHOST_EN_USBHOST_MASK     BIT0
-#define CM_ICLKEN_USBHOST_EN_USBHOST_DISABLE  (0UL << 0)
-#define CM_ICLKEN_USBHOST_EN_USBHOST_ENABLE   BIT0
+// CKGEN_CM1
 
-//Wakeup functional clock
-#define CM_FCLKEN_WKUP_EN_GPIO1_DISABLE       (0UL << 3)
-#define CM_FCLKEN_WKUP_EN_GPIO1_ENABLE        BIT3
+#define CKGEN_CM1_U_BASE                                    (0x4A004100)
 
-#define CM_FCLKEN_WKUP_EN_WDT2_DISABLE        (0UL << 5)
-#define CM_FCLKEN_WKUP_EN_WDT2_ENABLE         BIT5
+#define CKGEN_CM1_CM_DIV_M3_DPLL_CORE                       (CKGEN_CM1_U_BASE+0x34)
+#define CKGEN_CM1_CM_DIV_M4_DPLL_CORE                       (CKGEN_CM1_U_BASE+0x38)
+#define CKGEN_CM1_CM_DIV_M5_DPLL_CORE                       (CKGEN_CM1_U_BASE+0x3C)
+#define CKGEN_CM1_CM_DIV_M6_DPLL_CORE                       (CKGEN_CM1_U_BASE+0x40)
+#define CKGEN_CM1_CM_DIV_M7_DPLL_CORE                       (CKGEN_CM1_U_BASE+0x44)
 
-//Wakeup interface clock
-#define CM_ICLKEN_WKUP_EN_GPIO1_DISABLE       (0UL << 3)
-#define CM_ICLKEN_WKUP_EN_GPIO1_ENABLE        BIT3
+#define CKGEN_CM1_CM_DIV_M2_DPLL_MPU                        (CKGEN_CM1_U_BASE+0x70)
 
-#define CM_ICLKEN_WKUP_EN_WDT2_DISABLE        (0UL << 5)
-#define CM_ICLKEN_WKUP_EN_WDT2_ENABLE         BIT5
+#define CKGEN_CM1_CM_CLKMODE_DPLL_IVA                       (CKGEN_CM1_U_BASE+0xA0)
+#define CKGEN_CM1_CM_CLKSEL_DPLL_IVA                        (CKGEN_CM1_U_BASE+0xAC)
+#define CKGEN_CM1_CM_DIV_M4_DPLL_IVA                        (CKGEN_CM1_U_BASE+0xB8)
+#define CKGEN_CM1_CM_DIV_M5_DPLL_IVA                        (CKGEN_CM1_U_BASE+0xBC)
+#define CKGEN_CM1_CM_BYPCLK_DPLL_IVA                        (CKGEN_CM1_U_BASE+0xDC)
 
-//Peripheral functional clock
-#define CM_FCLKEN_PER_EN_GPT3_DISABLE         (0UL << 4)
-#define CM_FCLKEN_PER_EN_GPT3_ENABLE          BIT4
+#define CKGEN_CM1_CM_CLKSEL_DPLL_IVA_CLKSEL_VAL             (0x19c10)
+#define CKGEN_CM1_CM_CLKSEL_DPLL_IVA_M4_VAL                 (4)
+#define CKGEN_CM1_CM_CLKSEL_DPLL_IVA_M5_VAL                 (7)
+#define CKGEN_CM1_CM_CLKSEL_DPLL_IVA_BYCLK_VAL              (1)
+#define CKGEN_CM1_CM_CLKSEL_DPLL_IVA_CLKMODE_VAL            (7)
 
-#define CM_FCLKEN_PER_EN_GPT4_DISABLE         (0UL << 5)
-#define CM_FCLKEN_PER_EN_GPT4_ENABLE          BIT5
+#define CKGEN_CM1_CM_CLKMODE_DPLL_ABE                       (CKGEN_CM1_U_BASE+0xE0)
+#define CKGEN_CM1_CM_CLKSEL_DPLL_ABE                        (CKGEN_CM1_U_BASE+0xEC)
+#define CKGEN_CM1_CM_DIV_M2_DPLL_ABE                        (CKGEN_CM1_U_BASE+0xF0)
+#define CKGEN_CM1_CM_DIV_M3_DPLL_ABE                        (CKGEN_CM1_U_BASE+0xF4)
 
-#define CM_FCLKEN_PER_EN_UART3_DISABLE        (0UL << 11)
-#define CM_FCLKEN_PER_EN_UART3_ENABLE         BIT11
+#define CKGEN_CM1_CM_CLKSEL_DPLL_ABE_VAL                    (0x82ee00)
+#define CKGEN_CM1_CM_DIV_M2_DPLL_ABE_VAL                    (1)
+#define CKGEN_CM1_CM_DIV_M3_DPLL_ABE_VAL                    (1)
+#define CKGEN_CM1_CM_CLKMODE_DPLL_ABE_VAL                   (0xf27)
 
-#define CM_FCLKEN_PER_EN_GPIO2_DISABLE        (0UL << 13)
-#define CM_FCLKEN_PER_EN_GPIO2_ENABLE         BIT13
+#define CKGEN_CM1_CM_SHADOW_FREQ_CONFIG1                    (CKGEN_CM1_U_BASE+0x160)
+#define CM_SHADOW_FREQ_CONFIG1_DPLL_CORE_M2_DIV_OPP100      (1<<11)
+#define CM_SHADOW_FREQ_CONFIG1_DPLL_CORE_DPLL_EN_LOCK       (7<<8)
+#define CM_SHADOW_FREQ_CONFIG1_DLL_RESET_RST                (1<<3)
+#define CM_SHADOW_FREQ_CONFIG1_FREQ_UPDATE_START            (1<<0)
 
-#define CM_FCLKEN_PER_EN_GPIO3_DISABLE        (0UL << 14)
-#define CM_FCLKEN_PER_EN_GPIO3_ENABLE         BIT14
+#define CM_DIV_M2_DPLL_MPU_OPP100_VAL                       (1)
+#define CM_DIV_M3_DPLL_CORE_OPP100_VAL                      (5)
+#define CM_DIV_M4_DPLL_CORE_OPP100_VAL                      (8)
+#define CM_DIV_M5_DPLL_CORE_OPP100_VAL                      (4)
+#define CM_DIV_M6_DPLL_CORE_OPP100_VAL                      (6)
+#define CM_DIV_M7_DPLL_CORE_OPP100_VAL                      (5)
 
-#define CM_FCLKEN_PER_EN_GPIO4_DISABLE        (0UL << 15)
-#define CM_FCLKEN_PER_EN_GPIO4_ENABLE         BIT15
+// CKGEN_CM2
 
-#define CM_FCLKEN_PER_EN_GPIO5_DISABLE        (0UL << 16)
-#define CM_FCLKEN_PER_EN_GPIO5_ENABLE         BIT16
+#define CKGEN_CM2_U_BASE                                    (0x4A008100)
 
-#define CM_FCLKEN_PER_EN_GPIO6_DISABLE        (0UL << 17)
-#define CM_FCLKEN_PER_EN_GPIO6_ENABLE         BIT17
+#define CKGEN_CM2_CM_CLKMODE_DPLL_USB                       (CKGEN_CM2_U_BASE+0x80)
+#define CKGEN_CM2_CM_CLKSEL_DPLL_USB                        (CKGEN_CM2_U_BASE+0x8C)
+#define CKGEN_CM2_CM_DIV_M2_DPLL_USB                        (CKGEN_CM2_U_BASE+0x90)
 
-//Peripheral interface clock
-#define CM_ICLKEN_PER_EN_GPT3_DISABLE         (0UL << 4)
-#define CM_ICLKEN_PER_EN_GPT3_ENABLE          BIT4
+#define CKGEN_CM2_CM_CLKSEL_DPLL_USB_VAL                    (0x25817)
+#define CKGEN_CM2_CM_DIV_M2_DPLL_USB_VAL                    (0x282)
+#define CKGEN_CM2_CM_CLKMODE_DPLL_USB_VAL                   (0x7)
 
-#define CM_ICLKEN_PER_EN_GPT4_DISABLE         (0UL << 5)
-#define CM_ICLKEN_PER_EN_GPT4_ENABLE          BIT5
+// RESTORE_CM1
 
-#define CM_ICLKEN_PER_EN_UART3_DISABLE        (0UL << 11)
-#define CM_ICLKEN_PER_EN_UART3_ENABLE         BIT11
+#define RESTORE_CM1_U_BASE                                  (0x4A004E00)
 
-#define CM_ICLKEN_PER_EN_GPIO2_DISABLE        (0UL << 13)
-#define CM_ICLKEN_PER_EN_GPIO2_ENABLE         BIT13
+#define RESTORE_CM1_CM_DIV_M2_DPLL_CORE_RESTORE             (RESTORE_CM1_U_BASE+0x4)
+#define RESTORE_CM1_CM_DIV_M3_DPLL_CORE_RESTORE             (RESTORE_CM1_U_BASE+0x8)
+#define RESTORE_CM1_CM_DIV_M5_DPLL_CORE_RESTORE             (RESTORE_CM1_U_BASE+0x10)
+#define RESTORE_CM1_CM_DIV_M6_DPLL_CORE_RESTORE             (RESTORE_CM1_U_BASE+0x14)
+#define RESTORE_CM1_CM_DIV_M7_DPLL_CORE_RESTORE             (RESTORE_CM1_U_BASE+0x18)
+#define RESTORE_CM1_CM_CLKSEL_DPLL_CORE_RESTORE             (RESTORE_CM1_U_BASE+0x1C)
+#define RESTORE_CM1_CM_SHADOW_FREQ_CONFIG1_RESTORE          (RESTORE_CM1_U_BASE+0x30)
 
-#define CM_ICLKEN_PER_EN_GPIO3_DISABLE        (0UL << 14)
-#define CM_ICLKEN_PER_EN_GPIO3_ENABLE         BIT14
+// SCRM
 
-#define CM_ICLKEN_PER_EN_GPIO4_DISABLE        (0UL << 15)
-#define CM_ICLKEN_PER_EN_GPIO4_ENABLE         BIT15
+#define SCRM_U_BASE                                         (0x4A30A000)
 
-#define CM_ICLKEN_PER_EN_GPIO5_DISABLE        (0UL << 16)
-#define CM_ICLKEN_PER_EN_GPIO5_ENABLE         BIT16
-
-#define CM_ICLKEN_PER_EN_GPIO6_DISABLE        (0UL << 17)
-#define CM_ICLKEN_PER_EN_GPIO6_ENABLE         BIT17
-
-//Timer source clock selection
-#define CM_CLKSEL_PER_CLKSEL_GPT3_32K         (0UL << 1)
-#define CM_CLKSEL_PER_CLKSEL_GPT3_SYS         BIT1
-
-#define CM_CLKSEL_PER_CLKSEL_GPT4_32K         (0UL << 2)
-#define CM_CLKSEL_PER_CLKSEL_GPT4_SYS         BIT2
-
-//Reset management (Global and Cold reset)
-#define RST_GS            BIT1
-#define RST_DPLL3         BIT2
-#define GLOBAL_SW_RST     BIT1
-#define GLOBAL_COLD_RST   (0x0UL << 0)
+#define SCRM_AUXCLK3                                        (SCRM_U_BASE+0x31C)
+#define SCRM_AUXCLK3_VAL                                    (0x00010100)
 
 #endif // __OMAP4430PRCM_H__
 
