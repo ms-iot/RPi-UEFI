@@ -15,13 +15,14 @@
 #ifndef __OMAP4430GPIO_H__
 #define __OMAP4430GPIO_H__
 
-#define GPIO1_BASE (0x48310000)
-#define GPIO2_BASE (0x49050000)
-#define GPIO3_BASE (0x49052000)
-#define GPIO4_BASE (0x49054000)
-#define GPIO5_BASE (0x49056000)
-#define GPIO6_BASE (0x49058000)
+#define GPIO1_BASE (0x4A310000)
+#define GPIO2_BASE (0x48055000)
+#define GPIO3_BASE (0x48057000)
+#define GPIO4_BASE (0x48059000)
+#define GPIO5_BASE (0x4805B000)
+#define GPIO6_BASE (0x4805D000)
 
+// TODO: review below defines, offsets changed from omap3 to omap4
 #define GPIO_SYSCONFIG        (0x0010)
 #define GPIO_SYSSTATUS        (0x0014)
 #define GPIO_IRQSTATUS1       (0x0018)
@@ -30,8 +31,8 @@
 #define GPIO_IRQSTATUS2       (0x0028)
 #define GPIO_IRQENABLE2       (0x002C)
 #define GPIO_CTRL             (0x0030)
-#define GPIO_OE               (0x0034)
-#define GPIO_DATAIN           (0x0038)
+#define GPIO_OE               (0x0134)
+#define GPIO_DATAIN           (0x0138)
 #define GPIO_DATAOUT          (0x003C)
 #define GPIO_LEVELDETECT0     (0x0040)
 #define GPIO_LEVELDETECT1     (0x0044)
@@ -45,8 +46,8 @@
 #define GPIO_SETIRQENABLE2    (0x0074)
 #define GPIO_CLEARWKUENA      (0x0080)
 #define GPIO_SETWKUENA        (0x0084)
-#define GPIO_CLEARDATAOUT     (0x0090)
-#define GPIO_SETDATAOUT       (0x0094)
+#define GPIO_CLEARDATAOUT     (0x0190)
+#define GPIO_SETDATAOUT       (0x0194)
 
 #define GPIO_SYSCONFIG_IDLEMODE_MASK      (3UL << 3)
 #define GPIO_SYSCONFIG_IDLEMODE_FORCE     (0UL << 3)
