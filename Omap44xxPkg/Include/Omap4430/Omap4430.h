@@ -27,14 +27,5 @@
 #include "Omap4430Gpmc.h"
 #include "Omap4430Dma.h"
 
-
-//CONTROL_PBIAS_LITE
-#define CONTROL_PBIAS_LITE    0x4a100600
-#define PBIASVMODE3V          BIT21
-#define PBIASLITEPWRDNZ       BIT22
-#define PBIASVMODEERR         BIT23
-#define PBIASHIZ              BIT25
-#define PBIASPWRDNZ           BIT26
-
 #endif // __OMAP4430_H__
 
