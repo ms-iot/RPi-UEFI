@@ -366,10 +366,13 @@
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
 
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from SD"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(1,MBR,0xB663049F,0x3F,0x13986)/zImage"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/uImage"
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/board.dtb"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/uInitrd"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyO2,115200n8 root=/dev/mmcblk0p2 rootwait ro fixrtc nocompcache vram=48M omapfb.vram=0:24M"
+  
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|3
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(1,MBR,0xB663049F,0x3F,0x13986)/omap4-panda.dtb"
 
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi();VenHw(E68088EF-D1A4-4336-C1DB-4D3A204730A6)"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"
@@ -377,9 +380,9 @@
   #
   # ARM OS Loader
   #
-  # PandaBoard machine type required for ARM Linux: 
+  # PandaBoard machine type required for ARM Linux:
   gArmTokenSpaceGuid.PcdArmMachineType|2791
-
+  
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -442,8 +445,6 @@
   #
   Omap44xxPkg/PciEmulation/PciEmulation.inf
 
-  #NOTE: Open source EHCI stack doesn't work on Pandaboard.
-  #NOTE: UsbBus and UsbMassStorage don't work using iPhone SDK tool chain.
   MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf {
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800fffff
