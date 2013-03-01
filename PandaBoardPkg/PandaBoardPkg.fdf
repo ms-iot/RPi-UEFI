@@ -150,10 +150,10 @@ READ_LOCK_STATUS   = TRUE
   # USB Support (not supported currently)
   #
 
-  #INF Omap44xxPkg/PciEmulation/PciEmulation.inf
-  #INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  #INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-  #INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  INF Omap44xxPkg/PciEmulation/PciEmulation.inf
+  INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   #
   # UEFI application (Shell Embedded Boot Loader) 
