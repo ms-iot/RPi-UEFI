@@ -18,305 +18,326 @@
 #include <Omap4430/Omap4430.h>
 #include <PandaBoard.h>
 
-#define NUM_PINS_SHARED 232
-#define NUM_PINS_ABC 6
-#define NUM_PINS_XM 12
-
-PAD_CONFIGURATION PadConfigurationTableShared[] = {
-  //Pin,           MuxMode,    PullConfig,                      InputEnable
-  { SDRC_D0,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D1,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D2,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D3,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D4,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D5,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D6,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D7,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D8,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D9,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D10,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D11,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D12,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D13,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D14,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D15,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D16,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D17,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D18,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D19,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D20,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D21,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D22,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D23,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D24,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D25,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D26,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D27,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D28,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D29,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D30,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_D31,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_CLK,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_DQS0,     MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_CKE0,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { SDRC_CKE1,     MUXMODE7,   PULL_DISABLED,                INPUT  },
-  { SDRC_DQS1,     MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_DQS2,     MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { SDRC_DQS3,     MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_A1,       MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_A2,       MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_A3,       MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_A4,       MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_A5,       MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_A6,       MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_A7,       MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_A8,       MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_A9,       MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_A10,      MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_D0,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D1,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D2,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D3,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D4,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D5,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D6,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D7,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D8,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D9,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D10,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D11,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D12,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D13,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D14,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_D15,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_NCS0,     MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_NCS1,     MUXMODE0,   PULL_UP_SELECTED,             OUTPUT },
-  { GPMC_NCS2,     MUXMODE0,   PULL_UP_SELECTED,             OUTPUT },
-  { GPMC_NCS3,     MUXMODE0,   PULL_UP_SELECTED,             OUTPUT },
-  { GPMC_NCS4,     MUXMODE0,   PULL_UP_SELECTED,             OUTPUT },
-  { GPMC_NCS5,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_NCS6,     MUXMODE1,   PULL_DISABLED,                INPUT  },
-  { GPMC_NCS7,     MUXMODE1,   PULL_UP_SELECTED,             INPUT  },
-  { GPMC_CLK,      MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_NADV_ALE, MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_NOE,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_NWE,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_NBE0_CLE, MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { GPMC_NBE1,     MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_NWP,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { GPMC_WAIT0,    MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { GPMC_WAIT1,    MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { GPMC_WAIT2,    MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { GPMC_WAIT3,    MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { DSS_PCLK,      MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_HSYNC,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_PSYNC,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_ACBIAS,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA0,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA1,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA2,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA3,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA4,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA5,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA6,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA7,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA8,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA9,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA10,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA11,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA12,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA13,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA14,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA15,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA16,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA17,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { CAM_HS,        MUXMODE0,   PULL_UP_SELECTED,             INPUT },
-  { CAM_VS,        MUXMODE0,   PULL_UP_SELECTED,             INPUT },
-  { CAM_XCLKA,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { CAM_PCLK,      MUXMODE0,   PULL_UP_SELECTED,             INPUT },
-  { CAM_FLD,       MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { CAM_D0,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D1,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D2,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D3,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D4,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D5,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D6,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D7,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D8,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D9,        MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D10,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_D11,       MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CAM_XCLKB,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { CAM_WEN,       MUXMODE4,   PULL_DISABLED,                INPUT  },
-  { CAM_STROBE,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { CSI2_DX0,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CSI2_DY0,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CSI2_DX1,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { CSI2_DY1,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { MCBSP2_FSX,    MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { MCBSP2_CLKX,   MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { MCBSP2_DR,     MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { MCBSP2_DX,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { MMC1_CLK,      MUXMODE0,   PULL_UP_SELECTED,             OUTPUT },
-  { MMC1_CMD,      MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MMC1_DAT0,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MMC1_DAT1,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MMC1_DAT2,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MMC1_DAT3,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MMC1_DAT4,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MMC1_DAT5,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MMC1_DAT6,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MMC1_DAT7,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_CLK,      MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_CMD,      MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_DAT0,     MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_DAT1,     MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_DAT2,     MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_DAT3,     MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_DAT4,     MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_DAT5,     MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_DAT6,     MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MMC2_DAT7,     MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MCBSP3_DX,     MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { MCBSP3_DR,     MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { MCBSP3_CLKX,   MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { MCBSP3_FSX,    MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { UART2_CTS,     MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { UART2_RTS,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { UART2_TX,      MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { UART2_RX,      MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { UART1_TX,      MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { UART1_RTS,     MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { UART1_CTS,     MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { UART1_RX,      MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { MCBSP4_CLKX,   MUXMODE1,   PULL_DISABLED,                INPUT  },
-  { MCBSP4_DR,     MUXMODE1,   PULL_DISABLED,                INPUT  },
-  { MCBSP4_DX,     MUXMODE1,   PULL_DISABLED,                INPUT  },
-  { MCBSP4_FSX,    MUXMODE1,   PULL_DISABLED,                INPUT  },
-  { MCBSP1_CLKR,   MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { MCBSP1_FSR,    MUXMODE4,   PULL_UP_SELECTED,             OUTPUT },
-  { MCBSP1_DX,     MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { MCBSP1_DR,     MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { MCBSP1_CLKS,   MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { MCBSP1_FSX,    MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { MCBSP1_CLKX,   MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { UART3_CTS_RCTX,MUXMODE0,   PULL_UP_SELECTED,                 INPUT  },
-  { UART3_RTS_SD,  MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { UART3_RX_IRRX, MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { UART3_TX_IRTX, MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { HSUSB0_CLK,    MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_STP,    MUXMODE0,   PULL_UP_SELECTED,             OUTPUT },
-  { HSUSB0_DIR,    MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_NXT,    MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_DATA0,  MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_DATA1,  MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_DATA2,  MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_DATA3,  MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_DATA4,  MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_DATA5,  MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_DATA6,  MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { HSUSB0_DATA7,  MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { I2C1_SCL,      MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { I2C1_SDA,      MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { I2C2_SCL,      MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { I2C2_SDA,      MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { I2C3_SCL,      MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { I2C3_SDA,      MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { HDQ_SIO,       MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { MCSPI1_CLK,    MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MCSPI1_SIMO,   MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { MCSPI1_SOMI,   MUXMODE0,   PULL_DISABLED,                INPUT  },
-  { MCSPI1_CS0,    MUXMODE0,   PULL_UP_SELECTED,                 INPUT  },
-  { MCSPI1_CS1,    MUXMODE0,   PULL_UP_SELECTED,                 OUTPUT },
-  { MCSPI1_CS2,    MUXMODE4,   PULL_DISABLED,                OUTPUT },
-  { MCSPI1_CS3,    MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { MCSPI2_CLK,    MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { MCSPI2_SIMO,   MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { MCSPI2_SOMI,   MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { MCSPI2_CS0,    MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { MCSPI2_CS1,    MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { SYS_NIRQ,      MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { SYS_CLKOUT2,   MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_CLK,       MUXMODE3,   PULL_UP_SELECTED,             OUTPUT },
-  { ETK_CTL,       MUXMODE3,   PULL_UP_SELECTED,             OUTPUT },
-  { ETK_D0,        MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D1,        MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D2,        MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D3,        MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D4,        MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D5,        MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D6,        MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D7,        MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D8,        MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D9,        MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D10,       MUXMODE3,   PULL_UP_SELECTED,             OUTPUT },
-  { ETK_D11,       MUXMODE3,   PULL_UP_SELECTED,             OUTPUT },
-  { ETK_D12,       MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D13,       MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D14,       MUXMODE3,   PULL_UP_SELECTED,             INPUT  },
-  { ETK_D15,       MUXMODE3,   PULL_UP_SELECTED,             INPUT  }
+PAD_CONFIGURATION PadConfigurationTableSharedCore[] = {
+    {GPMC_AD0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat0 */
+    {GPMC_AD1, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat1 */
+    {GPMC_AD2, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat2 */
+    {GPMC_AD3, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat3 */
+    {GPMC_AD4, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat4 */
+    {GPMC_AD5, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat5 */
+    {GPMC_AD6, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat6 */
+    {GPMC_AD7, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat7 */
+    {GPMC_NOE, (PTU | IEN | OFF_EN | OFF_OUT_PTD | M1)},	 /* sdmmc2_clk */
+    {GPMC_NWE, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_cmd */
+    {SDMMC1_CLK, (PTU | OFF_EN | OFF_OUT_PTD | M0)},	 /* sdmmc1_clk */
+    {SDMMC1_CMD, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_cmd */
+    {SDMMC1_DAT0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat0 */
+    {SDMMC1_DAT1, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat1 */
+    {SDMMC1_DAT2, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat2 */
+    {SDMMC1_DAT3, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat3 */
+    {SDMMC1_DAT4, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat4 */
+    {SDMMC1_DAT5, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat5 */
+    {SDMMC1_DAT6, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat6 */
+    {SDMMC1_DAT7, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat7 */
+    {I2C1_SCL, (PTU | IEN | M0)},				/* i2c1_scl */
+    {I2C1_SDA, (PTU | IEN | M0)},				/* i2c1_sda */
+    {I2C2_SCL, (PTU | IEN | M0)},				/* i2c2_scl */
+    {I2C2_SDA, (PTU | IEN | M0)},				/* i2c2_sda */
+    {I2C3_SCL, (PTU | IEN | M0)},				/* i2c3_scl */
+    {I2C3_SDA, (PTU | IEN | M0)},				/* i2c3_sda */
+    {I2C4_SCL, (PTU | IEN | M0)},				/* i2c4_scl */
+    {I2C4_SDA, (PTU | IEN | M0)},				/* i2c4_sda */
+    {UART3_CTS_RCTX, (PTU | IEN | M0)},			/* uart3_tx */
+    {UART3_RTS_SD, (M0)},					/* uart3_rts_sd */
+    {UART3_RX_IRRX, (IEN | M0)},				/* uart3_rx */
+    {UART3_TX_IRTX, (M0)},					/* uart3_tx */
+    {USBB1_ULPITLL_CLK, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M4)},/* usbb1_ulpiphy_clk */
+    {USBB1_ULPITLL_STP, (OFF_EN | OFF_OUT_PTD | M4)},		/* usbb1_ulpiphy_stp */
+    {USBB1_ULPITLL_DIR, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_dir */
+    {USBB1_ULPITLL_NXT, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_nxt */
+    {USBB1_ULPITLL_DAT0, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_dat0 */
+    {USBB1_ULPITLL_DAT1, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_dat1 */
+    {USBB1_ULPITLL_DAT2, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_dat2 */
+    {USBB1_ULPITLL_DAT3, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_dat3 */
+    {USBB1_ULPITLL_DAT4, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_dat4 */
+    {USBB1_ULPITLL_DAT5, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_dat5 */
+    {USBB1_ULPITLL_DAT6, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_dat6 */
+    {USBB1_ULPITLL_DAT7, (IEN | OFF_EN | OFF_PD | OFF_IN | M4)},	/* usbb1_ulpiphy_dat7 */
+    {USBB1_HSIC_DATA, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* usbb1_hsic_data */
+    {USBB1_HSIC_STROBE, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* usbb1_hsic_strobe */
+    {USBC1_ICUSB_DP, (IEN | M0)},					/* usbc1_icusb_dp */
+    {USBC1_ICUSB_DM, (IEN | M0)},					/* usbc1_icusb_dm */
+    {UNIPRO_TY2, (PTU | IEN | M3)},					/* gpio_1 */
+    {GPMC_WAIT1,  (PTD | OFF_EN | OFF_PD | OFF_OUT_PTD | M3)},	/* gpio_62 */
+    {FREF_CLK2_OUT, (PTU | IEN | M3)},				/* gpio_182: BOARD_ID0 */
+	{GPMC_AD8, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M3)},	/* gpio_32 */
+	{GPMC_AD9, (PTU | IEN | M3)},					/* gpio_33 */
+	{GPMC_AD10, (PTU | IEN | M3)},					/* gpio_34 */
+	{GPMC_AD11, (PTU | IEN | M3)},					/* gpio_35 */
+	{GPMC_AD12, (PTU | IEN | M3)},					/* gpio_36 */
+	{GPMC_AD13, (PTD | OFF_EN | OFF_PD | OFF_OUT_PTD | M3)},	/* gpio_37 */
+	{GPMC_AD14, (PTD | OFF_EN | OFF_PD | OFF_OUT_PTD | M3)},	/* gpio_38 */
+	{GPMC_AD15, (PTD | OFF_EN | OFF_PD | OFF_OUT_PTD | M3)},	/* gpio_39 */
+	{GPMC_A16, (M3)},						/* gpio_40 */
+	{GPMC_A17, (PTD | M3)},						/* gpio_41 */
+	{GPMC_A18, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)},	/* kpd_row6 */
+	{GPMC_A19, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)},	/* kpd_row7 */
+	{GPMC_A20, (IEN | M3)},						/* gpio_44 */
+	{GPMC_A21, (M3)},						/* gpio_45 */
+	{GPMC_A22, (M3)},						/* gpio_46 */
+	{GPMC_A23, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col7 */
+	{GPMC_A24, (PTD | M3)},						/* gpio_48: BOARD_ID1 (Panda ES only) */
+	{GPMC_A25, (PTD | M3)},						/* gpio_49 */
+	{GPMC_NCS0, (M3)},						/* gpio_50 */
+	{GPMC_NCS1, (IEN | M3)},					/* gpio_51 */
+	{GPMC_NCS2, (IEN | M3)},					/* gpio_52 */
+	{GPMC_NCS3, (IEN | M3)},					/* gpio_53 */
+	{GPMC_NWP, (M3)},						/* gpio_54 */
+	{GPMC_CLK, (PTD | M3)},						/* gpio_55 */
+	{GPMC_NADV_ALE, (M3)},						/* gpio_56 */
+	{GPMC_NBE0_CLE, (M3)},						/* gpio_59 */
+	{GPMC_NBE1, (PTD | M3)},					/* gpio_60 */
+	{GPMC_WAIT0, (PTU | IEN | M3)},					/* gpio_61 */
+	{C2C_DATA11, (PTD | M3)},					/* gpio_100 */
+	{C2C_DATA12, (PTU | IEN | M3)},					/* gpio_101: BOARD_ID1 (Panda only) */
+	{C2C_DATA13, (PTD | M3)},					/* gpio_102 */
+	{C2C_DATA14, (M1)},						/* dsi2_te0 */
+	{C2C_DATA15, (PTD | M3)},					/* gpio_104 */
+	{HDMI_HPD, (M0)},						/* hdmi_hpd */
+	{HDMI_CEC, (M0)},						/* hdmi_cec */
+	{HDMI_DDC_SCL, (PTU | M0)},					/* hdmi_ddc_scl */
+	{HDMI_DDC_SDA, (PTU | IEN | M0)},				/* hdmi_ddc_sda */
+	{CSI21_DX0, (IEN | M0)},					/* csi21_dx0 */
+	{CSI21_DY0, (IEN | M0)},					/* csi21_dy0 */
+	{CSI21_DX1, (IEN | M0)},					/* csi21_dx1 */
+	{CSI21_DY1, (IEN | M0)},					/* csi21_dy1 */
+	{CSI21_DX2, (IEN | M0)},					/* csi21_dx2 */
+	{CSI21_DY2, (IEN | M0)},					/* csi21_dy2 */
+	{CSI21_DX3, (PTD | M7)},					/* csi21_dx3 */
+	{CSI21_DY3, (PTD | M7)},					/* csi21_dy3 */
+	{CSI21_DX4, (PTD | OFF_EN | OFF_PD | OFF_IN | M7)},		/* csi21_dx4 */
+	{CSI21_DY4, (PTD | OFF_EN | OFF_PD | OFF_IN | M7)},		/* csi21_dy4 */
+	{CSI22_DX0, (IEN | M0)},					/* csi22_dx0 */
+	{CSI22_DY0, (IEN | M0)},					/* csi22_dy0 */
+	{CSI22_DX1, (IEN | M0)},					/* csi22_dx1 */
+	{CSI22_DY1, (IEN | M0)},					/* csi22_dy1 */
+	{CAM_SHUTTER, (OFF_EN | OFF_PD | OFF_OUT_PTD | M0)},		/* cam_shutter */
+	{CAM_STROBE, (OFF_EN | OFF_PD | OFF_OUT_PTD | M0)},		/* cam_strobe */
+	{CAM_GLOBALRESET, (PTD | OFF_EN | OFF_PD | OFF_OUT_PTD | M3)},	/* gpio_83 */
+	{ABE_MCBSP2_DR, (IEN | OFF_EN | OFF_OUT_PTD | M0)},		/* abe_mcbsp2_dr */
+	{ABE_MCBSP2_DX, (OFF_EN | OFF_OUT_PTD | M0)},			/* abe_mcbsp2_dx */
+	{ABE_MCBSP2_FSX, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* abe_mcbsp2_fsx */
+	{ABE_MCBSP1_CLKX, (IEN | M0)},					/* abe_mcbsp1_clkx */
+	{ABE_MCBSP1_DR, (IEN | M0)},					/* abe_mcbsp1_dr */
+	{ABE_MCBSP1_DX, (OFF_EN | OFF_OUT_PTD | M0)},			/* abe_mcbsp1_dx */
+	{ABE_MCBSP1_FSX, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* abe_mcbsp1_fsx */
+	{ABE_PDM_UL_DATA, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* abe_pdm_ul_data */
+	{ABE_PDM_DL_DATA, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* abe_pdm_dl_data */
+	{ABE_PDM_FRAME, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* abe_pdm_frame */
+	{ABE_PDM_LB_CLK, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* abe_pdm_lb_clk */
+	{ABE_CLKS, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* abe_clks */
+	{ABE_DMIC_CLK1, (M0)},						/* abe_dmic_clk1 */
+	{ABE_DMIC_DIN1, (IEN | M0)},					/* abe_dmic_din1 */
+	{ABE_DMIC_DIN2, (PTU | IEN | M3)},				/* gpio_121 */
+	{ABE_DMIC_DIN3, (IEN | M0)},					/* abe_dmic_din3 */
+	{UART2_CTS, (PTU | IEN | M7)},					/* uart2_cts */
+	{UART2_RTS, (M7)},						/* uart2_rts */
+	{UART2_RX, (PTU | IEN | M7)},					/* uart2_rx */
+	{UART2_TX, (M7)},						/* uart2_tx */
+	{HDQ_SIO, (M3)},						/* gpio_127 */
+	{MCSPI1_CLK, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi1_clk */
+	{MCSPI1_SOMI, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi1_somi */
+	{MCSPI1_SIMO, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi1_simo */
+	{MCSPI1_CS0, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* mcspi1_cs0 */
+	{MCSPI1_CS1, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M3)},	/* mcspi1_cs1 */
+	{MCSPI1_CS2, (PTU | OFF_EN | OFF_OUT_PTU | M3)},		/* gpio_139 */
+	{MCSPI1_CS3, (PTU | IEN | M3)},					/* gpio_140 */
+	{SDMMC5_CLK, (PTU | IEN | OFF_EN | OFF_OUT_PTD | M0)},		/* sdmmc5_clk */
+	{SDMMC5_CMD, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* sdmmc5_cmd */
+	{SDMMC5_DAT0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* sdmmc5_dat0 */
+	{SDMMC5_DAT1, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* sdmmc5_dat1 */
+	{SDMMC5_DAT2, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* sdmmc5_dat2 */
+	{SDMMC5_DAT3, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* sdmmc5_dat3 */
+	{MCSPI4_CLK, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi4_clk */
+	{MCSPI4_SIMO, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi4_simo */
+	{MCSPI4_SOMI, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi4_somi */
+	{MCSPI4_CS0, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* mcspi4_cs0 */
+	{UART4_RX, (IEN | M0)},						/* uart4_rx */
+	{UART4_TX, (M0)},						/* uart4_tx */
+	{USBB2_ULPITLL_CLK, (IEN | M3)},				/* gpio_157 */
+	{USBB2_ULPITLL_STP, (IEN | M5)},				/* dispc2_data23 */
+	{USBB2_ULPITLL_DIR, (IEN | M5)},				/* dispc2_data22 */
+	{USBB2_ULPITLL_NXT, (IEN | M5)},				/* dispc2_data21 */
+	{USBB2_ULPITLL_DAT0, (IEN | M5)},				/* dispc2_data20 */
+	{USBB2_ULPITLL_DAT1, (IEN | M5)},				/* dispc2_data19 */
+	{USBB2_ULPITLL_DAT2, (IEN | M5)},				/* dispc2_data18 */
+	{USBB2_ULPITLL_DAT3, (IEN | M5)},				/* dispc2_data15 */
+	{USBB2_ULPITLL_DAT4, (IEN | M5)},				/* dispc2_data14 */
+	{USBB2_ULPITLL_DAT5, (IEN | M5)},				/* dispc2_data13 */
+	{USBB2_ULPITLL_DAT6, (IEN | M5)},				/* dispc2_data12 */
+	{USBB2_ULPITLL_DAT7, (IEN | M5)},				/* dispc2_data11 */
+	{USBB2_HSIC_DATA, (PTD | OFF_EN | OFF_OUT_PTU | M3)},		/* gpio_169 */
+	{USBB2_HSIC_STROBE, (PTD | OFF_EN | OFF_OUT_PTU | M3)},		/* gpio_170 */
+	{UNIPRO_TX0, (PTD | IEN | M3)},					/* gpio_171 */
+	{UNIPRO_TY0, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col1 */
+	{UNIPRO_TX1, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col2 */
+	{UNIPRO_TY1, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col3: BOARD_ID2 (gpio_171) */
+	{UNIPRO_TX2, (PTU | IEN | M3)},					/* gpio_0 */
+	{UNIPRO_RX0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)},	/* kpd_row0 */
+	{UNIPRO_RY0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M3 | DIS)}, /* kpd_row1: BOARD_ID4 (gpio_2) */
+	{UNIPRO_RX1, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M3 | DIS)}, /* kpd_row2: BOARD_ID3 (gpio_3) */
+	{UNIPRO_RY1, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)},	/* kpd_row3 */
+	{UNIPRO_RX2, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)},	/* kpd_row4 */
+	{UNIPRO_RY2, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)},	/* kpd_row5 */
+	{USBA0_OTG_CE, (PTD | OFF_EN | OFF_PD | OFF_OUT_PTD | M0)},	/* usba0_otg_ce */
+	{USBA0_OTG_DP, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* usba0_otg_dp */
+	{USBA0_OTG_DM, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* usba0_otg_dm */
+	{FREF_CLK1_OUT, (M0)},						/* fref_clk1_out */
+	{SYS_NIRQ1, (PTU | IEN | M0)},					/* sys_nirq1 */
+	{SYS_NIRQ2, (PTU | IEN | M0)},					/* sys_nirq2 */
+	{SYS_BOOT0, (PTU | IEN | M3)},					/* gpio_184 */
+	{SYS_BOOT1, (M3)},						/* gpio_185 */
+	{SYS_BOOT2, (PTD | IEN | M3)},					/* gpio_186 */
+	{SYS_BOOT3, (M3)},						/* gpio_187 */
+	{SYS_BOOT4, (M3)},						/* gpio_188 */
+	{SYS_BOOT5, (PTD | IEN | M3)},					/* gpio_189 */
+	{DPM_EMU0, (IEN | M0)},						/* dpm_emu0 */
+	{DPM_EMU1, (IEN | M0)},						/* dpm_emu1 */
+	{DPM_EMU2, (IEN | M0)},						/* dpm_emu2 */
+	{DPM_EMU3, (IEN | M5)},						/* dispc2_data10 */
+	{DPM_EMU4, (IEN | M5)},						/* dispc2_data9 */
+	{DPM_EMU5, (IEN | M5)},						/* dispc2_data16 */
+	{DPM_EMU6, (IEN | M5)},						/* dispc2_data17 */
+	{DPM_EMU7, (IEN | M5)},						/* dispc2_hsync */
+	{DPM_EMU8, (IEN | M5)},						/* dispc2_pclk */
+	{DPM_EMU9, (IEN | M5)},						/* dispc2_vsync */
+	{DPM_EMU10, (IEN | M5)},					/* dispc2_de */
+	{DPM_EMU11, (IEN | M5)},					/* dispc2_data8 */
+	{DPM_EMU12, (IEN | M5)},					/* dispc2_data7 */
+	{DPM_EMU13, (IEN | M5)},					/* dispc2_data6 */
+	{DPM_EMU14, (IEN | M5)},					/* dispc2_data5 */
+	{DPM_EMU15, (IEN | M5)},					/* dispc2_data4 */
+	{DPM_EMU16, (M3)},						/* gpio_27 */
+	{DPM_EMU17, (IEN | M5)},					/* dispc2_data2 */
+	{DPM_EMU18, (IEN | M5)},					/* dispc2_data1 */
+	{DPM_EMU19, (IEN | M5)},					/* dispc2_data0 */
 };
 
-PAD_CONFIGURATION PadConfigurationTableAbc[] = {
-  { DSS_DATA18,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA19,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA20,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA21,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA22,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA23,    MUXMODE0,   PULL_DISABLED,                OUTPUT }
+PAD_CONFIGURATION PadConfigurationTableSharedWkup[] = {
+    {PAD1_SR_SCL, (PTU | IEN | M0)}, /* sr_scl */
+    {PAD0_SR_SDA, (PTU | IEN | M0)}, /* sr_sda */
+    {PAD1_SYS_32K, (IEN | M0)},	 /* sys_32k */
+    {PAD0_FREF_CLK3_OUT, (M0)}, /* fref_clk3_out */
+	{PAD0_SIM_IO, (IEN | M0)},		/* sim_io */
+	{PAD1_SIM_CLK, (M0)},			/* sim_clk */
+	{PAD0_SIM_RESET, (M0)},			/* sim_reset */
+	{PAD1_SIM_CD, (PTU | IEN | M0)},	/* sim_cd */
+	{PAD0_SIM_PWRCTRL, (M0)},		/* sim_pwrctrl */
+	{PAD1_FREF_XTAL_IN, (M0)},		/* # */
+	{PAD0_FREF_SLICER_IN, (M0)},		/* fref_slicer_in */
+	{PAD1_FREF_CLK_IOREQ, (M0)},		/* fref_clk_ioreq */
+	{PAD0_FREF_CLK0_OUT, (M2)},		/* sys_drm_msecure */
+	{PAD1_FREF_CLK3_REQ, M7},		/* safe mode */
+	{PAD0_FREF_CLK4_OUT, (PTU | M3)},	/* led status_2 */
+	{PAD0_SYS_NRESPWRON, (M0)},		/* sys_nrespwron */
+	{PAD1_SYS_NRESWARM, (M0)},		/* sys_nreswarm */
+	{PAD0_SYS_PWR_REQ, (PTU | M0)},		/* sys_pwr_req */
+	{PAD1_SYS_PWRON_RESET, (M3)},		/* gpio_wk29 */
+	{PAD0_SYS_BOOT6, (IEN | M3)},		/* gpio_wk9 */
+	{PAD1_SYS_BOOT7, (IEN | M3)},		/* gpio_wk10 */
 };
 
-PAD_CONFIGURATION PadConfigurationTableXm[] = {
-  { DSS_DATA18,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA19,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA20,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA21,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA22,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA23,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { SYS_BOOT0,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { SYS_BOOT1,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { SYS_BOOT3,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { SYS_BOOT4,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { SYS_BOOT5,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
-  { SYS_BOOT6,     MUXMODE3,   PULL_DISABLED,                OUTPUT }
+PAD_CONFIGURATION PadConfigurationTable4430Core[] = {
+	{ABE_MCBSP2_CLKX, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* abe_mcbsp2_clkx */
+};
+
+PAD_CONFIGURATION PadConfigurationTable4430Wkup[] = {
+	{PAD1_FREF_CLK4_REQ, (PTU | M3)},	/* led status_1 */
+};
+
+PAD_CONFIGURATION PadConfigurationTable4460Core[] = {
+	{ABE_MCBSP2_CLKX, (PTU | OFF_EN | OFF_OUT_PTU | M3)},		/* led status_1 */
+};
+
+PAD_CONFIGURATION PadConfigurationTable4460Wkup[] = {
+    {PAD1_FREF_CLK4_REQ, (M3)}, /* gpio_wk7 for TPS: Mode 3 */
 };
 
 VOID
 PadConfiguration (
-  PANDABOARD_REVISION Revision
+  PANDABOARD_REVISION BoardRevision
   )
 {
   UINTN             Index;
-  UINT16            PadConfiguration;
-  PAD_CONFIGURATION *BoardConfiguration;
   UINTN             NumPinsToConfigure;
 
-  for (Index = 0; Index < NUM_PINS_SHARED; Index++) {
-    // Set up Pad configuration for particular pin.
-    PadConfiguration =  (PadConfigurationTableShared[Index].MuxMode << MUXMODE_OFFSET);
-    PadConfiguration |= (PadConfigurationTableShared[Index].PullConfig << PULL_CONFIG_OFFSET);
-    PadConfiguration |= (PadConfigurationTableShared[Index].InputEnable << INPUTENABLE_OFFSET);
-
-    // Configure the pin with specific Pad configuration.
-    MmioWrite16(PadConfigurationTableShared[Index].Pin, PadConfiguration);
-  }
-
-  if (Revision == REVISION_XM) {
-    BoardConfiguration = PadConfigurationTableXm;
-    NumPinsToConfigure = NUM_PINS_XM;
-  } else {
-    BoardConfiguration = PadConfigurationTableAbc;
-    NumPinsToConfigure = NUM_PINS_ABC;
-  }
-
+  // Calculate number of pins for core domain
+  NumPinsToConfigure = sizeof(PadConfigurationTableSharedCore) / sizeof(PAD_CONFIGURATION);
+  
   for (Index = 0; Index < NumPinsToConfigure; Index++) {
-    //Set up Pad configuration for particular pin.
-    PadConfiguration =  (BoardConfiguration[Index].MuxMode << MUXMODE_OFFSET);
-    PadConfiguration |= (BoardConfiguration[Index].PullConfig << PULL_CONFIG_OFFSET);
-    PadConfiguration |= (BoardConfiguration[Index].InputEnable << INPUTENABLE_OFFSET);
-
-    //Configure the pin with specific Pad configuration.
-    MmioWrite16(BoardConfiguration[Index].Pin, PadConfiguration);
+    // Configure the pin with specific Pad configuration.
+    MmioWrite16((OMAP4430_CONTROL_MODULE_CORE_BASE+PadConfigurationTableSharedCore[Index].Off),
+	            PadConfigurationTableSharedCore[Index].Val);
   }
+
+  // Calculate number of pins for wkup domain
+  NumPinsToConfigure = sizeof(PadConfigurationTableSharedWkup) / sizeof(PAD_CONFIGURATION);
+  
+  for (Index = 0; Index < NumPinsToConfigure; Index++) {
+    // Configure the pin with specific Pad configuration.
+    MmioWrite16((OMAP4430_CONTROL_MODULE_WKUP_BASE+PadConfigurationTableSharedWkup[Index].Off),
+	            PadConfigurationTableSharedWkup[Index].Val);
+  }
+  
+  // If PandaBoard-ES
+  if( BoardRevision == PANDABOARD_REVISION_PANDAES ) {
+      // Calculate number of pins for core domain
+      NumPinsToConfigure = sizeof(PadConfigurationTable4460Core) / sizeof(PAD_CONFIGURATION);
+  
+      for (Index = 0; Index < NumPinsToConfigure; Index++) {
+        // Configure the pin with specific Pad configuration.
+        MmioWrite16((OMAP4430_CONTROL_MODULE_CORE_BASE+PadConfigurationTable4460Core[Index].Off),
+	              PadConfigurationTable4460Core[Index].Val);
+      }
+	  
+      // Calculate number of pins for wkup domain
+      NumPinsToConfigure = sizeof(PadConfigurationTable4460Wkup) / sizeof(PAD_CONFIGURATION);
+  
+      for (Index = 0; Index < NumPinsToConfigure; Index++) {
+        // Configure the pin with specific Pad configuration.
+        MmioWrite16((OMAP4430_CONTROL_MODULE_WKUP_BASE+PadConfigurationTable4460Wkup[Index].Off),
+	              PadConfigurationTable4460Wkup[Index].Val);
+      }
+  }
+  else {
+      // Calculate number of pins for core domain
+      NumPinsToConfigure = sizeof(PadConfigurationTable4430Core) / sizeof(PAD_CONFIGURATION);
+  
+      for (Index = 0; Index < NumPinsToConfigure; Index++) {
+        // Configure the pin with specific Pad configuration.
+        MmioWrite16((OMAP4430_CONTROL_MODULE_CORE_BASE+PadConfigurationTable4430Core[Index].Off),
+	              PadConfigurationTable4430Core[Index].Val);
+      }
+	  
+      // Calculate number of pins for wkup domain
+      NumPinsToConfigure = sizeof(PadConfigurationTable4430Wkup) / sizeof(PAD_CONFIGURATION);
+  
+      for (Index = 0; Index < NumPinsToConfigure; Index++) {
+        // Configure the pin with specific Pad configuration.
+        MmioWrite16((OMAP4430_CONTROL_MODULE_WKUP_BASE+PadConfigurationTable4430Wkup[Index].Off),
+	              PadConfigurationTable4430Wkup[Index].Val);
+      }
+  }
+
+  // EMIF pads
+  MmioWrite32 (0x4A100638, 0x7c7c7c7c);
+  MmioWrite32 (0x4A10063C, 0x7c7c7c7c);
+  MmioWrite32 (0x4A100640, 0x7C787C00);
+  MmioWrite32 (0x4A100644, 0xA0888C0F);
+
+  MmioWrite32 (0x4A100648, 0x7C7C7C7C);
+  MmioWrite32 (0x4A10064C, 0x7C7C7C7C);
+  MmioWrite32 (0x4A100650, 0x7C787C00);
+  MmioWrite32 (0x4A100654, 0xA0888C0F);
+
 }
