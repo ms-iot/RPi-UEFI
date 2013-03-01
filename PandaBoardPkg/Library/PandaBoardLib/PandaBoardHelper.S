@@ -20,41 +20,77 @@
 .text
 .align 3
 
-GCC_ASM_EXPORT(ArmPlatformIsBootMemoryInitialized)
-GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
+GCC_ASM_EXPORT(ArmPlatformPrePiBootAction)
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 
 /**
-  Called at the early stage of the Boot phase to know if the memory has already been initialized
-
-  Running the code from the reset vector does not mean we start from cold boot. In some case, we
-  can go through this code with the memory already initialized.
-  Because this function is called at the early stage, the implementation must not use the stack.
-  Its implementation must probably done in assembly to ensure this requirement.
-
-  @return   Return a non zero value if initialized
+  ArmPlatformPrePiBootAction
 
 **/
-ASM_PFX(ArmPlatformIsBootMemoryInitialized):
-  // The system memory is initialized by the PandaBoard firmware
-  mov   r0, #1
-  bx    lr
+ASM_PFX(ArmPlatformPrePiBootAction):
+  //relocate the relocator
+  sub r12,r12
+  orr r12,r12,#0x80000000
+  mov r3,r12                 // relocator target address (0x80000000)
+  ldr r0, =relocator_start   // relocator code start addr
+  ldr r1, =relocator_end     // relocator end addr
+  sub r1,r1,r0               // compute relocator code size
+  lsr r1,r1,#0x2             // size in words
+reloc_loop_reloc:            // copy relocator
+  ldm r0!,{r2}
+  stm r3!,{r2}
+  subs r1,r1,#0x1
+  bne reloc_loop_reloc
 
-    
-/**
-  Initialize the memory where the initial stacks will reside
+  // get chip id code
+  ldr r2,=0x4a002206         // control module id code address
+  ldrh r2,[r2]               // get higher order 16b
+  lsl r2,r2,#0x14
+  ldr r1,=0xb9400000         // compare with 4460 id
+  cmp r1,r2                  // Z bit set if 4460
 
-  This memory can contain the initial stacks (Secure and Secure Monitor stacks).
-  In some platform, this region is already initialized and the implementation of this function can
-  do nothing. This memory can also represent the Secure RAM.
-  This function is called before the satck has been set up. Its implementation must ensure the stack
-  pointer is not used (probably required to use assembly language)
+  // update dmm conf
+  mov r0,#0x4e
+  lsl r0,r0,#0x18            // load DMM LISA base address
+  ldr r2,=0x482af000         // load MA LISA base address
+  ldr r1,[r0,#0x40]          // get DMM LISA section 0
+  str r1,[r0,#0x4c]          // update DMM LISA section 3
+  streq r1,[r2,#0x4c]        // update MA LISA section 3 (when Z=1: 4460 only)
+  ldr r1,=0xff020100         // prepare LISA section 0
+  str r1,[r0,#0x40]          // update DMM LISA section 0
+  streq r1,[r2,#0x40]        // update MA LISA section 0 (when Z set: 4460 only)
+  bx r12                     // jump to relocator
 
-**/
-ASM_PFX(ArmPlatformInitializeBootMemory):
-  // We must need to go into this function
-  bx    lr
+relocator_start:
+  // update emif conf.
+  sub r2,r0,#0x1000000
+  sub r1,r2,#0x1000000
+  mov r0,#0x10
+  str r0,[r1,#0xc]
+  str r0,[r2,#0xc]
+  ldr r0,[r1,#0x8]
+  orr r0,r0,#0x8
+  str r0,[r1,#0x8]
+  str r0,[r2,#0x8]
 
+  // copy
+  add r1,r12,#0x8000
+  add r0,r1,#0x8000
+  mov r10,#0x1
+  lsl r11,r10,#0x5
+reloc_loop_1M:
+  lsl r10,r10,#0xA
+reloc_loop_4K:
+  ldm r0!,{r2-r9}
+  stm r1!,{r2-r9}
+  subs r10,r10,#1
+  bne reloc_loop_4K
+  add r0,r0,#0x8000
+  subs r11,r11,#1
+  add r10,r10,#0x1
+  bne reloc_loop_1M
+  bx lr
+relocator_end:
 
 //UINTN
 //ArmPlatformGetCorePosition (
