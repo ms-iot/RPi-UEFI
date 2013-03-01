@@ -47,12 +47,12 @@ ARM_CORE_INFO mVersatileExpressMpCoreInfoPandaBoard[] = {
 
 VOID
 PadConfiguration (
-  PANDABOARD_REVISION Revision
+  PANDABOARD_REVISION BoardRevision
   );
 
 VOID
 ClockInit (
-  VOID
+  PANDABOARD_REVISION BoardRevision
   );
 
 /**
@@ -61,26 +61,22 @@ ClockInit (
   @return Board revision
 **/
 PANDABOARD_REVISION
-PandaBoardGetRevision (
+PandaBoardGetBoardRevision (
   VOID
   )
 {
-#if 0
-  UINT32 OldPinDir;
   UINT32 Revision;
 
-  // Read GPIO 171, 172, 173
-  OldPinDir = MmioRead32 (GPIO6_BASE + GPIO_OE);
-  MmioWrite32(GPIO6_BASE + GPIO_OE, (OldPinDir | BIT11 | BIT12 | BIT13));
-  Revision = MmioRead32 (GPIO6_BASE + GPIO_DATAIN);
-  
-  // Restore I/O settings
-  MmioWrite32 (GPIO6_BASE + GPIO_OE, OldPinDir);
-  
-  return (PANDABOARD_REVISION)((Revision >> 11) & 0x7);
-#endif
+  // If Chip Id code matches 4460 processor
+  if( ((MmioRead32(CONTROL_CORE_ID_CODE)>>16)&0xFFF) == 0xb94 ) {
+    Revision = PANDABOARD_REVISION_PANDAES;
+  }
+  else {
+    // Assume 4430
+    Revision = PANDABOARD_REVISION_PANDA;
+  }
 
-  return 0;
+  return Revision;
 }
 
 /**
@@ -113,10 +109,7 @@ ArmPlatformGetBootMode (
 }
 
 /**
-  Initialize controllers that must setup at the early stage
-
-  Some peripherals must be initialized in Secure World.
-  For example, some L2x0 requires to be initialized in Secure World
+  Early board setup
 
 **/
 RETURN_STATUS
@@ -124,30 +117,21 @@ ArmPlatformInitialize (
   IN  UINTN                     MpId
   )
 {
-#if 0
   PANDABOARD_REVISION Revision;
 
-  Revision = PandaBoardGetRevision();
+  // Get chip version
+  Revision = PandaBoardGetBoardRevision();
 
   // Set up Pin muxing.
   PadConfiguration (Revision);
 
   // Set up system clocking
-  ClockInit ();
-
-  // Turn off the functional clock for Timer 3
-  MmioAnd32 (CM_FCLKEN_PER, 0xFFFFFFFF ^ CM_ICLKEN_PER_EN_GPT3_ENABLE );
-  ArmDataSyncronizationBarrier ();
-
-  // Clear IRQs
-  MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
-  ArmDataSyncronizationBarrier ();
-#endif
+  ClockInit (Revision);
 
   // Make sure GPMC region region 0 is disabled
   // Not doing so makes gpmc_init hang early in kernel init
   MmioAnd32 (GPMC_CONFIG7_0, ~CSVALID);
-
+  
   return RETURN_SUCCESS;
 }
 
