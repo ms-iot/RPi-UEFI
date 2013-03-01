@@ -57,17 +57,10 @@ ConfigureUSBHost (
   VOID
   )
 {
-  EFI_STATUS Status;
-  UINT8      Data = 0;
-
   // Take USB host out of force-standby mode
-  MmioWrite32 (UHH_SYSCONFIG, UHH_SYSCONFIG_MIDLEMODE_NO_STANDBY
-                            | UHH_SYSCONFIG_CLOCKACTIVITY_ON
-                            | UHH_SYSCONFIG_SIDLEMODE_NO_STANDBY
-                            | UHH_SYSCONFIG_ENAWAKEUP_ENABLE
-                            | UHH_SYSCONFIG_AUTOIDLE_ALWAYS_RUN);
-  MmioWrite32 (UHH_HOSTCONFIG, UHH_HOSTCONFIG_P3_CONNECT_STATUS_DISCONNECT
-                             | UHH_HOSTCONFIG_P2_CONNECT_STATUS_DISCONNECT
+  MmioWrite32 (UHH_SYSCONFIG, UHH_SYSCONFIG_STANDBYMODE_NO_STANDBY
+                            | UHH_SYSCONFIG_IDLEMODE_NO_IDLE);
+  MmioWrite32 (UHH_HOSTCONFIG, UHH_HOSTCONFIG_P2_CONNECT_STATUS_DISCONNECT
                              | UHH_HOSTCONFIG_P1_CONNECT_STATUS_DISCONNECT
                              | UHH_HOSTCONFIG_ENA_INCR_ALIGN_DISABLE
                              | UHH_HOSTCONFIG_ENA_INCR16_ENABLE
@@ -76,35 +69,17 @@ ConfigureUSBHost (
                              | UHH_HOSTCONFIG_AUTOPPD_ON_OVERCUR_EN_ON
                              | UHH_HOSTCONFIG_P1_ULPI_BYPASS_ULPI_MODE);
 
-  // USB reset (GPIO 147 - Port 5 pin 19) output high
-  MmioAnd32 (GPIO5_BASE + GPIO_OE, ~BIT19);
-  MmioWrite32 (GPIO5_BASE + GPIO_SETDATAOUT, BIT19);
+  // fref auxclk3 feeds USB3320 ULPI/DPDM converter with 19.2 MHz square clock
+  MmioWrite32 (SCRM_AUXCLK3, SCRM_AUXCLK3_VAL);
 
-  // Get the Power IC protocol
-  Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTWL6030);
-  ASSERT_EFI_ERROR (Status);  
+  // USB3320 and LAN9514 reset (HUB_NRESET: GPIO 62 - Port 2 pin 30 output high)
+  MmioAnd32 (GPIO2_BASE + GPIO_OE, ~BIT30);
+  MmioOr32 (GPIO2_BASE + GPIO_SETDATAOUT, BIT30);
 
-  // Power the USB PHY
-  Data = VAUX_DEV_GRP_P1;
-  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VAUX2_DEV_GRP), 1, &Data);
-  ASSERT_EFI_ERROR(Status);
-
-  Data = VAUX_DEDICATED_18V;
-  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VAUX2_DEDICATED), 1, &Data);
-  ASSERT_EFI_ERROR (Status);  
-
-  // Enable power to the USB hub
-  Status = gTWL6030->Read (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
-  ASSERT_EFI_ERROR (Status);
-
-  // LEDAON controls the power to the USB host, PWM is disabled
-  Data &= ~LEDAPWM;
-  Data |= LEDAON;
-
-  Status = gTWL6030->Write (gTWL6030, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
-  ASSERT_EFI_ERROR (Status);
+  // Enable power to USB hub (HUB_NPD: GPIO1 - Port 1 pin 1 output high)
+  MmioAnd32 (GPIO1_BASE + GPIO_OE, ~BIT1);
+  MmioOr32 (GPIO1_BASE + GPIO_SETDATAOUT, BIT1);
 }
-
 
 EFI_STATUS
 PciIoPollMem (
@@ -455,10 +430,6 @@ PciEmulationEntryPoint (
   UINT8                   CapabilityLength;
   UINT8                   PhysicalPorts;
   UINTN                   Count;
-
-  // TODO
-  // Currently this driver makes boot up crashing on Panda
-  return EFI_SUCCESS;
 
   //Configure USB host for OMAP4430.
   ConfigureUSBHost();
