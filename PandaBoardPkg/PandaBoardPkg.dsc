@@ -85,6 +85,7 @@
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   
   SerialPortLib|Omap44xxPkg/Library/SerialPortLib/SerialPortLib.inf
+  SerialPortExtLib|EmbeddedPkg/Library/TemplateSerialPortExtLib/TemplateSerialPortExtLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
 
   RealTimeClockLib|Omap44xxPkg/Library/RealTimeClockLib/RealTimeClockLib.inf

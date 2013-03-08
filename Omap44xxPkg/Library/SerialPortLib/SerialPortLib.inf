@@ -17,7 +17,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PandaBoardSerialPortLib
   FILE_GUID                      = 97546cbd-c0ff-4c48-ab0b-e4f58862acd3
-  MODULE_TYPE                    = PEIM
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib
 
