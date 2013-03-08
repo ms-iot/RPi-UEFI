@@ -17,7 +17,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SerialPortLib
   FILE_GUID                      = 8ecefc8f-a2c4-4091-b80f-20f7aeb0567f
-  MODULE_TYPE                    = PEIM
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib
 
