@@ -46,6 +46,7 @@
   # ARM PL390 General Interrupt Driver in Secure and Non-secure
   ArmGicSecLib|SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/Gic400Dxe/PL390GicSecLib.inf
   ArmGicLib|SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/Gic400Dxe/PL390GicLib.inf
+  ArmSmcLib|ArmPkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
