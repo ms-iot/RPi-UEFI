@@ -48,6 +48,7 @@
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
+  ArmSmcLib|ArmPkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
 
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
