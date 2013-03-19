@@ -69,6 +69,11 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|TRUE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|TRUE
+
 !ifdef $(EDK2_SKIP_PEICORE)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
