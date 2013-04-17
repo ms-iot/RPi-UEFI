@@ -147,6 +147,9 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x2C001000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C002000
 
+  # Ethernet (SMSC 91C111)
+  gArmPlatformTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
+
   #
   # ARM OS Loader
   #
