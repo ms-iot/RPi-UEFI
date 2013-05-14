@@ -14,8 +14,49 @@
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/TimerLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include "Mmc.h"
+
+#define MAX_RETRY_COUNT  1000
+#define CMD_RETRY_COUNT  20
+
+#define TPL_FIRMWARE_INTERRUPTS   ((EFI_TPL)((int) TPL_NOTIFY + 1))
+#define TPL_FOR_MMC_BLOCK_IO      TPL_FIRMWARE_INTERRUPTS
+
+EFI_TPL
+CurrentTpl() {
+  const EFI_TPL Current = gBS->RaiseTPL(TPL_HIGH_LEVEL) ;
+  gBS->RestoreTPL(Current) ;
+  return Current ;
+}
+
+EFI_TPL
+RaiseTplIfLow() {
+  EFI_TPL Current = CurrentTpl() ;
+  /*
+    UEFI Spec states:
+    TPL_CALLBACK Interrupts code executing below TPL_CALLBACK level. Long
+      term operations (such as file system operations and disk I/O) can occur
+      at this level.
+    TPL_NOTIFY Interrupts code executing below TPL_NOTIFY level. Blocking is
+      not allowed at this level. Code executes to completion and returns. If
+      code requires more processing, it needs to signal an event to wait to
+      obtain control again at whatever level it requires. This level is
+      typically used to process low level IO to or from a device.
+    (Firmware Interrupts) This level is internal to the firmware . It is the
+      level at which internal interrupts occur. Code running at this level
+      interrupts code running at the TPL_NOTIFY level (or lower levels). If
+      the interrupt requires extended time to complete, firmware signals
+      another event (or events) to perform the longer term operations so that
+      other interrupts can occur.
+   */
+  if (Current < TPL_FOR_MMC_BLOCK_IO) {
+    Current = gBS->RaiseTPL(TPL_FOR_MMC_BLOCK_IO) ;
+  }
+  return Current ;
+}
+
 
 EFI_STATUS
 MmcNotifyState (
@@ -146,6 +187,7 @@ MmcIoBlocks (
   EFI_MMC_HOST_PROTOCOL   *MmcHost;
   UINTN                   BytesRemainingToBeTransfered;
   UINTN                   BlockCount;
+  EFI_TPL                 Tpl;
 
   BlockCount = 1;
   MmcHostInstance = MMC_HOST_INSTANCE_FROM_BLOCK_IO_THIS (This);
@@ -225,8 +267,11 @@ MmcIoBlocks (
       // Write a single block
       Cmd = MMC_CMD24;
     }
+    // Raise Tpl to protect against Timer events between command and block IO
+    Tpl = RaiseTplIfLow() ;
     Status = MmcHost->SendCommand (MmcHost, Cmd, CmdArg);
     if (EFI_ERROR (Status)) {
+      gBS->RestoreTPL(Tpl);
       DEBUG ((EFI_D_ERROR, "MmcIoBlocks(MMC_CMD%d): Error %r\n", Cmd, Status));
       return Status;
     }
@@ -234,6 +279,7 @@ MmcIoBlocks (
     if (Transfer == MMC_IOBLOCKS_READ) {
       // Read one block of Data
       Status = MmcHost->ReadBlockData (MmcHost, Lba, This->Media->BlockSize, Buffer);
+      gBS->RestoreTPL(Tpl) ;
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_BLKIO, "MmcIoBlocks(): Error Read Block Data and Status = %r\n", Status));
         MmcStopTransmission (MmcHost);
