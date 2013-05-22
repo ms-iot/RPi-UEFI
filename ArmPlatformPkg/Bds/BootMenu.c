@@ -705,12 +705,32 @@ BootShell (
   return Status;
 }
 
+EFI_STATUS
+Reboot (
+  IN LIST_ENTRY *BootOptionsList
+  )
+{
+  gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+Shutdown (
+  IN LIST_ENTRY *BootOptionsList
+  )
+{
+  gRT->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+  return EFI_UNSUPPORTED;
+}
+
 struct BOOT_MAIN_ENTRY {
   CONST CHAR16* Description;
   EFI_STATUS (*Callback) (IN LIST_ENTRY *BootOptionsList);
 } BootMainEntries[] = {
     { L"Boot Manager", BootMenuManager },
     { L"Shell", BootShell },
+    { L"Reboot", Reboot },
+    { L"Shutdown", Shutdown },
 };
 
 
