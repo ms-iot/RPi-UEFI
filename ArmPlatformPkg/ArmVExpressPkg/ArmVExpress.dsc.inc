@@ -356,9 +356,6 @@
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
 [Components.common]
-  # Versatile Express FileSystem
-  ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
-
   #
   # Networking stack
   #
