@@ -40,8 +40,8 @@
 
 // Length of the buffer used to hold the user input for the main menu
 // This includes the NULL terminator
-// 1 chars + NULL gives room for up to 9 boot device configs
-#define BOOT_OPTION_LEN   2
+// 1 chars + newline + NULL gives room for up to 9 boot device configs
+#define BOOT_OPTION_LEN   3
 
 #define ARM_BDS_OPTIONAL_DATA_SIGNATURE   SIGNATURE_32('a', 'b', 'o', 'd')
 
