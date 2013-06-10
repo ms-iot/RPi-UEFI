@@ -37,12 +37,18 @@
 [Sources.common]
   CTA5s.c
   CTA5sMem.c
+  CTA5Helper.asm | RVCT
+  CTA5Helper.S   | GCC
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
 
 [FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
   gArmTokenSpaceGuid.PcdFvBaseAddress
+
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
