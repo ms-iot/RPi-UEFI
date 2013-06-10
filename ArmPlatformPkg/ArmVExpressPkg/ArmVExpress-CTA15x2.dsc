@@ -99,6 +99,7 @@
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"  
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress"
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|2
 
   #
   # NV Storage PCDs. Use base of 0x00000000 for NOR1
@@ -128,9 +129,6 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x40000000
   
-  # Size of the region used by UEFI in permanent memory (Reserved 64MB)
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
-    
   #
   # ARM Pcds
   #
@@ -154,9 +152,6 @@
   ## PL011 - Serial Terminal
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x1c090000
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|38400
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x1C170000
@@ -288,7 +283,7 @@
   ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
   #
-  # Semi-hosting filesystem
+  # Filesystems
   #
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
   
@@ -303,13 +298,7 @@
   #
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  FatPkg/EnhancedFatDxe/Fat.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-
-  #
-  # Application
-  #  
-  EmbeddedPkg/Ebl/Ebl.inf
 
   #
   # Bds
