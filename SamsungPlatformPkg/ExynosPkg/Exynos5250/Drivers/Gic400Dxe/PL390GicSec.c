@@ -15,6 +15,7 @@
 #include <Base.h>
 #include <Library/ArmLib.h>
 #include <Library/DebugLib.h>
+#include <Library/ArmPlatformLib.h>
 #include <Library/IoLib.h>
 #include <Library/ArmGicLib.h>
 
@@ -50,7 +51,7 @@ ArmGicSetupNonSecure (
   }
 
   // Only the primary core should set the Non Secure bit to the SPIs (Shared Peripheral Interrupt).
-  if (IS_PRIMARY_CORE(MpId)) {
+  if (ArmPlatformIsPrimaryCore (MpId)) {
     // Ensure all GIC interrupts are Non-Secure
     for (Index = 0; Index < (ArmGicGetMaxNumInterrupts (GicDistributorBase) / 32); Index++) {
       MmioWrite32 (GicDistributorBase + ARM_GIC_ICDISR + (Index * 4), 0xffffffff);
