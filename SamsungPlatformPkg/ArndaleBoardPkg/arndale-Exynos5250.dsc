@@ -56,7 +56,6 @@
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A8 --fpu=softvfp -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Exynos5250/Include/Platform
 
-  #GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a8 -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Exynos5250/Include/Platform
   GCC:*_*_ARM_PLATFORM_FLAGS == -march=armv7-a -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Exynos5250/Include/Platform
 
   XCODE:*_*_ARM_PLATFORM_FLAGS == -arch armv7 -I$(WORKSPACE)/SamsungPlatformPkg/ExynosPkg/Exynos5250/Include/Platform
@@ -242,7 +241,6 @@
   SamsungPlatformPkg/ExynosPkg/Exynos5250/MemoryInitPei/MemoryInitPeim.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
-  #Nt32Pkg/BootModePei/BootModePei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
     <LibraryClasses>
@@ -268,22 +266,17 @@
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
-  #MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  #MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
-  #MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
-  #EmbeddedPkg/SerialDxe/SerialDxe.inf
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
-  #MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 
   SamsungPlatformPkg/ArndaleBoardPkg/FvbDxe/FvbDxe.inf
   SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/TimerDxe/TimerDxe.inf
@@ -318,9 +311,6 @@
   #
   # Application
   #
-  #SamsungPlatformPkg/Apps/TestApps/HashServicesTest/HashServicesTest.inf
-  #SamsungPlatformPkg/Apps/TestApps/RngServicesTest/RngServicesTest.inf
-
   #
   # Bds
   #
@@ -346,9 +336,7 @@
   # usb host : ehci + bus + pci_emul + mass_storage
   #
   SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/PciEmulation/PciEmulation.inf
-  #SamsungPlatformPkg/ExynosPkg/Exynos5250/OhciDxe/OhciDxe.inf
   MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  #MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
@@ -363,8 +351,6 @@
     <LibraryClasses>
       LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
   }
-  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
-  #MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   SamsungPlatformPkg/Apps/Tools/fwupdate/fwupdate_5250.inf
@@ -372,9 +358,7 @@
   #
   # Crypto for Exynos
   #
-  #SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/HashDxe/HashDxe.inf
 
   #
   # Rng for Exynos
   #
-  #SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/RngDxe/RngDxe.inf
