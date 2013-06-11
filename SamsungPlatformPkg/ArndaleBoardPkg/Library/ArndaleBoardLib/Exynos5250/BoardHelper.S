@@ -14,6 +14,7 @@
 #include <AsmMacroIoLib.h>
 #include <Base.h>
 #include <Library/PcdLib.h>
+#include <Library/ArmLib.h>
 #include <AutoGen.h>
 #.include AsmMacroIoLib.inc
 
@@ -23,6 +24,9 @@
 .align 2
 
 GCC_ASM_EXPORT(ArmGetCpuCountPerCluster)
+GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
+GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
 
 # IN None
 # OUT r0 = SCU Base Address
@@ -67,5 +71,26 @@ _Return:
   add   r0, r0, #1
   ldmfd SP!, {r1-r2}
   bx lr
+
+ASM_PFX(ArmPlatformIsPrimaryCore):
+  #last 2 bit of mpid register in 5250 is CPU ID
+  ldr   r1, =0x3
+  and   r0, r0, r1
+  #id for core0 should be 0
+  ldr   r1, =0x0
+  cmp   r0, r1
+  moveq r0, #1
+  movne r0, #0
+  mov pc,  lr
+
+ASM_PFX(ArmPlatformGetCorePosition):
+  and  r1, r0, #0x03 //cpu core mask last 2 bits
+  and  r0, r0, #(0x0f<<8) //cpu cluster mask bit 8-11
+  add  r0, r1, r0, LSR #7
+  mov pc, lr
+
+
+ASM_PFX(ArmPlatformPeiBootAction):
+  mov pc, lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED 

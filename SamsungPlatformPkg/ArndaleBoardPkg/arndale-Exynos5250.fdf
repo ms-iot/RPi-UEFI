@@ -120,7 +120,6 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  #INF ArmPlatformPkg/Sec/Sec.inf
   INF SamsungPlatformPkg/ExynosPkg/Exynos5250/Sec/Sec.inf
 
 
@@ -155,8 +154,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   INF MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
-  #INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-  #INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
@@ -166,14 +163,10 @@ READ_LOCK_STATUS   = TRUE
   # Multiple Console IO support
   #
   INF MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
-  #INF MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   INF EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
-  #INF EmbeddedPkg/SerialDxe/SerialDxe.inf
-
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
-  #INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 
 !ifdef $(EXYNOS5250_EVT1)
   INF SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/Gic400Dxe/PL390GicDxe.inf
@@ -207,9 +200,7 @@ READ_LOCK_STATUS   = TRUE
   # USB HOST STACK
   #
   INF SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/PciEmulation/PciEmulation.inf
-  #INF SamsungPlatformPkg/ExynosPkg/Exynos5250/OhciDxe/OhciDxe.inf
   INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  #INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
@@ -223,20 +214,14 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
   INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
   INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
-  INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
-  #INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
   # Crypto for Exynos
   #
-  #INF SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/HashDxe/HashDxe.inf
-  #INF SamsungPlatformPkg/ExynosPkg/Exynos5250/Drivers/RngDxe/RngDxe.inf
 
   #
   # UEFI application (Shell Embedded Boot Loader)
   #
   INF ShellBinPkg/UefiShell/UefiShell.inf 
-  #INF SamsungPlatformPkg/Apps/TestApps/HashServicesTest/HashServicesTest.inf
-  #INF SamsungPlatformPkg/Apps/TestApps/RngServicesTest/RngServicesTest.inf
 
   #
   # Bds

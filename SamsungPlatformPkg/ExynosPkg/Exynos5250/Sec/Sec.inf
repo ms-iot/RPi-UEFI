@@ -62,9 +62,6 @@
   gArmTokenSpaceGuid.PcdArmNsacr
   gArmTokenSpaceGuid.PcdArmNonSecModeTransition
 
-  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
-  gArmTokenSpaceGuid.PcdArmPrimaryCore
-
   gArmTokenSpaceGuid.PcdSecureFvBaseAddress
   gArmTokenSpaceGuid.PcdSecureFvSize
 
