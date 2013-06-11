@@ -21,6 +21,7 @@
 #include <Library/ArmGicLib.h>
 #include <Library/ArmCpuLib.h>
 #include <Library/IoLib.h>
+#include <Library/ArmPlatformLib.h>
 #include "SecInternal.h"
 #include "Smc.h"
 
@@ -94,7 +95,7 @@ CEntryPoint (
   }
 
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
-  if (IS_PRIMARY_CORE(MpId)) {
+  if (ArmPlatformIsPrimaryCore (MpId)) {
     if (ArmIsMpCore()) {
       // Is UEFI built as it is assumed that TZSW is running?
       // PcdTrustzoneSupport==1: YES.
@@ -174,7 +175,7 @@ TrustedWorldInitialization (
   ArmPlatformSecTrustzoneInit (MpId);
 
   // Setup the Trustzone Chipsets
-  if (IS_PRIMARY_CORE(MpId)) {
+  if (ArmPlatformIsPrimaryCore (MpId)) {
     if (ArmIsMpCore()) {
       // Signal the secondary core the Security settings is done (event: EVENT_SECURE_INIT)
       ArmCallSEV ();
