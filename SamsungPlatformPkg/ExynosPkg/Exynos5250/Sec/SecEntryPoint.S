@@ -14,12 +14,14 @@
 #include <AutoGen.h>
 #include <AsmMacroIoLib.h>
 #include <Library/ArmPlatformLib.h>
+#include <ArmPlatform.h>
 #include "SecInternal.h"
 
 .text
 .align 3
 
 GCC_ASM_IMPORT(CEntryPoint)
+GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
 GCC_ASM_IMPORT(CopyFirmwareFromEMMC)
 GCC_ASM_IMPORT(CopyFirmwareFromSDMMC)
 GCC_ASM_IMPORT(ArmPlatformClockInitialize)
@@ -35,6 +37,16 @@ GCC_ASM_EXPORT(_ModuleEntryPoint)
 
 SecStartupAddr:	    .word       ASM_PFX(_SecEntryFromTzsw)
 StartupAddr:        .word       ASM_PFX(CEntryPoint)
+
+// Convert the (ClusterId,CoreId) into a Core Position
+// 0x0F03 is the magic value for ARM_CORE_MASK | ARM_CLUSTER_MASK
+//Core is 0-1 bits and cluster is 8-11 bits
+#define GetCorePositionFromMpId(Pos, MpId, Tmp)    \
+	ldr   Tmp, =0x0F03 ;                             \
+	and   MpId, Tmp ;                                \
+	lsr   Pos, MpId, #6 ;                            \
+	and   Tmp, MpId, #3 ;                            \
+	add   Pos, Pos, Tmp
 
 // Reserve a region at the top of the IRAM Core stack
 // for Global variables for the XIP phase
@@ -85,13 +97,13 @@ ASM_PFX(_ModuleEntryPoint):
 _IdentifyCpu:
   // Identify CPU ID
   bl   ASM_PFX(ArmReadMpidr)
-  // Get ID of this CPU in Multicore system
-  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCoreMask), r1)
-  and  r5, r0, r1
+ // Keep a copy of the MpId register value
+  mov   r5, r0
 
   // Is it the Primary Core ?
-  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r3)
-  cmp  r5, r3
+  bl   ASM_PFX(ArmPlatformIsPrimaryCore)
+  cmp   r0, #1
+
   // Only the primary core initialize the memory (SMC)
   beq  _InitMem
 
@@ -118,9 +130,6 @@ _InitMem:
   SetiRamStack (r1, r2, r3)
 
   bl  ASM_PFX(ArmPlatformSecBootMemoryInit)
-
-  // Only Primary CPU could run this line (the secondary cores have jumped from _IdentifyCpu to _SetupStack)
-  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r5)
 
 _SetupPrimaryCoreStack:
   // Get the top of the primary stacks (and the base of the secondary stacks)
