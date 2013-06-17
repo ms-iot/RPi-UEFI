@@ -21,7 +21,11 @@
   PLATFORM_GUID                  = 3a91a0f8-3af4-409d-a71d-a199dc134357
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
+!ifdef $(EDK2_OUT_DIR)
+  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)
+!else
   OUTPUT_DIRECTORY               = Build/ArmVExpress-RTSM-A15_MPCore
+!endif
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
