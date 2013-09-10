@@ -23,6 +23,9 @@
 GCC_ASM_EXPORT(ArmPlatformPrePiBootAction)
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 
+GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
+
 /**
   ArmPlatformPrePiBootAction
 
@@ -98,5 +101,19 @@ relocator_end:
 //  );
 ASM_PFX(ArmPlatformGetCorePosition):
   bx    lr
+
+ASM_PFX(ArmPlatformIsPrimaryCore):
+  #Bits 8 through 11 are CPU ID
+  ldr   r1, =0xf00
+  and   r0, r0, r1
+  #id for core0 should be 0
+  ldr   r1, =0x0
+  cmp   r0, r1
+  moveq r0, #1
+  movne r0, #0
+  mov   pc, lr
+
+ASM_PFX(ArmPlatformPeiBootAction):
+  mov pc, lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
