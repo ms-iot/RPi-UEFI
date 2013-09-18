@@ -57,7 +57,7 @@ NumBlocks     = 0x280
 gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvSize
 FV = FVMAIN_SEC
 
-0x00080000|0x00280000
+0x00080000|0x00200000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
