@@ -28,10 +28,10 @@
 
 [FD.Arndale_EFI]
 BaseAddress   = 0x40000000|gArmTokenSpaceGuid.PcdFdBaseAddress
-Size          = 0x00280000|gArmTokenSpaceGuid.PcdFdSize
+Size          = 0x00294000|gArmTokenSpaceGuid.PcdFdSize
 ErasePolarity = 1
 BlockSize     = 0x00014000
-NumBlocks     = 0x20
+NumBlocks     = 0x21
 
 ################################################################################
 #
@@ -53,7 +53,7 @@ NumBlocks     = 0x20
 gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvSize
 FV = FVMAIN_SEC
 
-0x00014000|0x00270000
+0x00014000|0x0026C000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
