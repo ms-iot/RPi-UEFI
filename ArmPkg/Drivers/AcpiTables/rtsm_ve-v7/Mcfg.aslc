@@ -1,0 +1,62 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#define ACPI_5_0_MCFG_VERSION  0x1
+
+#pragma pack(1)
+typedef struct
+{
+   EFI_ACPI_DESCRIPTION_HEADER Header;
+   UINT64 Reserved1;
+   UINT64 ullBaseAddress;
+   UINT16 usSegGroupNum;
+   UINT8  ucStartBusNum;
+   UINT8  ucEndBusNum;
+   UINT32 Reserved2;
+}EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE;
+#pragma pack()
+
+EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE Mcfg=
+{
+  {
+      EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE),
+      ACPI_5_0_MCFG_VERSION,
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION
+    },
+    0x0000000000000000,                                 //Reserved
+    0x0000000000000000,                                 //Base Address
+    0x0000,                                             //Segment Group Number
+    0x00,                                               //Start Bus Number
+    0x00,                                               //End Bus Number
+    0x00000000,                                         //Reserved
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Mcfg;
+}

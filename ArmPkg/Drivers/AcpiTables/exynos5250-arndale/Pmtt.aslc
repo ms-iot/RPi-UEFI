@@ -1,0 +1,216 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#define EFI_ACPI_MEMORY_AGGREGATOR_TYPE_SOCKET          00     //socket
+#define EFI_ACPI_MEMORY_AGGREGATOR_TYPE_MEMCTRL         01    //Memory Controller
+#define EFI_ACPI_MEMORY_AGGREGATOR_TYPE_DIMM            02	  //DIMM
+#define EFI_ACPI_MEMORY_AGGREGATOR_TYPE_RESVERVED       03	  //RESVERVED
+
+#define EFI_ACPI_MEMORY_AGGREGATOR_FLAG_TLAD         01
+#define EFI_ACPI_MEMORY_AGGREGATOR_FLAG_PHYELEMENT   02	// BIT1 - set to 1 since socket is a physical element of the topology
+//Bit 2 and 3 - If 00, indicates that all components aggregated by this device implements volatile memory
+// If 01, indicates that components aggregated by this device implements both volatile and non-volatile memory
+// If 10, indicates that all components aggregated by this device implements non-volatile memory
+#define EFI_ACPI_MEMORY_AGGREGATOR_FLAG__VOLATILE     00
+#define EFI_ACPI_MEMORY_AGGREGATOR_FLAG__MIXED        4
+#define EFI_ACPI_MEMORY_AGGREGATOR_FLAG__NONVOLATILE  0x08
+#define EFI_ACPI_MEMORY_AGGREGATOR_FLAG__RSVD         0x0C
+
+#define MAXNUMBER_OF_PROXIMITY_DOMAINS  0x3
+
+#define MAX_SOCKET          0x2
+#define NUM_MEM_CONTROLLERS 0x2
+#define MAX_DIMM            0x02
+
+#pragma pack (1)
+// PMMT Table fields
+typedef struct {
+  UINT32                                  ReadLatency;
+  UINT32                                  WriteLatency;
+  UINT32                                  ReadBW;
+  UINT32                                  WriteBW;
+  UINT16                                  OptimalAccUnit;
+  UINT16                                  OptimalAccAlignment;
+} EFI_ACPI_MEMCTRL_CHAR_TABLE;
+
+typedef struct {
+  UINT8                                     Type;
+  UINT8                                     Rsvd;
+  UINT16                                    Length;
+  UINT16                                    Flag;
+  UINT16                                    Rsvd1;
+  UINT16                                    PhyCompIdentifier;
+  UINT16                                    Rsvd2;
+  UINT32                                    Size;
+  UINT32                                    SmBiosHandle;
+} EFI_ACPI_MEMORY_AGGREGATOR_DIMM_STRUC;
+
+typedef struct {
+  UINT8                                     Type;
+  UINT8                                     Rsvd;
+  UINT16                                    Length;
+  UINT16                                    Flag;
+  UINT16                                    Rsvd1;
+  EFI_ACPI_MEMCTRL_CHAR_TABLE               MemCtrlCharTable;
+  UINT16               	                    Rsvd2;
+  UINT16                                    NumProxDomains;
+  UINT32                                    ProxDomain[MAXNUMBER_OF_PROXIMITY_DOMAINS];
+  EFI_ACPI_MEMORY_AGGREGATOR_DIMM_STRUC     PhyCompIdentStruc[MAX_DIMM];
+} EFI_ACPI_MEMORY_AGGREGATOR_MEMCTRL_STRUC;
+
+typedef struct {
+  UINT8                                     Type;
+  UINT8                                     Rsvd;
+  UINT16                                    Length;
+  UINT16                                    Flag;
+  UINT16                                    Rsvd1;
+  UINT16                                    SckIdent;
+  UINT16                                    Rsvd2;
+  EFI_ACPI_MEMORY_AGGREGATOR_MEMCTRL_STRUC  MemCtrlStruc[NUM_MEM_CONTROLLERS];
+} EFI_ACPI_MEMORY_AGGREGATOR_SOCKET_STRUC;
+
+typedef struct {
+  EFI_ACPI_5_0_MEMORY_TOPOLOGY_TABLE               Header; 
+  EFI_ACPI_MEMORY_AGGREGATOR_SOCKET_STRUC   TopLevelmemAggrDevStruc[MAX_SOCKET];
+} EFI_ACPI_5_0_PLATFORM_MEMORY_TOPOLOGY_TABLE;
+#pragma pack ()
+
+
+EFI_ACPI_5_0_PLATFORM_MEMORY_TOPOLOGY_TABLE Pmtt = {
+  {
+    { 
+      EFI_ACPI_5_0_PLATFORM_MEMORY_TOPOLOGY_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_5_0_PLATFORM_MEMORY_TOPOLOGY_TABLE),   // Length
+      EFI_ACPI_5_0_MEMORY_TOPOLOGY_TABLE_REVISION,   // Revision
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION 
+    },
+    EFI_ACPI_RESERVED_DWORD,                           // Reserved[0]  
+  },
+  {
+    /*Socket 0*/
+    {
+      0x00,                                           //Subtable Type:Socket
+      0x00,                                           //Reserved
+      0x0080,                                         //Length
+      0x0001,                                         //Flags 
+      0x0000,                                         //Reserved
+      0x0000,                                         //Socket ID 
+      0x0000,                                          //Reserved
+      {
+        /*Memory Controller 1*/
+
+        {
+          0x01,                                         //Subtable Type:Memory Controller
+          0x00,                                         //Reserved
+          0x0054,                                       //Length
+          0x0005,                                       //Flags
+          0x0000,                                       //Reserved
+          {
+            0x00000000,                                   //Read Latency
+            0x00000000,                                   //Write Latency 
+            0x00000000,                                   //Read Bandwidth
+            0x00000000,                                   //Write Bandwidth
+            0x0000,                                       //Access Width
+            0x0000,                                       //Alignment
+          },
+          0x0000,                                       //Reserved
+          MAXNUMBER_OF_PROXIMITY_DOMAINS,                  //Domain Count
+          0x00000000,                                   //Proximity Domain
+          0x00000000,                                   //Proximity Domain
+          0x00000000,                                   //Proximity Domain  
+          {
+            /*DIMM 0*/
+            {
+               0x02,                                      //Subtable Type:Physical Component (DIMM)
+               0x00,                                      //Reserved
+               0x0014,                                    //Length
+               0x0002,                                    //Flags
+               0x0000,                                    //Reserved
+               0x0000,                                    //Component ID
+               0x0000,                                    //Reserved
+               0x00000000,                                //Memory Size
+               0x00000000,                                //Bios Handle
+            },
+            /*DIMM 1*/
+            {
+               0x02,                                      //Subtable Type:Physical Component (DIMM)
+               0x00,                                      //Reserved
+               0x0014,                                    //Length
+               0x0002,                                    //Flags
+               0x0000,                                    //Reserved
+               0x0000,                                    //Component ID
+               0x0000,                                    //Reserved
+               0x00000000,                                //Memory Size
+               0x00000000,                                //Bios Handle
+            },
+          },
+        },
+      
+        /*Memory Controller 2*/         
+        {
+          0x01,                                         //Subtable Type:Memory Controller
+          0x00,                                         //Reserved
+          0x0020,                                       //Length
+          0x0001,                                       //Flags
+          0x0000,                                       //Reserved
+          {
+            0x00000000,                                   //Read Latency
+            0x00000000,                                   //Write Latency 
+            0x00000000,                                   //Read Bandwidth
+            0x00000000,                                   //Write Bandwidth
+            0x0000,                                       //Access Width
+            0x0000                                       //Alignment
+          },
+          0x0000,                                       //Reserved
+          0x0000,                                      //Domain Count
+            {0},
+            {0},
+         
+        },
+      },
+    },
+  
+   
+    /*Socket 1*/
+    {
+      0x00,                                           //Subtable Type:Socket
+      0x00,                                           //Reserved
+      0x000c,                                         //Length
+      0x0001,                                         //Flags 
+      0x0000,                                         //Reserved
+      0x0000,                                         //Socket ID 
+      0x0000                                         //Reserved   
+    },
+  },
+    
+   
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Pmtt;
+}

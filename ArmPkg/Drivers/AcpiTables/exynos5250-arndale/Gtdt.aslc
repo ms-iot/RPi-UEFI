@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+EFI_ACPI_5_0_GENERIC_TIMER_DESCRIPTION_TABLE Gtdt =
+{
+    {
+      EFI_ACPI_5_0_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_5_0_GENERIC_TIMER_DESCRIPTION_TABLE),
+      EFI_ACPI_5_0_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION,
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION
+    },
+    0x0000000000000000,                             //Timer Address
+    0x00000001,                                     //Flags 
+    0x00000000,                                     //Secure PL1 Interrupt
+    0x00000000,                                     //SPL1 Flags 
+    0x00000000,                                     //Non-Secure PL1 Interrupt
+    0x00000000,                                     //NSPL1 Flags 
+    0x00000000,                                     //Virtual Timer Interrupt
+    0x00000000,                                     //VT Flags 
+    0x00000000,                                     //Non-Secure PL2 Interrupt
+    0x00000000,                                     //NSPL2 Flags
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Gtdt;
+}
+
+
