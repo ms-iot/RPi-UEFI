@@ -49,6 +49,14 @@
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressLib.inf
   ArmTrustZoneLib|ArmPlatformPkg/Drivers/ArmTrustZone/ArmTrustZone.inf
 
+#!ifdef $(EDK2_ARMVE_NETWORK)
+  # Networking Requirements
+  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+  DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
+  UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
+  IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
+#!endif
+
   # ARM PL310 L2 Cache Driver
   L2X0CacheLib|ArmPlatformPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
   # ARM PL354 SMC Driver
@@ -197,6 +205,11 @@
   #
   gArmTokenSpaceGuid.PcdL2x0ControllerBase|0x1E00A000
 
+  #
+  # LAN9118 Ethernet Driver PCDs
+  #
+  gArmPlatformTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x4E000000
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -300,7 +313,6 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
-  #
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
