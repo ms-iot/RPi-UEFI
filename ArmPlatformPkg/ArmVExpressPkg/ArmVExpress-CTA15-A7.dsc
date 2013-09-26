@@ -175,6 +175,9 @@
   # ISP1761 USB OTG Controller
   gEmbeddedTokenSpaceGuid.PcdIsp1761BaseAddress|0x1B000000
 
+  # Ethernet (SMSC 91C111)
+  gArmPlatformTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x1A000000
+  
   #
   # ARM OS Loader
   #
