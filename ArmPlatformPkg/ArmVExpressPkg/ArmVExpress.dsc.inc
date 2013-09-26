@@ -374,3 +374,4 @@
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+  ArmPlatformPkg/Drivers/LAN9118Dxe/LAN9118Dxe.inf
