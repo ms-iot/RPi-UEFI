@@ -223,6 +223,7 @@ GenEtherCrc32 (
   return ReverseBits (Remainder);
 }
 
+#ifndef MDEPKG_NDEBUG
 STATIC CONST CHAR16 *Mac2Str (EFI_MAC_ADDRESS *Mac)
 {
   static CHAR16 MacStr[18];
@@ -237,6 +238,7 @@ STATIC CONST CHAR16 *Mac2Str (EFI_MAC_ADDRESS *Mac)
       Mac->Addr[3], Mac->Addr[4], Mac->Addr[5]);
   return MacStr;
 }
+#endif
 
 // Function to read from MAC indirect registers
 UINT32
@@ -1772,6 +1774,7 @@ SnpStationAddress (
     IndirectMACWrite32 (INDIRECT_MAC_INDEX_ADDRL, (UINT32)((UINT32)NewMac->Addr[0]) | ((UINT32)NewMac->Addr[1] << 8) | ((UINT32)NewMac->Addr[2] << 16) | ((UINT32)NewMac->Addr[3] << 24));
     IndirectMACWrite32 (INDIRECT_MAC_INDEX_ADDRH, (UINT32)((((UINT32)NewMac->Addr[4]) | ((UINT32)NewMac->Addr[5] << 8)) & 0xFFFF));
   }
+  Status = EFI_SUCCESS;
 
   // Restore TPL and return
 exit_unlock:
@@ -1815,6 +1818,7 @@ SnpStatistics (
 
   // Serialize access to data and registers
   SavedTpl = gBS->RaiseTPL (LAN9118_TPL);
+  LanDriver = INSTANCE_FROM_SNP_THIS(Snp);
 
   // Check that driver was started and initialised
   if (Snp->Mode->State == EfiSimpleNetworkStarted) {
@@ -2080,6 +2084,8 @@ SnpTransmit (
 
   // Serialize access to data and registers
   SavedTpl = gBS->RaiseTPL (LAN9118_TPL);
+  LanDriver = INSTANCE_FROM_SNP_THIS(Snp);
+  TxCacheIndex = (-1);
 
   if (Snp->Mode->State != EfiSimpleNetworkInitialized) {
      ReturnUnlock (EFI_NOT_STARTED);
@@ -2100,9 +2106,6 @@ SnpTransmit (
   if (!Snp->Mode->MediaPresent) {
      ReturnUnlock (EFI_NOT_READY);
   }
-
-  LanDriver = INSTANCE_FROM_SNP_THIS(Snp);
-  TxCacheIndex = (-1);
 
   // Find a free entry in the TxCache array
   for (TxCacheIndex = LAN9118_TX_CACHE_DEPTH - 1; TxCacheIndex >= 0; --TxCacheIndex) {
