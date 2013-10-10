@@ -162,11 +162,14 @@
   #
   # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux:
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linaro disk image on virtio"
+!ifdef $(EDK2_USE_ANDROID_CONFIG)
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/kernel"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/ramdisk.img"
+!else
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/Image"
-#  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"xxx"
-#  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L""
-  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fvp-base-gicv2-psci.dtb"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0 earlyprintk=pl011,0x1c090000 debug user_debug=31 loglevel=9 root=/dev/vda2"
+!endif
+  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fvp-base-gicv2-psci.dtb"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|3
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fdt.dtb"
 
