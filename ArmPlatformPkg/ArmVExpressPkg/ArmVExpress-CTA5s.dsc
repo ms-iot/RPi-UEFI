@@ -271,6 +271,12 @@
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
   #
+  # SMBIOS Support
+  #
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  ArmPkg/Drivers/UpdateSmbios/UpdateSmbios.inf
+
+  #
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
