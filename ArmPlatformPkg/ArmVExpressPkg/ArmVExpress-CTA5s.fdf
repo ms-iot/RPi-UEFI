@@ -142,6 +142,12 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
   #
+  # SMBIOS Support
+  #
+  INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  INF ArmPkg/Drivers/UpdateSmbios/UpdateSmbios.inf
+
+  #
   # ACPI Support
   #
   INF MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
