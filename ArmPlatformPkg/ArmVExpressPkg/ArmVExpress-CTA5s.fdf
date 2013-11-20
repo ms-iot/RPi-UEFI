@@ -74,6 +74,8 @@ FV = FVMAIN_COMPACT
 ################################################################################
 
 [FV.FVMAIN_SEC]
+FvBaseAddress      = 0x0
+FvForceRebase      = TRUE
 FvAlignment        = 8
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
