@@ -241,6 +241,12 @@
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
+  #
+  # SMBIOS Support
+  #
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  ArmPkg/Drivers/UpdateSmbios/UpdateSmbios.inf
+
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
