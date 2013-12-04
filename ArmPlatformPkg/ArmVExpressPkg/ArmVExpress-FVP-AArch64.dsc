@@ -157,6 +157,8 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C000000
 !endif
 
+  # Ethernet (SMSC 91C111)
+  gArmPlatformTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
   #
   # ARM OS Loader
   #
