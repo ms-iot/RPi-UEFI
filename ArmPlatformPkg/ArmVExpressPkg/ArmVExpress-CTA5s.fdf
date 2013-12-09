@@ -156,7 +156,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF RuleOverride=ACPITABLE ArmPkg/Drivers/AcpiTables/rtsm_ve-v7/AcpiTables.inf
 
-  INF ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
+  INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
   #INF ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf
