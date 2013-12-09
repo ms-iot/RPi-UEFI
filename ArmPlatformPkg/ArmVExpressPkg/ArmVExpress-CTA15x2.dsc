@@ -60,10 +60,6 @@
 
   # Uncomment to turn on GDB stub in SEC. 
   #DebugAgentLib|EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
-  
-  # ARM PL390 General Interrupt Driver in Secure and Non-secure
-  ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
-  ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
 
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15 -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA15x2
@@ -213,7 +209,7 @@
   ArmPlatformPkg/Sec/Sec.inf {
     <LibraryClasses>
       # Use the implementation which set the Secure bits
-      ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+      ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
   }
 
   #
@@ -292,7 +288,7 @@
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   ArmPkg/Drivers/AcpiTables/rtsm_ve-v7/AcpiTables.inf
 
-  ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
+  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
   ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
   #ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf
