@@ -133,7 +133,7 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  INF RuleOverride=ACPITABLE ArmPkg/Drivers/AcpiTables/rtsm_ve-aemv8a-foundation/AcpiTables.inf
+  INF RuleOverride=ACPITABLE ArmPkg/Drivers/AcpiTables/foundation-v8/AcpiTables.inf
 
   #
   # SMBIOS Support
