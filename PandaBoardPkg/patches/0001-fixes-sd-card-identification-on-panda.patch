@@ -1,0 +1,31 @@
+From 8d5bd220aee4a0b6e4c1dc9b3b54fe1b30c30e32 Mon Sep 17 00:00:00 2001
+From: Olivier Deprez <o-deprez@ti.com>
+Date: Mon, 25 Jun 2012 11:06:31 +0200
+Subject: [PATCH] fixes sd card identification on panda
+
+It is observed with few SD cards that the protocol is hanging after issuing cmd5 and before cmd8.
+Adding a small delay inbetween recovers and driver bring up is continuing without problem.
+---
+EmbeddedPkg/Universal/MmcDxe/MmcBlockIo.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/EmbeddedPkg/Universal/MmcDxe/MmcBlockIo.c b/EmbeddedPkg/Universal/MmcDxe/MmcBlockIo.c
+index 47f4aeb..f8d2cc4 100644
+--- a/EmbeddedPkg/Universal/MmcDxe/MmcBlockIo.c
++++ b/EmbeddedPkg/Universal/MmcDxe/MmcBlockIo.c
+@@ -229,6 +229,12 @@ MmcIdentificationMode (
+ 
+   // Are we using SDIO ?
+   Status = MmcHost->SendCommand (MmcHost, MMC_CMD5, 0);
++
++#if 1 // Added for Panda Board
++  /* It seems few SD cards need some time to recover from this command? */
++  MicroSecondDelay(1000);
++#endif
++  
+   if (Status == EFI_SUCCESS) {
+     DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD5): Error - SDIO not supported.\n"));
+     return EFI_UNSUPPORTED;
+-- 
+1.7.4.1
+
