@@ -145,6 +145,16 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L""|VOID*|0x0000001B
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L""|VOID*|0x0000001C
 
+  #
+  # LAN9118 Ethernet Driver PCDs
+  #
+  gArmPlatformTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x0|UINT32|0x000000FF
+
+  #
+  # LAN91x Ethernet Driver PCDs
+  #
+  gArmPlatformTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x0|UINT32|0x000000FE
+  
 [PcdsFixedAtBuild.ARM]
   # Stack for CPU Cores in Secure Monitor Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
@@ -156,4 +166,3 @@
   # and PcdCPUCoreSecSecondaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x0|UINT32|0x00000008
-
