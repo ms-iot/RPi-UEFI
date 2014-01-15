@@ -1,0 +1,67 @@
+
+=== SmdkBoard OVERVIEW ===
+
+The SMDK project aims to support firmware for Exynos 4210 Soc using the edk2
+code base.
+
+=== STATUS ===
+
+Current status: Alpha
+
+Current capabilities:
+* Uefi Boot from SDMMC card
+
+=== FUTURE PLANS ===
+
+* SUpport for USB
+  - KeyBoard, Mouse and MassStorage
+
+=== BUILDING SMDK Board ===
+
+Pre-requisites:
+* Build environment capable of build the edk2 MdeModulePkg.
+* A properly configured ASL compiler:
+  - Intel ASL compiler: Available from http://www.acpica.org
+  - Microsoft ASL compiler: Available from http://www.acpi.info
+
+Building the iRam_Bl:
+The iRam_Bl is the 1st stage bootloader which is executed by the IROM code.
+This code is reused from the u-boot project. this image has to be a plane binary image
+which will not have any header format. After generating the binary image the checksum is generated
+and stored in the same file at a particular offset. that is done by the executable generated with
+the iRam_Bl source files.
+
+To generate the iRAM_Bl image
+* Download the u-boot source from git://git.denx.de/u-boot.git by running below command
+  git clone git://git.denx.de/u-boot.git
+* Run following commands
+ - export ARCH=arm
+ - export CROSS_COMPILE=/usr/local/arm/gcc-linaro-4.5-2011.03-0/bin/arm-linux-gnueabi- or respective toolchain path
+ - make smdkv310_config
+ - make mmc_spl
+* the binary "u-boot-mmc-spl.bin" will be generated in the spl directory.
+* copy the generated u-boot-mmc-spl.bin to the Uefi Workspace Build/SmdkBoard-Exynos/RELEASE_ARMGCC/FV/
+
+
+Build the SdmkBoardPkg by running from the Workspace
+ build -p SamsungPlatformPkg/SmdkBoardPkg/SmdkBoardPkg-Exynos.dsc -a ARM -t ARMGCC -b RELEASE for release version
+
+Following the edk2 build process, you will find the SMDK binaries
+under the $WORKSPACE/Build/*/*/FV directory. You can find the below
+mentioned binary image.
+* SMDKBOARD_EFI.FD
+* u-boot-mmc-spl.bin
+
+=== RUNNING SmdkBoardPkg on the SMDK v310 board ===
+* need to be in Linux Environment to do the below procedure
+* After inserting the SD card. unmount the card by using the command umount /media/XXXXX.
+* copy the u-boot-mmc-spl.bin to the SD/MMC card by using the comand
+  sudo dd if=Build/SmdkBoard-Exynos/RELEASE_ARMGCC/FV/u-boot-mmc-spl.bin of=/dev/sdc bs=512 seek=1
+* Copy the Uefi Image to SD/MMC with below command from the Workspace.
+  sudo dd if=Build/SmdkBoard-Exynos/RELEASE_ARMGCC/FV/SMDKBOARD_EFI.fd of=/dev/sdc bs=512 seek=65
+* Now the booting device is ready to be used.
+* Insert the SDMMC card in the v310 board reader slot MMC Ch2.
+* Connect the Uart cable from the v310 device to the PC terminal.
+* POwer ON the Device.
+* The boot message should be visible on the termial.
+* use option 1 to enter the Embedded Boot loader.

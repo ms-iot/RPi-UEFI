@@ -1,0 +1,49 @@
+#/** @file
+#
+#  Copyright (c) 2011, Samsung Electronics Co. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SDHCDxe
+  FILE_GUID                      = e7c3d754-8688-4586-b38f-4ae9b74b8ff1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = SDHCInitialize
+
+
+[Sources.common]
+  SDHCDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SamsungPlatformPkgOrigen/ExynosPkg/ExynosPkg.dec
+  SamsungPlatformPkgOrigen/SamsungPlatformPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  IoLib
+  TimerLib
+
+[Guids]
+
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gSamsungPlatformGpioProtocolGuid			## GPIO Protocol
+
+[FixedPcd]
+  gExynosPkgTokenSpaceGuid.PcdCmuBase
+  gExynosPkgTokenSpaceGuid.PcdSdMmcBase
+
+[Depex]
+	TRUE
