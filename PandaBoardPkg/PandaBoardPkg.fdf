@@ -96,7 +96,7 @@ READ_LOCK_STATUS   = TRUE
   # PI DXE Drivers producing Architectural Protocols (EFI Services) 
   #
   INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
-  INF ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
+  INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
 
   INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
