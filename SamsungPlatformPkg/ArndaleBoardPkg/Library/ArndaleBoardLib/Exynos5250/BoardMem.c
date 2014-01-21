@@ -61,8 +61,8 @@ ArmPlatformGetVirtualMemoryMap (
 
   DEBUG ((EFI_D_ERROR, "++%a:%d\n", __FUNCTION__, __LINE__));
 
-  UINTN  MemoryBase_Pcd = PcdGet32(PcdSystemMemoryBase);
-  UINTN  MemorySize_Pcd = PcdGet32(PcdSystemMemorySize);
+  UINTN  MemoryBase_Pcd = PcdGet64(PcdSystemMemoryBase);
+  UINTN  MemorySize_Pcd = PcdGet64(PcdSystemMemorySize);
   UINTN  FrameBufferBase_Pcd = PcdGet32(PcdFrameBufferBase);
   UINTN  FrameBufferSize_Pcd = PcdGet32(PcdFrameBufferSize);
   UINTN  MpSharedArgsBase_Pcd = PcdGet32(PcdMpSharedArgsBase);
