@@ -150,13 +150,19 @@
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x1C050000
   
   #
-  # ARM General Interrupt Controller
+  # Select network device based on build time macro
+!if $(EDK2_ARMVE_SUPPORT_QEMU) == 1
+  # Ethernet (SMSC 9118, for QEMU, matches real hardware)
+  gArmPlatformTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x1A000000
+!else
+  # Ethernet (SMSC 91C111, for RTSM)
+  gArmPlatformTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
+!endif
+
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x2C001000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C002000
 
-  # Ethernet (SMSC 91C111)
-  gArmPlatformTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
 
   #
   # ARM OS Loader
