@@ -5775,8 +5775,8 @@ RELEASE_ARMGCC_AARCH64_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_AARC
 *_ARMLINUXGCC_*_ASL_FLAGS          = DEF(IASL_FLAGS)
 *_ARMLINUXGCC_*_ASL_OUTFLAGS       = DEF(IASL_OUTFLAGS)
 *_ARMLINUXGCC_*_ASLPP_FLAGS        = -x c -E -P
-*_ARMLINUXGCC_*_ASLCC_FLAGS        = -x c
-*_ARMLINUXGCC_*_ASLDLINK_FLAGS     = DEF(GCC_DLINK_FLAGS_COMMON) --entry ReferenceAcpiTable
+*_ARMLINUXGCC_*_ASLCC_FLAGS        = -x c -Dmain=ReferenceAcpiTable
+*_ARMLINUXGCC_*_ASLDLINK_FLAGS     = -nostdlib --entry _ReferenceAcpiTable --emit-relocs
 
 ##################
 # ARM definitions
