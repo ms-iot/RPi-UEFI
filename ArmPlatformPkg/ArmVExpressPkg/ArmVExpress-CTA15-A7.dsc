@@ -254,6 +254,11 @@
   #
   ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmHwDxe.inf
 
+  # SMBIOS Support
+
+  ArmPlatformPkg/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+ 
   #
   # Filesystems
   #
