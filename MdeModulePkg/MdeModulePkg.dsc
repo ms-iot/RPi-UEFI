@@ -336,10 +336,11 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/PeiCrc32GuidedSectionExtractLib/PeiCrc32GuidedSectionExtractLib.inf
   }
+  
+  MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
+  MdeModulePkg/Universal/Fdt/FdtTableDxe/FdtTableDxe.inf
 
-  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
-
-[Components.IA32, Components.X64, Components.IPF]  
+[Components.IA32, Components.X64, Components.IPF]
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
