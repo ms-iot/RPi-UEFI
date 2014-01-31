@@ -1,0 +1,48 @@
+## @file
+#  FDT Table Protocol Driver
+#
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#  This program and the accompanying materials are
+#  licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FdtTableDxe
+  FILE_GUID                      = 261F9737-CDF6-46CE-A9E2-5DD16B957413
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeFdtTableDxe
+
+[Sources]
+  FdtTableDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  UefiDriverEntryPoint
+  DxeServicesLib
+
+[Guids]
+  gEfiFdtTableGuid
+
+[FeaturePcd]
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFdtImage
+
+[Protocols]
+
+[Depex]
+  TRUE

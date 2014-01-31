@@ -339,8 +339,9 @@
   }
 
   MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+  MdeModulePkg/Universal/Fdt/FdtTableDxe/FdtTableDxe.inf
 
-[Components.IA32, Components.X64, Components.IPF]  
+[Components.IA32, Components.X64, Components.IPF]
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
