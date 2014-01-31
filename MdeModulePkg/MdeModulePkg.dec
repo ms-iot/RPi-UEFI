@@ -692,6 +692,8 @@
   ## Default Creator Revision for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|0x01000013|UINT32|0x30001038
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFdtImage|{ 0x66,0x0f,0xe1,0x96,0xa5,0x0f,0x43,0x8c,0xa9,0x50,0xbe,0x6a,0x58,0xb9,0x12,0x1b }|VOID*|0x30001041
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output column and the default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output could be at max column and max row.
