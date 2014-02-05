@@ -1,0 +1,88 @@
+## @file
+#  
+#  Component Description File For OhciDxe Module.
+#
+#  OhciDxe driver is responsible for managing the behavior of OHCI controller. 
+#  It implements the interfaces of monitoring the status of all ports and transferring
+#  Control, Bulk, Interrupt and Isochronous requests to Usb1.x device
+#
+#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = OhciDxe
+  FILE_GUID                      = 2FB92EFA-2EE0-4bae-9EB6-7464125E1EF7
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  
+  ENTRY_POINT                    = OhciDriverEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gOhciDriverBinding                        
+#  COMPONENT_NAME                =  gOhciComponentName
+#  COMPONENT_NAME2               =  gOhciComponentName2
+#
+
+[Sources]
+  OhciSched.c
+  OhciDebug.c
+  UsbHcMem.h
+  OhciDebug.h
+  OhciQueue.c
+  OhciReg.c
+  UsbHcMem.c
+  OhciQueue.h
+  Ohci.c
+  Ohci.h
+  OhciReg.h
+  OhciSched.h
+  ComponentName.c
+  ComponentName.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport  ## SOMETIME_CONSUMES (enable/disable usb legacy support.)
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## PRODUCES ## Event
+
+[Protocols]
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiUsb2HcProtocolGuid                        ## BY_START
+  gEfiCpuArchProtocolGuid
+
+# [Event]
+#   ##
+#   # Periodic timer event for checking the result of interrupt transfer execution.
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
+#
