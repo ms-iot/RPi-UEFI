@@ -1,0 +1,274 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#define ACPI_5_0_CSRT_VERSION   0x1
+
+#define ACPI_RESOURCE_GROUP_NUM 0x2
+#define ACPI_RESOURCE_DESCRIPTOR_NUM0 0x7
+#define ACPI_RESOURCE_DESCRIPTOR_NUM1 0x9
+
+/*resource group header*/
+typedef struct 
+{
+  UINT32 Length;
+  UINT32 VendorID;
+  UINT32 SubvendorID;
+  UINT16 DeviceID;
+  UINT16 SubdeviceID;
+  UINT16 Revision;
+  UINT16 Reserved;
+  UINT32 SharedInfoLength;
+}EFI_ACPI_5_0_CRST_RESOURCE_GROUP_HEADER;
+
+/*resource descriptor header*/
+typedef struct 
+{
+  UINT32 Length;
+  UINT16 ResourceType;
+  UINT16 ResourceSubType;
+  UINT32 UID;
+}EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR;
+
+
+/*timer share info*/
+typedef struct 
+{   
+   UINT16 usMajorVersion;
+   UINT16 usMinorVersion;
+   UINT32 uwMMIOBaseAddressLow;
+   UINT32 uwMMIOBaseAddressHigh;
+   UINT32 uwGSIInterrupt;
+   UINT8  ucInterruptPolarity;
+   UINT8  ucInterruptMode;
+   UINT8  ucNumChannels;
+   UINT8  ucDMAAddressWidth;
+   UINT16 usDMAAddressWidth;
+   UINT16 usNumHandshakeSignals;
+   UINT32 uwMaxBlockSize;
+}EFI_ACPI_5_0_CRST_SHARE_INFO;
+
+
+
+/*timer resource group header*/
+typedef struct 
+{
+  EFI_ACPI_5_0_CRST_RESOURCE_GROUP_HEADER head;
+  EFI_ACPI_5_0_CRST_SHARE_INFO ShareInfo; /*share info*/
+  EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR ResourceDescriptor[ACPI_RESOURCE_DESCRIPTOR_NUM0];  
+}EFI_ACPI_5_0_CRST_RESOURCE_GROUP0;
+
+/*timer resource group header*/
+typedef struct 
+{
+  EFI_ACPI_5_0_CRST_RESOURCE_GROUP_HEADER head;
+  EFI_ACPI_5_0_CRST_SHARE_INFO ShareInfo; /*share info*/
+  EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR ResourceDescriptor[ACPI_RESOURCE_DESCRIPTOR_NUM1];  
+}EFI_ACPI_5_0_CRST_RESOURCE_GROUP1;
+
+
+
+
+/*CSRT structure*/
+typedef struct {
+    EFI_ACPI_DESCRIPTION_HEADER Header;
+    EFI_ACPI_5_0_CRST_RESOURCE_GROUP0 ResourceGroup0;
+    EFI_ACPI_5_0_CRST_RESOURCE_GROUP1 ResourceGroup1;
+} EFI_ACPI_5_0_CORE_SYSTEM_RESOURCE_TABLE;
+
+
+
+
+EFI_ACPI_5_0_CORE_SYSTEM_RESOURCE_TABLE Csrt = {    
+  {
+      EFI_ACPI_5_0_CORE_SYSTEM_RESOURCE_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_5_0_CORE_SYSTEM_RESOURCE_TABLE),
+      ACPI_5_0_CSRT_VERSION,
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID_INTEL},
+      EFI_ACPI_OEM_TABLE_ID_INTEL,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION 
+  },
+  /*EFI_ACPI_5_0_CRST_RESOURCE_GROUP0*/
+  {
+    sizeof(EFI_ACPI_5_0_CRST_RESOURCE_GROUP0),       /*Length*/
+    EFI_ACPI_CREATOR_ID,                            /*VendorID*/
+    0,                                              /*SubvendorID*/     
+    0x9C60,                                         /*DeviceID*/
+    0x0,                                            /*SubdeviceID*/
+    0002,                                           /*Revision*/
+    0,                                              /*Reserved*/
+    sizeof(EFI_ACPI_5_0_CRST_SHARE_INFO),           /*SharedInfoLength*/
+    /*share info*/
+    {
+      0x1,                                            /*Major Version*/
+      0x0,                                            /*Minor Version*/
+      0xB3A00000,                                     /*MMIO Base Address Low*/
+      0x00000000,                                     /*MMIO Base Address High*/
+      0x0000002A,                                     /*GSI Interrupt*/
+      0x2,                                            /*Interrupt Polarity*/
+      0x0,                                            /*Interrupt Mode*/
+      0x6,                                            /*Num Channels*/  
+      0x20,                                           /*DMA Address Width*/
+      0x0,                                            /*Base Request Line*/
+      0x10,                                           /*Num Handshake Signals*/
+      0xfff,                                          /*Max Block Size*/
+    },
+    {
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x1,                                            /*ResourceSubType*/
+        0x20495053                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x30414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x31414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x32414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x33414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x34414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x35414843                                      /*UID*/
+      },
+    }
+  },  
+  {
+    /*header*/
+    {
+      sizeof(EFI_ACPI_5_0_CRST_RESOURCE_GROUP1),       /*Length*/
+      EFI_ACPI_CREATOR_ID,                            /*VendorID*/
+      0,                                              /*SubvendorID*/     
+      0x9C60,                                         /*DeviceID*/
+      0x0,                                            /*SubdeviceID*/
+      0003,                                           /*Revision*/
+      0,                                              /*Reserved*/
+      sizeof(EFI_ACPI_5_0_CRST_SHARE_INFO),           /*SharedInfoLength*/
+    },
+    /*share info*/
+    {
+      0x1,                                            /*Major Version*/
+      0x0,                                            /*Minor Version*/
+      0x0,                                     /*MMIO Base Address Low*/
+      0x00000000,                                     /*MMIO Base Address High*/
+      0x0000002B,                                     /*GSI Interrupt*/
+      0x2,                                            /*Interrupt Polarity*/
+      0x0,                                            /*Interrupt Mode*/
+      0x8,                                            /*Num Channels*/  
+      0x20,                                           /*DMA Address Width*/
+      0x10,                                            /*Base Request Line*/
+      0x10,                                           /*Num Handshake Signals*/
+      0xfff,                                          /*Max Block Size*/
+    },
+    {
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x1,                                            /*ResourceSubType*/
+        0x20433249                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x30414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x31414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x32414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x33414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x34414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x35414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x36414843                                      /*UID*/
+      },
+      {
+        sizeof(EFI_ACPI_5_0_CRST_RESOURCE_DESCRIPTOR),  /*Length*/
+        0x3,                                            /*ResourceType*/
+        0x0,                                            /*ResourceSubType*/
+        0x37414843                                      /*UID*/
+      },
+    },
+  },
+          
+      
+};
+
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Csrt;
+}

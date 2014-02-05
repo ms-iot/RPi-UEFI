@@ -1,0 +1,106 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#define EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE_REVISION 0x1
+//
+// MSCT Table definition
+//
+#pragma pack (1)
+typedef struct {
+  UINT8   Revision;
+  UINT8   Length;
+  UINT32  ProxDomRangeLow;
+  UINT32  ProxDomRangeHigh;
+  UINT32  MaxProcessorCapacity;
+  UINT64  MaxMemoryCapacity;
+} EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE;
+
+typedef struct {
+  EFI_ACPI_5_0_MAXIMUM_SYSTEM_CHARACTERISTICS_TABLE_HEADER Header;  
+  EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE  ProxDomInfoStructure[4];
+} EFI_ACPI_MAXIMUM_SYSTEM_CHARACTERISTICS_TABLE;
+
+#pragma pack ()
+
+EFI_ACPI_MAXIMUM_SYSTEM_CHARACTERISTICS_TABLE Msct = {
+  {
+   {
+        EFI_ACPI_5_0_MAXIMUM_SYSTEM_CHARACTERISTICS_TABLE_SIGNATURE,
+        sizeof (EFI_ACPI_MAXIMUM_SYSTEM_CHARACTERISTICS_TABLE),
+        EFI_ACPI_5_0_MAXIMUM_SYSTEM_CHARACTERISTICS_TABLE_REVISION,
+        0x00,                                                     // Checksum will be updated at runtime
+        {EFI_ACPI_OEM_ID},
+        EFI_ACPI_OEM_TABLE_ID,
+        EFI_ACPI_OEM_REVISION,
+        EFI_ACPI_CREATOR_ID,
+        EFI_ACPI_CREATOR_REVISION 
+    },
+    //
+    // Beginning of MSCT specific fields
+    //
+    0x00000038,                                              // OffsetProxDomInfo
+    4 - 1,                                                   // MaxNumProxDom
+    0x00000000,                                              // MaxNumClockDom
+    0x00000FFFFFFFFFFF,                                      // MaxPhysicalAddress
+  },
+  {
+    {
+      EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE_REVISION,    // Revision  
+      sizeof (EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE),    // Length
+      0x00000000,                                                          // ProxDomRangeLow
+      0x00000003,                                                          // ProxDomRangeHigh
+      0x00000010,                                                          // MaxProcessorCapacity
+      0x0000004000000000                                                  // MaxMemoryCapacity
+    },
+    {
+      EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE_REVISION,    // Revision
+      sizeof (EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE),    // Length
+      0x00000000,                                                          // ProxDomRangeLow
+      0x00000000,                                                          // ProxDomRangeHigh
+      0x00000000,                                                          // MaxProcessorCapacity
+      0x0000000000000000,                                                 // MaxMemoryCapacity
+    },
+   
+    {
+      EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE_REVISION,    // Revision
+      sizeof (EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE),    // Length
+      0x00000000,                                                          // ProxDomRangeLow
+      0x00000000,                                                          // ProxDomRangeHigh
+      0x00000000,                                                          // MaxProcessorCapacity
+      0x0000000000000000,                                                 // MaxMemoryCapacity
+    },
+   
+    {
+      EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE_REVISION,    // Revision
+      sizeof (EFI_ACPI_MAXIMUM_PROXIMITY_DOMAIN_INFORMATION_STRUCTURE),    // Length
+      0x00000000,                                                          // ProxDomRangeLow
+      0x00000000,                                                          // ProxDomRangeHigh
+      0x00000000,                                                          // MaxProcessorCapacity
+      0x0000000000000000,                                                   // MaxMemoryCapacity
+    },
+  },
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Msct;
+}

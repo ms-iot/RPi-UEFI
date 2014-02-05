@@ -1,0 +1,141 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#define MAX_POWER_STATES_NUM 0x2
+#define MAX_PHYSICAL_COMPONENTS_NUM 0x3
+#define MAX_MEMORY_POWER_NODE_COUNT 0x2
+#define MAX_CHARACTERISTICS_COUNT   0x2
+
+#pragma pack (1)
+typedef struct
+{
+  EFI_ACPI_5_0_MPST_MEMORY_POWER_STRUCTURE structre;
+  EFI_ACPI_5_0_MPST_MEMORY_POWER_STATE     state[MAX_POWER_STATES_NUM];
+  UINT16                                   components[MAX_PHYSICAL_COMPONENTS_NUM];
+}EFI_ACPI_5_0_MPST_MEMORY_POWER_STRUCTURE_EX;
+
+typedef struct
+{
+  EFI_ACPI_5_0_MPST_MEMORY_POWER_STATE_CHARACTERISTICS_STRUCTURE structre; 
+  UINT64 ulResverd;
+}EFI_ACPI_5_0_MPST_MEMORY_POWER_STATE_CHARACTERISTICS_STRUCTURE_EX;
+
+typedef struct
+{
+    EFI_ACPI_5_0_MEMORY_POWER_STATUS_TABLE table;
+    EFI_ACPI_5_0_MPST_MEMORY_POWER_NODE_TABLE node;
+    EFI_ACPI_5_0_MPST_MEMORY_POWER_STRUCTURE_EX powerNode[MAX_MEMORY_POWER_NODE_COUNT];    
+    EFI_ACPI_5_0_MPST_MEMORY_POWER_STATE_CHARACTERISTICS_TABLE Characteristics;
+    EFI_ACPI_5_0_MPST_MEMORY_POWER_STATE_CHARACTERISTICS_STRUCTURE_EX powerChar[MAX_CHARACTERISTICS_COUNT];    
+}EFI_ACPI_5_0_MEMORY_POWER_STATUS_TABLE_EX;
+#pragma pack ()
+
+
+EFI_ACPI_5_0_MEMORY_POWER_STATUS_TABLE_EX Mpst ={
+  {
+    {
+        EFI_ACPI_5_0_MEMORY_POWER_STATE_TABLE_SIGNATURE,
+        0x000000B6,
+        EFI_ACPI_5_0_MEMORY_POWER_STATE_TABLE_REVISION,
+        0x00,                                                     // Checksum will be updated at runtime
+        {EFI_ACPI_OEM_ID},
+        EFI_ACPI_OEM_TABLE_ID,
+        EFI_ACPI_OEM_REVISION,
+        EFI_ACPI_CREATOR_ID,
+        EFI_ACPI_CREATOR_REVISION
+      },
+      0x00,                                       //Channel ID
+      {0,0,0},                                       //Reserved
+     
+  },
+    0x0002,                                     //Power Node Count
+    {0,0},                                     //Reserved
+    {
+      {
+          0x00,                                       //Flags
+          0x00,                                       //Reserved
+          0x0000,                                     //Node ID
+          0x0000000000,                               //Length
+          0x00000000000000000000,                     //ange Address
+          0x00000000000000000000,                     //Range Length 
+          0x00000002,                                 // Num Power
+          0x00000003,                                 // Num Physical Components
+          {
+            {
+              0x00,                                   //Power State
+              0x00,                                   //InfoIndex
+            },
+            {
+              0x00,                                   //Power State
+              0x00,                                   //InfoIndex
+            },
+          },
+          0x0000,                                     //Component Id
+          0x0001,                                     //Component Id
+          0x0002,                                     //Component Id
+      },
+      {
+          0x00,                                       //Flags
+          0x00,                                       //Reserved
+          0x0000,                                     //Node ID
+          0x0000000000,                               //Length
+          0x00000000000000000000,                     //ange Address
+          0x00000000000000000000,                     //Range Length 
+          0x00000001,                                 // Num Power
+          0x00000001,                                 // Num Physical Components
+          {
+            0x00,                                   //Power State
+            0x00,                                   //InfoIndex
+          },        
+          0x0000,                                     //Component Id
+          
+      },
+    },
+    
+    0x0002,                                         //Characteristics Count
+    {0,0},                                         //Reserved
+    {
+      {
+        0x01,                                         //Structure ID
+        0x00,                                         //Flags
+        0x0000,                                       //Reserved
+        0x00000000,                                   //Average Power
+        0x00000000,                                   //Power Saving
+        0x0000000000000000,                           //Exit Latency
+        0x0000000000000000,                           //Reserved      
+      },
+      {
+        0x01,                                         //Structure ID
+        0x00,                                         //Flags
+        0x0000,                                       //Reserved
+        0x00000000,                                   //Average Power
+        0x00000000,                                   //Power Saving
+        0x0000000000000000,                           //Exit Latency
+        0x0000000000000000,                           //Reserved      
+      },
+    },    
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Mpst;
+}

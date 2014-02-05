@@ -1,0 +1,88 @@
+/** @file
+  FACS Table
+  
+  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are
+  licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+  
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/ 
+
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+
+EFI_ACPI_5_0_FIRMWARE_ACPI_CONTROL_STRUCTURE Facs = {
+  EFI_ACPI_5_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE,
+  sizeof (EFI_ACPI_5_0_FIRMWARE_ACPI_CONTROL_STRUCTURE),
+
+  //
+  // Hardware Signature will be updated at runtime
+  //
+  0x00000000,                             //HardwareSignature  
+  0x00,                                   //FirmwareWakingVector
+  0x00,                                   //GlobalLock
+  0x00,                                   //Flags
+  0x0000000000000000,                     //XFirmwareWakingVector
+  0x02,                                   //Version
+  {
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE
+  },
+  0x00,
+  {
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE,
+      EFI_ACPI_RESERVED_BYTE
+  }
+};
+
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the 
+  // data structure from the exeutable
+  //
+  return (VOID*)&Facs;
+}
+

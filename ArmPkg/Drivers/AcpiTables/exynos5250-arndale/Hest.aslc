@@ -1,0 +1,86 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#pragma pack(1)
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER             Header;
+  UINT32                                  ErrorEntryCount;
+  EFI_ACPI_5_0_GENERIC_HARDWARE_ERROR_SOURCE_STRUCTURE     GenHardWareError;  
+  
+} EFI_ACPI_5_0_HARDWARE_ERROR_SOURCE_TABLE;
+
+#pragma pack()
+
+EFI_ACPI_5_0_HARDWARE_ERROR_SOURCE_TABLE Hest = {    
+  {
+      EFI_ACPI_5_0_HARDWARE_ERROR_SOURCE_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_5_0_HARDWARE_ERROR_SOURCE_TABLE),
+      EFI_ACPI_5_0_HARDWARE_ERROR_SOURCE_TABLE_REVISION,
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      0x02,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION 
+  },
+  0x00000001,                                   //Error Source Count 
+{
+  0x0009,                                      //Subtable Type:Generic Hardware Error Source
+  0x0002,                                      //Source Id
+  0xFFFF,                                      //Related Source Id
+  0x00,                                        //Reserved
+  0x01,                                        //Enabled      
+  0x00000001,                                  //Records To Preallocate
+  0x00000001,                                  //Max Sections Per Record 
+  0x00001000,                                  //Max Raw Data Length
+
+  /* Error Status Address : [Generic Address Structure]*/
+ {
+    0x00,                                        //Space ID:SystemMemory
+    0x40,                                        //Bit Width
+    0x00,                                        //Bit Offset
+    0x04,                                        //Encoded Access Width
+    0x43000000,                         		 //Address
+  },
+  /*Notify : [Hardware Error Notification Structure]*/
+  {
+    0x03,                                        //Notify Type:SCI
+    0x1c,                                        //Notify Length    
+    0x0000,                                      //Configuration Write Enable    
+    0x00000000,                                  //PollInterval    
+    0x00000000,                                  //Vector    
+    0x00000000,                                  //Polling Threshold Value    
+    0x00000000,                                  //Polling Threshold Window    
+    0x00000000,                                  //Error Threshold Value    
+    0x00000000,                                  //Error Threshold Window
+  },
+  0x00001000,                                  //Error Status Block Length 
+},
+
+};
+
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Hest;
+}

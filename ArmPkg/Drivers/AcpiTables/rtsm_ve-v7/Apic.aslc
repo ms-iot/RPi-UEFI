@@ -1,0 +1,216 @@
+/** @file
+  MADT Table
+
+  This file contains a structure definition for the ACPI 1.0 Multiple APIC
+  Description Table (MADT).
+
+  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are
+  licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+//
+// Local APIC address
+//
+#define EFI_ACPI_LOCAL_APIC_ADDRESS 0x2C002000 // TBD
+
+
+#define ACPI_PROCESSOR_LOCAL_GIC              0xb
+#define ACPI_GIC_DISTRIBUTOR                  0xc
+
+//These addresses are defined by the MP shared region defined in the UEFI memory map.
+#define MP_REGISTER_ADDRESS_GIC0         0x80301000
+#define DISTRIBUTOR_PHYSICAL_ADDRESS     0x02000000
+
+#define ACPI_GICC_NUM  0x8
+
+//
+// Ensure proper structure formats
+//
+#pragma pack (1)
+//
+// ACPI 5.0 MADT structure
+//
+typedef struct {
+  EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
+  EFI_ACPI_5_0_GIC_STRUCTURE           									Gic[ACPI_GICC_NUM];
+  EFI_ACPI_5_0_GIC_DISTRIBUTOR_STRUCTURE       					Distributor;
+
+} EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+//
+// Multiple APIC Description Table
+//
+EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
+  {
+    {
+      EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE),
+      EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION
+    },
+
+    //
+    // MADT specific fields
+    //
+    EFI_ACPI_LOCAL_APIC_ADDRESS,
+    0x00000000
+  },
+  {
+    //LocalGic0
+    {
+      ACPI_PROCESSOR_LOCAL_GIC,                         //Type
+      sizeof (EFI_ACPI_5_0_GIC_STRUCTURE),              //Length
+      0x00,                                             //Reserved
+      0x00,                                             //GicId
+      0x00,                                             //AcpiProcessorUid
+      0x00000001,                         							//Flags
+      0x00000000,                                     	//ParkingProtocolVersion
+      0x00000000,                                     	//PerformanceInterruptGsiv
+      0x0000000000000000,                             	//ParkedAddress
+      0x000000002C002000,                             	//PhysicalBaseAddress
+    },
+    //LocalGic1
+    {
+      ACPI_PROCESSOR_LOCAL_GIC,                         //Type
+      sizeof (EFI_ACPI_5_0_GIC_STRUCTURE),              //Length
+      0x00,                                             //Reserved
+      0x01,                                             //GicId
+      0x01,                                             //AcpiProcessorUid
+      EFI_ACPI_5_0_GIC_ENABLED,                         //Flags
+      0x00000000,                                       //ParkingProtocolVersion
+      0x00000000,                                       //PerformanceInterruptGsiv
+      0x0000000000000000,                              	//ParkedAddress
+      0x000000002C002000                              	//PhysicalBaseAddress
+    },
+    //LocalGic2
+    {
+      ACPI_PROCESSOR_LOCAL_GIC,                        	//Type:
+      sizeof (EFI_ACPI_5_0_GIC_STRUCTURE),              //Length
+      0x00,                                             //Reserved
+      0x02,                                             //GicId
+      0x02,                                             //AcpiProcessorUid
+      EFI_ACPI_5_0_GIC_ENABLED,                         //Flags
+      0x00000000,                                      	//ParkingProtocolVersion
+      0x00000000,                                       //PerformanceInterruptGsiv
+      0x0000000000000000,                             	//ParkedAddress
+      0x000000002C002000,                              	//PhysicalBaseAddress
+    },
+    //LocalGic3
+    {
+      ACPI_PROCESSOR_LOCAL_GIC,                         //Type
+      sizeof (EFI_ACPI_5_0_GIC_STRUCTURE),              //Length
+      0x00,                                             //Reserved
+      0x03,                                             //GicId
+      0x03,                                             //AcpiProcessorUid
+      EFI_ACPI_5_0_GIC_ENABLED,                         //Flags
+      0x00000000,                                      	//ParkingProtocolVersion
+      0x00000000,                                      	//PerformanceInterruptGsiv
+      0x0000000000000000,                              	//ParkedAddress
+      0x000000002C002000,                              	//PhysicalBaseAddress
+    },
+    //LocalGic4
+    {
+      ACPI_PROCESSOR_LOCAL_GIC,                         //Type
+      sizeof (EFI_ACPI_5_0_GIC_STRUCTURE),              //Length
+      0x00,                                             //Reserved
+      0x04,                                             //GicId
+      0x04,                                             //AcpiProcessorUid
+      0,                        											  //Flags
+      0x00000000,                                      	//ParkingProtocolVersion
+      0x00000000,                                      	//PerformanceInterruptGsiv
+      0x0000000000000000,                             	//ParkedAddress
+      0x000000002C002000,                              	//PhysicalBaseAddress
+    },
+    //LocalGic5
+    {
+      ACPI_PROCESSOR_LOCAL_GIC,                         //Type
+      sizeof (EFI_ACPI_5_0_GIC_STRUCTURE),              //Length
+      0x00,                                             //Reserved
+      0x05,                                             //GicId
+      0x05,                                             //AcpiProcessorUid
+      0x0,                         											//Flags
+      0x00000000,                                       //ParkingProtocolVersion
+      0x00000000,                                     	//PerformanceInterruptGsiv
+      0x0000000000000000,                             	//ParkedAddress
+      0x000000002C002000,                               //PhysicalBaseAddress
+    },
+    //LocalGic6
+    {
+      ACPI_PROCESSOR_LOCAL_GIC,                         //Type
+      sizeof (EFI_ACPI_5_0_GIC_STRUCTURE),              //Length
+      0x00,                                             //Reserved
+      0x06,                                             //GicId
+      0x06,                                             //AcpiProcessorUid
+      0x0,                         											//Flags
+      0x00000000,                                     	//ParkingProtocolVersion
+      0x00000000,                                     	//PerformanceInterruptGsiv
+      0x0000000000000000,                             	//ParkedAddress
+      0x000000002C002000 ,                             	//PhysicalBaseAddress
+    },
+    //LocalGic7
+    {
+      ACPI_PROCESSOR_LOCAL_GIC,                         //Type
+      sizeof (EFI_ACPI_5_0_GIC_STRUCTURE),              //Length
+      0x00,                                             //Reserved
+      0x07,                                             //GicId
+      0x07,                                             //AcpiProcessorUid
+      0x0,                         											//Flags
+      0x00000000,                                      	//ParkingProtocolVersion
+      0x00000000,                                     	//PerformanceInterruptGsiv
+      0x0000000000000000,                             	//ParkedAddress
+      0x000000002C002000,                             	//PhysicalBaseAddress
+    },
+  },
+  //Distributor
+  {
+    ACPI_GIC_DISTRIBUTOR,                             //Type
+    sizeof (EFI_ACPI_5_0_GIC_DISTRIBUTOR_STRUCTURE),  //Length
+    0,                                                //Reserved1
+    0,                                                //GicId
+    0x000000002C001000,                               //PhysicalBaseAddress
+    0,                                                //SystemVectorBase
+    0                                                 //Reserved2
+  }
+
+};
+
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Madt;
+}

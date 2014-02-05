@@ -1,0 +1,86 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#define ACPI_5_0_SPMI_REVISION  0x4
+
+#pragma pack(1)
+typedef struct
+{
+
+    EFI_ACPI_DESCRIPTION_HEADER             Header;
+    UINT8  ucInterfaceType;
+    UINT8  Reserved;
+    UINT16 usIPMISpecVersion;
+    UINT8  ucInterruptType;
+    UINT8  ucGPENumber;
+    UINT8  Reserved2;
+    UINT8  ucPCIDeviceFlag;
+    UINT32 uwInterrupt;
+    EFI_ACPI_5_0_GENERIC_ADDRESS_STRUCTURE IPMIRegister;
+    UINT8  ucPCISegment;
+    UINT8  ucPCIBus;
+    UINT8  ucPCIDevice;
+    UINT8  ucPCIFunction;
+    UINT8  Reserved3;
+}EFI_ACPI_5_0_SERVER_PLATFORM_MANAGEMENT_INTERFACE_TABLE;
+#pragma pack()
+
+EFI_ACPI_5_0_SERVER_PLATFORM_MANAGEMENT_INTERFACE_TABLE Spmi = 
+{
+  {
+      EFI_ACPI_5_0_SERVER_PLATFORM_MANAGEMENT_INTERFACE_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_5_0_SERVER_PLATFORM_MANAGEMENT_INTERFACE_TABLE),
+      ACPI_5_0_SPMI_REVISION,
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      0x00,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION
+    },
+    0x00,                             //Interface Type
+    0x00,                             //Reserved
+    0x0000,                           //IPMI Spec Version
+    0x00,                             //Interrupt Type
+    0x00,                             //GPE Number
+    0x00,                             //Reserved
+    0x00,                             //PCI Device Flag
+    0x00000000,                       //Interrupt
+    {
+      0x00,                           //Space ID:SystemMemory
+      0x08,                           //Bit Width
+      0x00,                           //Bit Offset
+      0x01,                           //Encoded Access Width
+      0x0000000000000000,             //Address
+    },
+    0x00,                             //PCI Segment
+    0x00,                             //PCI Bus
+    0x00,                             //PCI Device
+    0x00,                             //PCI Function
+    0x00,                             //Reserved      
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Spmi;
+}

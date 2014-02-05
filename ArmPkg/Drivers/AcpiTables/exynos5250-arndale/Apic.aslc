@@ -1,0 +1,246 @@
+/** @file
+  MADT Table
+
+  This file contains a structure definition for the ACPI 1.0 Multiple APIC
+  Description Table (MADT).
+
+  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are
+  licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+//
+// Local APIC address
+//
+#define EFI_ACPI_LOCAL_APIC_ADDRESS 0x00000000 // TBD
+
+//
+// Multiple APIC Flags are defined in AcpiX.0.h
+//
+#define EFI_ACPI_5_0_MULTIPLE_APIC_FLAGS (EFI_ACPI_1_0_PCAT_COMPAT)
+
+#define ACPI_PROCESSOR_LOCAL_GIC              0xb
+#define ACPI_GIC_DISTRIBUTOR                  0xc
+
+//These addresses are defined by the MP shared region defined in the UEFI memory map.
+#define MP_REGISTER_ADDRESS_GIC0         0x80301000
+#define DISTRIBUTOR_PHYSICAL_ADDRESS     0x02000000
+
+#define ACPI_GICC_NUM  0x8
+
+//
+// Ensure proper structure formats
+//
+#pragma pack (1)
+typedef struct
+{
+	EFI_ACPI_5_0_PROCESSOR_LOCAL_SAPIC_STRUCTURE stu;
+	UINT8																					str[6];
+}EFI_ACPI_5_0_PROCESSOR_LOCAL_SAPIC_STRUCTURE_EX;
+
+//
+// ACPI 5.0 MADT structure
+//
+typedef struct {
+  EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
+  EFI_ACPI_5_0_PROCESSOR_LOCAL_APIC_STRUCTURE           LocalGicApic;
+  EFI_ACPI_5_0_IO_APIC_STRUCTURE      					IOACPI;
+  EFI_ACPI_5_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE 		IntSource;
+  EFI_ACPI_5_0_NON_MASKABLE_INTERRUPT_SOURCE_STRUCTURE	Nmi;
+  EFI_ACPI_5_0_LOCAL_APIC_NMI_STRUCTURE					LocalApicNmi;
+  EFI_ACPI_5_0_LOCAL_APIC_ADDRESS_OVERRIDE_STRUCTURE    LocalAcpiAddr;
+  EFI_ACPI_5_0_IO_SAPIC_STRUCTURE						IOSapic;
+  EFI_ACPI_5_0_PROCESSOR_LOCAL_SAPIC_STRUCTURE_EX			LocalSapic;
+  EFI_ACPI_5_0_PLATFORM_INTERRUPT_SOURCES_STRUCTURE		PlatFormIntSource;
+  EFI_ACPI_5_0_PROCESSOR_LOCAL_X2APIC_STRUCTURE			LocalX2Apic;
+  EFI_ACPI_5_0_LOCAL_X2APIC_NMI_STRUCTURE 				LocalX2ApicNmi;
+  EFI_ACPI_5_0_GIC_STRUCTURE          					Gic;
+  EFI_ACPI_5_0_GIC_DISTRIBUTOR_STRUCTURE       			Distributor;
+} EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+//
+// Multiple APIC Description Table
+//
+EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
+  {
+    {
+      EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE),
+      EFI_ACPI_5_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION
+    },
+
+    //
+    // MADT specific fields
+    //
+    EFI_ACPI_LOCAL_APIC_ADDRESS,
+    EFI_ACPI_5_0_MULTIPLE_APIC_FLAGS
+  },
+  
+	//Processor Local APIC
+	{
+	  0x00,                         										//Type:Processor Local APIC
+	  sizeof (EFI_ACPI_5_0_PROCESSOR_LOCAL_APIC_STRUCTURE),              //Length
+	  0x00,                                             //Processor ID
+	  0x00,                                             //Local Apic ID
+	  0x00000001,                                      	//Flags	 
+	},
+	//I/O APIC
+	{
+	  0x01,                         										//Type:I/O APIC
+	  sizeof (EFI_ACPI_5_0_IO_APIC_STRUCTURE),          //Length
+	  0x01,                                             //I/O Apic ID
+	  0x00,                                             //Reserved
+	  0x00000000,                                      	//Address
+	  0x00000000,                         							//Interrupt     
+	},
+	//Interrupt Source Override
+	{
+	  0x02,                         										//Type:Interrupt Source Override
+	  sizeof (EFI_ACPI_5_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE),              //Length
+	  0x00,                                             //Bus
+	  0x00,                                             //Source
+	  0x0000000000,                                    	//Interrupt
+	  0x0000,                         									//Flags      
+	},
+	//NMI Source
+	{
+	  0x03,                         										//Type:NMI Source
+	  sizeof (EFI_ACPI_5_0_NON_MASKABLE_INTERRUPT_SOURCE_STRUCTURE),              //Length
+	  0x000D,                                           //Flags
+	  0x00000001,                                     	//Interrupt      
+	},
+	//Local APIC NMI
+	{
+	  0x04,                         										//Type:Local APIC NMI
+	  sizeof (EFI_ACPI_5_0_LOCAL_APIC_NMI_STRUCTURE),		//Length
+	  0x00,                                             //Processor ID
+	  0x0005,                                           //Flags
+	  0x01,                                             //Interrupt Input LINT
+	  
+	},
+	//Local APIC Address Override
+	{
+	  0x05,                         										//Type:Local APIC Address Override
+	  sizeof (EFI_ACPI_5_0_LOCAL_APIC_ADDRESS_OVERRIDE_STRUCTURE),              //Length
+	  0x00,                                             //Reserved      
+	  0x0000000000000000,                               //APIC Address     
+	},
+	//I/O SAPIC
+	{
+	  0x06,                         										//Type:I/O SAPIC
+	  sizeof (EFI_ACPI_5_0_IO_SAPIC_STRUCTURE),        	//Length
+	  0x00,                                             //I/O Sapic ID
+	  0x00,                                             //Reserved     
+	  0x00000000,                                       //Interrupt Base    
+	  0x0000000000000000 ,                              //Address
+	},
+	//Local SAPIC
+	{
+	  0x07,                         										//Type:Local SAPIC
+	  sizeof (EFI_ACPI_5_0_PROCESSOR_LOCAL_SAPIC_STRUCTURE_EX),              //Length
+	  0x00,                                             //Processor ID
+	  0x00,                                             //Local Sapic ID
+	  0x00,                                             //Local Sapic EID
+	  {0,0,0},                     											//Reserved
+	  0x00000001,                                       //Flags
+	  0x00000000,                                       //Processor UID  
+	 	{'\\','C','P','U','0','\0'},
+	},
+	//Platform Interrupt Sources
+	{
+	  0x08,                         					//Type:Platform Interrupt Sources
+	  sizeof (EFI_ACPI_5_0_PLATFORM_INTERRUPT_SOURCES_STRUCTURE),              //Length
+	  0x0005,                                          	//Flags
+	  0x00,                                             //InterruptType
+	  0x00,                                             //Processor ID
+	  0x00,                     												//Processor EID
+	  0x00,                                       			//I/O Sapic Vector
+	  0x00000001,                                       //Interrupt
+	  0x00000001,                                				//Flags
+	},
+	//Processor Local x2APIC
+	{
+	  0x09,                         										//Type:Processor Local x2APIC
+	  sizeof (EFI_ACPI_5_0_PROCESSOR_LOCAL_X2APIC_STRUCTURE),              //Length
+	  {0,0},                                          	//Reserved
+	  0x00000000,                                 			//Processor x2Apic ID
+	  0x00000001,                                 			//Flags
+	  0x00000000,                     									//Processor UID
+	},
+	//Local x2APIC NMI
+	{
+	  0x0A,                         										//Type:Local x2APIC NMI
+	  sizeof (EFI_ACPI_5_0_LOCAL_X2APIC_NMI_STRUCTURE), //Length
+	  0x0005,                                          	//Flags
+	  0x00000000,                                 			//Processor UID
+	  0x00,                                 						//Interrupt Input LINT
+	  {0,0,0},                     											//Reserved
+	},
+
+	//Generic Interrupt Controller
+  {
+    0x0B,                         										//Type:Generic Interrupt Controller
+    sizeof (EFI_ACPI_5_0_GIC_STRUCTURE),              //Length
+    0x00,                                             //Reserved
+    0x00,                                             //Local GIC Hardware ID
+    0x00,                                             //AcpiProcessorUid
+    0x00000001,                         							//Flags
+    0x00000000,                                       //ParkingProtocolVersion
+    0x00000000,                                       //PerformanceInterruptGsiv
+    0x0000000000000000,                               //ParkedAddress
+    0x0000000000000000,                               //PhysicalBaseAddress
+  },
+  //Distributor
+  {
+    0x0C,                             								//Type
+    sizeof (EFI_ACPI_5_0_GIC_DISTRIBUTOR_STRUCTURE),  //Length
+    0,                                                //Reserved1
+    0,                                                //GicId
+    0x0000000000000000,                               //PhysicalBaseAddress
+    0,                                                //SystemVectorBase
+    0                                                 //Reserved2
+  }
+
+};
+
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Madt;
+}

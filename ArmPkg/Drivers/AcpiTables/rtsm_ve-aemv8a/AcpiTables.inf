@@ -1,0 +1,70 @@
+## @file
+#  Component description file for PlatformAcpiTables module.
+#
+#  ACPI table data and ASL sources required to boot the platform.
+#
+#  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformAcpiTables
+  FILE_GUID                      = 7E374E25-8E01-4FEE-87F2-390C23C606CD
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+  FFS_EXT                        = SEC
+  COMPILE_SELECT                 = .c=acpi_c
+
+[Sources]
+  Platform.h
+  Apic.aslc
+  Bert.aslc  
+  Dsdt.asl
+  Ecdt.aslc
+  Einj.aslc
+  Erst.aslc   
+  Facp.aslc
+  Facs.aslc 
+  Gtdt.aslc
+  Hest.aslc
+  Mcfg.aslc
+  Mpst.aslc
+  Msct.aslc
+  Oem0.aslc
+  Pmtt.aslc
+  Slit.aslc
+  Spmi.aslc  
+  Srat.aslc
+  Ssdt0.asl
+  Uefi.aslc
+
+ ###rsdp/xsdt created by building the acpi table
+ ###tables need to change format
+ #asf!.asl
+ #bgrt.asl
+ #boot.asl
+ #cpep.asl
+ #fpdt.asl 
+ #tpm2.asl 
+
+[Packages]
+  MdePkg/MdePkg.dec

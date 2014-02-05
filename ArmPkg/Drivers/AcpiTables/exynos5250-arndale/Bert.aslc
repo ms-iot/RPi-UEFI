@@ -1,0 +1,84 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+// Generic error severity in data entry
+#define BOOT_ERROR_SEVERITY_RECOVERABLE       0
+#define BOOT_ERROR_SEVERITY_FATAL             1
+#define BOOT_ERROR_SEVERITY_CORRECTED         2
+#define BOOT_ERROR_SEVERITY_NONE              3
+
+#pragma pack(1)
+
+// ErrorStatus block record definitions for various errors
+typedef struct {
+  UINT32              UeValid:1;
+  UINT32              CeValid:1;
+  UINT32              MultipleUeValid:1;
+  UINT32              MultipleCeValid:1;
+  UINT32              NumErrorDataEntry:10;
+  UINT32              Resv1:18;
+} BOOT_ERROR_BLOCK_STATUS;
+
+
+typedef struct {
+  // Error Status block
+  BOOT_ERROR_BLOCK_STATUS  BlockStatus;
+  UINT32              RawDataOffset;
+  UINT32              RawDataSize;
+  UINT32              ErrDataSize;
+  UINT32              Severity;
+  // Error Status data...
+} EFI_ACPI_5_0_BOOT_ERROR_REGION;
+
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER             Header;
+  UINT32                                  BootErrorRegionLen;
+  UINT64                                  BootErrorRegion;
+} EFI_ACPI_5_0_BOOT_ERROR_RECORD_TABLE;
+
+#pragma pack()
+
+
+
+EFI_ACPI_5_0_BOOT_ERROR_RECORD_TABLE Bert = {    
+  {
+      EFI_ACPI_5_0_BOOT_ERROR_RECORD_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_5_0_BOOT_ERROR_RECORD_TABLE),
+      EFI_ACPI_5_0_BOOT_ERROR_RECORD_TABLE_REVISION,
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      0x02,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION 
+  },
+  0x9D,            												//BootErrorRegionLen
+  0x43000008             										//BootErrorRegion
+      
+};
+
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Bert;
+}

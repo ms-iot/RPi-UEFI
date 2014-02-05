@@ -1,0 +1,202 @@
+/*
+ * Copyright (c) 2013 Linaro Limited
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSD License which accompanies
+ * this distribution, and is available at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * Contributors:
+ *     Yi Li - yi.li@linaro.org
+*/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#pragma pack (1)
+typedef struct {
+  UINT8                                   Operation;
+  UINT8                                   Instruction;
+  UINT8                                   Flags;
+  UINT8                                   Reserved8;
+  EFI_ACPI_5_0_GENERIC_ADDRESS_STRUCTURE  Register;
+  UINT64                                  Value;
+  UINT64                                  Mask;
+} EFI_ACPI_WHEA_SERIALIZATION_ACTION;
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER             Header;
+  UINT32                                  InjectionHeaderSize;
+  UINT32                                  Resv1;
+  UINT32                                  InstructionEntryCount;
+} EFI_ACPI_WHEA_ERROR_INJECTION_HEADER;
+
+typedef struct {
+  EFI_ACPI_WHEA_ERROR_INJECTION_HEADER header;
+  EFI_ACPI_WHEA_SERIALIZATION_ACTION      InstructionEntry[8];
+} EFI_ACPI_5_0_ERROR_INJECTION_TABLE;
+
+#pragma pack ()
+
+
+EFI_ACPI_5_0_ERROR_INJECTION_TABLE Einj = {    
+  {
+    {
+        EFI_ACPI_5_0_ERROR_INJECTION_TABLE_SIGNATURE,
+        sizeof (EFI_ACPI_5_0_ERROR_INJECTION_TABLE),
+        EFI_ACPI_5_0_ERROR_INJECTION_TABLE_REVISION,
+        0x00,                                                     // Checksum will be updated at runtime
+        {EFI_ACPI_OEM_ID},
+        EFI_ACPI_OEM_TABLE_ID,
+        0x00000002,
+        EFI_ACPI_CREATOR_ID,
+        EFI_ACPI_CREATOR_REVISION 
+    },
+    sizeof(EFI_ACPI_WHEA_ERROR_INJECTION_HEADER),
+    EFI_ACPI_RESERVED_DWORD,  
+    0x08,                                           /*Injection Entry Count*/
+  },
+
+  {
+    {  //Action0
+      0x00,                               // Action:Begin Operation
+      0x0,                                // Instruction:Read Register
+      0x0,                                // Flags
+      0x00,                               // Reserved
+      /*Register Region*/
+      {
+        EFI_ACPI_3_0_SYSTEM_MEMORY,         //Space ID
+        0x40,                               //Bit Width
+        0x0,                                 //Bit Offset
+        0x4,                                //Encoded Access Width
+        0x0000000000000000,                 //Address
+      },
+      0x0000000000000000,                 // Value for InjectError()
+      0xFFFFFFFFFFFFFFFF                   // Mask is only valid for 32-bits 
+    },
+    {  //Action1
+      0x01,                               // Action:Get Trigger Table
+      0x0,                                // Instruction:Read Register
+      0x0,                                // Flags
+      0x00,                               // Reserved
+      /*Register Region*/
+      {
+        EFI_ACPI_3_0_SYSTEM_MEMORY,         //Space ID
+        0x40,                               //Bit Width
+        0x0,                                 //Bit Offset
+        0x4,                                //Encoded Access Width
+        0x0000000000000000,                 //Address
+      },
+      0x0000000000000000,                 // Value for InjectError()
+      0xFFFFFFFFFFFFFFFF                  // Mask is only valid for 32-bits 
+    },
+    {  //Action2
+      0x02,                               // Action:Set Error Type
+      0x2,                                // Instruction:Write Register
+      0x1,                                // Flags
+      0x00,                               // Reserved
+      /*Register Region*/
+      {
+        EFI_ACPI_3_0_SYSTEM_MEMORY,         //Space ID
+        0x40,                               //Bit Width
+        0x0,                                 //Bit Offset
+        0x4,                                //Encoded Access Width
+        0x0000000000000000,                 //Address
+      },
+      0x0000000000000000,                 // Value for InjectError()
+      0xFFFFFFFFFFFFFFFF                  // Mask is only valid for 32-bits 
+    },
+    {  //Action3
+      0x03,                               // Action:Get Error Type
+      0x0,                                // Instruction:Read Register
+      0x0,                                // Flags
+      0x00,                               // Reserved
+      /*Register Region*/
+      {
+        EFI_ACPI_3_0_SYSTEM_MEMORY,         //Space ID
+        0x40,                               //Bit Width
+        0x0,                                 //Bit Offset
+        0x4,                                //Encoded Access Width
+        0x0000000000000000,                 //Address
+      },
+      0x0000000000000000,                 // Value for InjectError()
+      0xFFFFFFFFFFFFFFFF                  // Mask is only valid for 32-bits 
+    },
+    {  //Action4
+      0x04,                               // Action:End Operation
+      0x3,                                // Instruction:Write Register
+      0x1,                                // Flags
+      0x00,                               // Reserved
+      /*Register Region*/
+      {
+        EFI_ACPI_3_0_SYSTEM_MEMORY,         //Space ID
+        0x40,                               //Bit Width
+        0x0,                                 //Bit Offset
+        0x4,                                //Encoded Access Width
+        0x0000000000000000,                 //Address
+      },
+      0x0000000000000000,                 // Value for InjectError()
+      0xFFFFFFFFFFFFFFFF                  // Mask is only valid for 32-bits 
+    },
+    {  //Action5
+      0x05,                               // Action:Execute Operation
+      0x3,                                // Instruction:Write Register
+      0x1,                                // Flags
+      0x00,                               // Reserved
+      /*Register Region*/
+      {
+        EFI_ACPI_3_0_SYSTEM_IO,             //Space ID
+        0x10,                               //Bit Width
+        0x0,                                 //Bit Offset
+        0x2,                                //Encoded Access Width
+        0x0000000000000000,                 //Address
+      },
+      0x0000000000000000,                 // Value for InjectError()
+      0xFFFFFFFFFFFFFFFF                  // Mask is only valid for 32-bits 
+    },
+    {  //Action6
+      0x06,                               // Action:Check Busy Status
+      0x1,                                // Instruction:Read Register
+      0x0,                                // Flags
+      0x00,                               // Reserved
+      /*Register Region*/
+      {
+        EFI_ACPI_3_0_SYSTEM_MEMORY,         //Space ID
+        0x40,                               //Bit Width
+        0x0,                                 //Bit Offset
+        0x4,                                //Encoded Access Width
+        0x0000000000000000,                 //Address
+      },
+      0x0000000000000000,                 // Value for InjectError()
+      0xFFFFFFFFFFFFFFFF                  // Mask is only valid for 32-bits 
+    },
+    {  //Action7
+      0x07,                               // Action:Get Command Status
+      0x0,                                // Instruction:Read Register
+      0x1,                                // Flags
+      0x00,                               // Reserved
+      /*Register Region*/
+      {
+        EFI_ACPI_3_0_SYSTEM_MEMORY,         //Space ID
+        0x40,                               //Bit Width
+        0x0,                                 //Bit Offset
+        0x4,                                //Encoded Access Width
+        0x0000000000000000,                 //Address
+      },
+      0x0000000000000000,                 // Value for InjectError()
+      0xFFFFFFFFFFFFFFFF                  // Mask is only valid for 32-bits 
+    },  
+  },
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Einj;
+}
