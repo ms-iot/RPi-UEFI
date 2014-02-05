@@ -356,9 +356,6 @@
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
 [Components.common]
-  # Versatile Express FileSystem
-  ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
-
   #
   # Networking stack
   #
@@ -374,4 +371,5 @@
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-
+  ArmPlatformPkg/Drivers/LAN9118Dxe/LAN9118Dxe.inf
+  ArmPlatformPkg/Drivers/LAN91xDxe/LAN91xDxe.inf
