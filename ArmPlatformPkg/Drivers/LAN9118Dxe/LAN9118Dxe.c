@@ -1380,11 +1380,6 @@ SnpInitialize (
     gRxDataSize = RxBufferSize;
   }
 
-  // Set the current MAC Address
-  Snp->Mode->CurrentAddress = GetCurrentMacAddress ();
-
-  // Set the permanent MAC Address
-  Snp->Mode->PermanentAddress = Snp->Mode->CurrentAddress;
 
   // Do auto-negotiation if supported
   Status = AutoNegotiate (Snp);
@@ -2568,9 +2563,11 @@ Lan9118DxeEntry (
 
   //  Set broadcast address
   SetMem (&SnpMode->BroadcastAddress, sizeof (EFI_MAC_ADDRESS), 0xFF);
+  SnpMode->PermanentAddress = GetCurrentMacAddress ();
+  SnpMode->CurrentAddress = SnpMode->PermanentAddress;
 
   // Assign fields for device path
-  Lan9118Path->Lan9118.MacAddress = GetCurrentMacAddress ();
+  Lan9118Path->Lan9118.MacAddress = SnpMode->PermanentAddress;
   Lan9118Path->Lan9118.IfType = Snp->Mode->IfType;
 
   // Initialise the protocol
