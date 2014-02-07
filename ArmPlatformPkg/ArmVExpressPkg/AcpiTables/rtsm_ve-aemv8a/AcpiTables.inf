@@ -1,0 +1,51 @@
+##
+#  Component description file for PlatformAcpiTables module.
+#
+#  ACPI table data and ASL sources required to boot the platform.
+#
+#  Copyright (c) 2013, Linaro Ltd.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformAcpiTables
+  FILE_GUID                      = 7E374E25-8E01-4FEE-87F2-390C23C606CD
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  facp.asl
+  dsdt.asl
+  ssdt0.asl
+  bert.asl
+  ecdt.asl
+  facs.asl
+  gtdt.asl
+  hest.asl
+  apic.asl
+  mcfg.asl
+  mpst.asl
+  oem0.asl
+  slit.asl
+  spmi.asl
+  srat.asl
+  uefi.asl
+  cpep.asl
+  einj.asl
+  erst.asl
+  fpdt.asl
+  mchi.asl
+  msct.asl
+  pmtt.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
