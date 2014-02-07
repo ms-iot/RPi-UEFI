@@ -80,7 +80,7 @@ MnpGetModeData (
     // will be updated to reflect any change of media status
     //
     Status = Snp->GetStatus (Snp, &InterruptStatus, NULL);
-    if (!EFI_ERROR (Status)) {
+    if (!EFI_ERROR (Status) || (Status == EFI_NOT_STARTED)) {
       CopyMem (SnpModeData, Snp->Mode, sizeof (*SnpModeData));
     }
   }
