@@ -971,6 +971,7 @@ Probe (
 
   // Read and save the Permanent MAC Address
   LanDriver->SnpMode.PermanentAddress = GetCurrentMacAddress (LanDriver);
+  LanDriver->SnpMode.CurrentAddress = LanDriver->SnpMode.PermanentAddress;
   DEBUG((EFI_D_ERROR, //EFI_D_NET | EFI_D_INFO,
          "LAN91x: HW MAC Address: %02x-%02x-%02x-%02x-%02x-%02x\n",
          LanDriver->SnpMode.PermanentAddress.Addr[0],
@@ -1042,8 +1043,6 @@ SnpStart (
     ReturnUnlock (EFI_DEVICE_ERROR);
   }
 
-  // Set the Current MAC address
-  Mode->CurrentAddress = Mode->PermanentAddress;
 
   // Change state
   Mode->State = EfiSimpleNetworkStarted;
