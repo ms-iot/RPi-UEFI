@@ -1,0 +1,46 @@
+#/** @file
+#  SMBIOS Table for ARM platform
+#
+#  Copyright (c) 2013 Linaro.org
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformSmbiosDxe
+  FILE_GUID                      = 3847D23F-1D95-4772-B60C-4BBFBC4D532F
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PlatfomrSmbiosDriverEntryPoint
+
+[Sources]
+  PlatformSmbiosDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                        # PROTOCOL SOMETIMES_CONSUMED
+
+[Guids]
+
+[Depex]
+  gEfiSmbiosProtocolGuid
