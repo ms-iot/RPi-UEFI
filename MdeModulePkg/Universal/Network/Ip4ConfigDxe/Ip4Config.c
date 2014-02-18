@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ip4Config.h"
 #include "NicIp4Variable.h"
 
+#include <Guid/Hostname.h>
+
 //
 // Ip4 Config Protocol
 //
@@ -327,11 +329,14 @@ EfiIp4ConfigStart (
   IP4_CONFIG_INSTANCE       *Instance;
   EFI_DHCP4_PROTOCOL        *Dhcp4;
   EFI_DHCP4_MODE_DATA       Dhcp4Mode;
-  EFI_DHCP4_PACKET_OPTION   *OptionList[1];
+  EFI_DHCP4_PACKET_OPTION   *OptionList[2];
   IP4_CONFIG_DHCP4_OPTION   ParaList;
   EFI_STATUS                Status;
   UINT32                    Source;
   EFI_TPL                   OldTpl;
+  CHAR8                     Hostname[256];
+  UINTN                     HostnameSize = 256;
+  EFI_DHCP4_PACKET_OPTION   *HostnameOption = NULL;
 
   if ((This == NULL) || (DoneEvent == NULL) || (ReconfigEvent == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -436,7 +441,35 @@ EfiIp4ConfigStart (
   Dhcp4Mode.ConfigData.OptionCount = 1;
   Dhcp4Mode.ConfigData.OptionList  = OptionList;
 
+  Status = gRT->GetVariable (
+                  L"Hostname",
+                  &gEfiHostnameVariableGuid,
+                  NULL,
+                  &HostnameSize,
+                  &Hostname
+                  );
+  if (!EFI_ERROR (Status) && HostnameSize != 0) {
+    Dhcp4Mode.ConfigData.OptionCount = 2;
+
+    HostnameOption = AllocatePool (
+                       sizeof (EFI_DHCP4_PACKET_OPTION) - 1 + HostnameSize
+                       );
+    if (HostnameOption == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    HostnameOption->OpCode = DHCP_TAG_HOSTNAME;
+    HostnameOption->Length = (UINT8) HostnameSize;
+    CopyMem (HostnameOption->Data, Hostname, HostnameOption->Length);
+
+    OptionList[1] = HostnameOption;
+  }
+
   Status = Dhcp4->Configure (Dhcp4, &Dhcp4Mode.ConfigData);
+
+  if (HostnameOption) {
+    FreePool (HostnameOption);
+  }
 
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;

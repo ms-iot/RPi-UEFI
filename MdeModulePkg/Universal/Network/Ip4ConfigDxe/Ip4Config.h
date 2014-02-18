@@ -59,6 +59,7 @@ extern EFI_IP4_CONFIG_PROTOCOL         mIp4ConfigProtocolTemplate;
 #define IP4_CONFIG_STATE_STARTED       1
 #define IP4_CONFIG_STATE_CONFIGURED    2
 
+#define DHCP_TAG_HOSTNAME              12
 #define DHCP_TAG_PARA_LIST             55
 #define DHCP_TAG_NETMASK               1
 #define DHCP_TAG_ROUTER                3
