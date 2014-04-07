@@ -1,0 +1,57 @@
+## @file
+#
+#  Component description file for Crypto engine module
+#
+#  This is the main routine for initializing the Crypto engine support routines.
+#
+#  Copyright (c) 2012, Samsung Electronics Co. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HashDxe
+  FILE_GUID                        = 2ceb319d-ee89-4ef2-9a0d-7958abf4cd87
+  MODULE_TYPE                   = DXE_DRIVER
+  VERSION_STRING              = 1.0
+  ENTRY_POINT                    = HashDxeInitialize
+
+[Sources]
+  HashDxe.c
+  
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SamsungPlatformPkg/ExynosPkg/Exynos5250/ExynosPkg.dec
+  SamsungPlatformPkg/SamsungPlatformPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UncachedMemoryAllocationLib
+  DebugLib
+  IoLib
+  ArmGicLib
+
+[Guids]
+  gEfiHashAlgorithmSha1Guid
+  gEfiHashAlgorithmSha256Guid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiHashProtocolGuid
+  gSamsungPlatformGpioProtocolGuid
+
+[Pcd]
+  gExynosPkgTokenSpaceGuid.PcdCmuBase
+  gExynosPkgTokenSpaceGuid.PcdCryptoBase
+
+[Depex]
+  TRUE 
