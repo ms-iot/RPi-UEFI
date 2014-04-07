@@ -21,7 +21,11 @@
   PLATFORM_GUID                  = 0de70077-9b3b-43bf-ba38-0ea37d77141b
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
+!ifdef $(EDK2_OUT_DIR)
+  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)
+!else
   OUTPUT_DIRECTORY               = Build/ArmVExpress-FVP-AArch64
+!endif
   SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -158,15 +162,23 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C000000
 !endif
 
+  # Ethernet (SMSC 91C111)
+  gArmPlatformTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
   #
   # ARM OS Loader
   #
   # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux:
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from SemiHosting"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linaro disk image on virtio"
+!ifdef $(EDK2_USE_ANDROID_CONFIG)
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/kernel"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/ramdisk.img"
+  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fvp-base-gicv2-psci.dtb"
+!else
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/Image"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/filesystem.cpio.gz"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0 earlyprintk=pl011,0x1c090000 debug user_debug=31 loglevel=9"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0 earlyprintk=pl011,0x1c090000 debug user_debug=31 loglevel=9 root=/dev/vda2"
+  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fdt.dtb"
+!endif
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|3
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fdt.dtb"
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
