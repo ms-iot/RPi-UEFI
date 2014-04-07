@@ -388,3 +388,5 @@
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   ArmPlatformPkg/ArmVExpressPkg/ArmVExpressFastBootDxe/ArmVExpressFastBootDxe.inf
+  ArmPlatformPkg/Drivers/LAN9118Dxe/LAN9118Dxe.inf
+  ArmPlatformPkg/Drivers/LAN91xDxe/LAN91xDxe.inf
