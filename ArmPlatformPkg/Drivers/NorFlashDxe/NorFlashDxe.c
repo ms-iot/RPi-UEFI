@@ -1,6 +1,6 @@
 /** @file  NorFlashDxe.c
 
-  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -20,11 +20,13 @@
 
 #include "NorFlashDxe.h"
 
+STATIC EFI_EVENT mNorFlashVirtualAddrChangeEvent;
 
 //
 // Global variable declarations
 //
 NOR_FLASH_INSTANCE **mNorFlashInstances;
+UINT32               mNorFlashDeviceCount;
 
 NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
   NOR_FLASH_SIGNATURE, // Signature
@@ -72,7 +74,7 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
     FvbEraseBlocks, // EraseBlocks
     NULL, //ParentHandle
   }, //  FvbProtoccol;
-
+  NULL, // FvbBuffer
   {
     {
       {
@@ -109,7 +111,7 @@ NorFlashCreateInstance (
 
   ASSERT(NorFlashInstance != NULL);
 
-  Instance = AllocateCopyPool (sizeof(NOR_FLASH_INSTANCE),&mNorFlashInstanceTemplate);
+  Instance = AllocateRuntimeCopyPool (sizeof(NOR_FLASH_INSTANCE),&mNorFlashInstanceTemplate);
   if (Instance == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -123,11 +125,15 @@ NorFlashCreateInstance (
   Instance->Media.BlockSize = BlockSize;
   Instance->Media.LastBlock = (NorFlashSize / BlockSize)-1;
 
-  CopyGuid (&Instance->DevicePath.Vendor.Guid,NorFlashGuid);
+  CopyGuid (&Instance->DevicePath.Vendor.Guid, NorFlashGuid);
 
   if (SupportFvb) {
     Instance->SupportFvb = TRUE;
     Instance->Initialize = NorFlashFvbInitialize;
+    Instance->FvbBuffer = AllocateRuntimePool (BlockSize);;
+    if (Instance->FvbBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     Status = gBS->InstallMultipleProtocolInterfaces (
                   &Instance->Handle,
@@ -137,7 +143,7 @@ NorFlashCreateInstance (
                   NULL
                   );
     if (EFI_ERROR(Status)) {
-      FreePool(Instance);
+      FreePool (Instance);
       return Status;
     }
   } else {
@@ -150,7 +156,7 @@ NorFlashCreateInstance (
                     NULL
                     );
     if (EFI_ERROR(Status)) {
-      FreePool(Instance);
+      FreePool (Instance);
       return Status;
     }
   }
@@ -340,8 +346,14 @@ NorFlashUnlockAndEraseSingleBlock (
   UINTN           Index;
   EFI_TPL         OriginalTPL;
 
-  // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
-  OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  if (!EfiAtRuntime ()) {
+    // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
+    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  } else {
+    // This initialization is only to prevent the compiler to complain about the
+    // use of uninitialized variables
+    OriginalTPL = TPL_HIGH_LEVEL;
+  }
 
   Index = 0;
   // The block erase might fail a first time (SW bug ?). Retry it ...
@@ -358,8 +370,10 @@ NorFlashUnlockAndEraseSingleBlock (
     DEBUG((EFI_D_ERROR,"EraseSingleBlock(BlockAddress=0x%08x: Block Locked Error (try to erase %d times)\n", BlockAddress,Index));
   }
 
-  // Interruptions can resume.
-  gBS->RestoreTPL (OriginalTPL);
+  if (!EfiAtRuntime ()) {
+    // Interruptions can resume.
+    gBS->RestoreTPL (OriginalTPL);
+  }
 
   return Status;
 }
@@ -581,8 +595,14 @@ NorFlashWriteSingleBlock (
   // Start writing from the first address at the start of the block
   WordAddress = BlockAddress;
 
-  // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
-  OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  if (!EfiAtRuntime ()) {
+    // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
+    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  } else {
+    // This initialization is only to prevent the compiler to complain about the
+    // use of uninitialized variables
+    OriginalTPL = TPL_HIGH_LEVEL;
+  }
 
   Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
   if (EFI_ERROR(Status)) {
@@ -632,8 +652,10 @@ NorFlashWriteSingleBlock (
   }
 
 EXIT:
-  // Interruptions can resume.
-  gBS->RestoreTPL (OriginalTPL);
+  if (!EfiAtRuntime ()) {
+    // Interruptions can resume.
+    gBS->RestoreTPL (OriginalTPL);
+  }
 
   if (EFI_ERROR(Status)) {
     DEBUG((EFI_D_ERROR, "NOR FLASH Programming [WriteSingleBlock] failed at address 0x%08x. Exit Status = \"%r\".\n", WordAddress, Status));
@@ -772,6 +794,50 @@ NorFlashReset (
   return EFI_SUCCESS;
 }
 
+/**
+  Fixup internal data so that EFI can be call in virtual mode.
+  Call the passed in Child Notify event and convert any pointers in
+  lib to virtual mode.
+
+  @param[in]    Event   The Event that is being processed
+  @param[in]    Context Event Context
+**/
+VOID
+EFIAPI
+NorFlashVirtualNotifyEvent (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  UINTN Index;
+
+  for (Index = 0; Index < mNorFlashDeviceCount; Index++) {
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->DeviceBaseAddress);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->RegionBaseAddress);
+
+    // Convert BlockIo protocol
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.FlushBlocks);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.ReadBlocks);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.Reset);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.WriteBlocks);
+
+    // Convert Fvb
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.EraseBlocks);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.GetAttributes);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.GetBlockSize);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.GetPhysicalAddress);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.Read);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.SetAttributes);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.Write);
+
+    if (mNorFlashInstances[Index]->FvbBuffer != NULL) {
+      EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbBuffer);
+    }
+  }
+
+  return;
+}
+
 EFI_STATUS
 EFIAPI
 NorFlashInitialise (
@@ -782,7 +848,6 @@ NorFlashInitialise (
   EFI_STATUS              Status;
   UINT32                  Index;
   NOR_FLASH_DESCRIPTION*  NorFlashDevices;
-  UINT32                  NorFlashDeviceCount;
   BOOLEAN                 ContainVariableStorage;
 
   Status = NorFlashPlatformInitialization ();
@@ -791,15 +856,15 @@ NorFlashInitialise (
     return Status;
   }
 
-  Status = NorFlashPlatformGetDevices (&NorFlashDevices,&NorFlashDeviceCount);
+  Status = NorFlashPlatformGetDevices (&NorFlashDevices, &mNorFlashDeviceCount);
   if (EFI_ERROR(Status)) {
     DEBUG((EFI_D_ERROR,"NorFlashInitialise: Fail to get Nor Flash devices\n"));
     return Status;
   }
 
-  mNorFlashInstances = AllocatePool (sizeof(NOR_FLASH_INSTANCE*) * NorFlashDeviceCount);
+  mNorFlashInstances = AllocateRuntimePool (sizeof(NOR_FLASH_INSTANCE*) * mNorFlashDeviceCount);
 
-  for (Index = 0; Index < NorFlashDeviceCount; Index++) {
+  for (Index = 0; Index < mNorFlashDeviceCount; Index++) {
     // Check if this NOR Flash device contain the variable storage region
     ContainVariableStorage =
         (NorFlashDevices[Index].RegionBaseAddress <= PcdGet32 (PcdFlashNvStorageVariableBase)) &&
@@ -819,6 +884,19 @@ NorFlashInitialise (
       DEBUG((EFI_D_ERROR,"NorFlashInitialise: Fail to create instance for NorFlash[%d]\n",Index));
     }
   }
+
+  //
+  // Register for the virtual address change event
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  NorFlashVirtualNotifyEvent,
+                  NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &mNorFlashVirtualAddrChangeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
