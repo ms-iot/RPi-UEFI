@@ -1,6 +1,6 @@
 /** @file  NorFlashDxe.h
 
-  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,8 @@
 #include <Base.h>
 #include <PiDxe.h>
 
+#include <Guid/EventGroup.h>
+
 #include <Protocol/BlockIo.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 
@@ -26,6 +28,7 @@
 #include <Library/IoLib.h>
 #include <Library/NorFlashPlatformLib.h>
 #include <Library/UefiLib.h>
+#include <Library/UefiRuntimeLib.h>
 
 #define NOR_FLASH_ERASE_RETRY                     10
 
@@ -141,6 +144,7 @@ struct _NOR_FLASH_INSTANCE {
 
   BOOLEAN                             SupportFvb;
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL FvbProtocol;
+  VOID*                               FvbBuffer;
 
   NOR_FLASH_DEVICE_PATH	              DevicePath;
 };
