@@ -15,7 +15,7 @@
   They will do basic validation for authentication data structure, then call crypto library
   to verify the signature.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -450,22 +450,26 @@ AutenticatedVariableServiceInitialize (
   Add public key in store and return its index.
 
   @param[in]  PubKey                  Input pointer to Public Key data
+  @param[in]  VariableDataEntry       The variable data entry 
 
   @return                             Index of new added item
 
 **/
 UINT32
 AddPubKeyInStore (
-  IN  UINT8               *PubKey
+  IN  UINT8                        *PubKey,
+  IN  VARIABLE_ENTRY_CONSISTENCY   *VariableDataEntry
   )
 {
-  EFI_STATUS              Status;
-  BOOLEAN                 IsFound;
-  UINT32                  Index;
-  VARIABLE_POINTER_TRACK  Variable;
-  UINT8                   *Ptr;
-  UINT8                   *Data;
-  UINTN                   DataSize;
+  EFI_STATUS                       Status;
+  BOOLEAN                          IsFound;
+  UINT32                           Index;
+  VARIABLE_POINTER_TRACK           Variable;
+  UINT8                            *Ptr;
+  UINT8                            *Data;
+  UINTN                            DataSize;
+  VARIABLE_ENTRY_CONSISTENCY       PublicKeyEntry;
+  UINT32                           Attributes;
 
   if (PubKey == NULL) {
     return 0;
@@ -478,8 +482,8 @@ AddPubKeyInStore (
              &mVariableModuleGlobal->VariableGlobal,
              FALSE
              );
-  ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Get public key database variable failure, Status = %r\n", Status));
     return 0;
   }
 
@@ -530,8 +534,8 @@ AddPubKeyInStore (
                  &mVariableModuleGlobal->VariableGlobal,
                  FALSE
                  );
-      ASSERT_EFI_ERROR (Status);
       if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "Get public key database variable failure, Status = %r\n", Status));
         return 0;
       }
 
@@ -546,6 +550,21 @@ AddPubKeyInStore (
       }     
     }
 
+    //
+    // Check the variable space for both public key and variable data.
+    //
+    PublicKeyEntry.VariableSize = (mPubKeyNumber + 1) * EFI_CERT_TYPE_RSA2048_SIZE;
+    PublicKeyEntry.Guid         = &gEfiAuthenticatedVariableGuid;
+    PublicKeyEntry.Name         = AUTHVAR_KEYDB_NAME;
+    Attributes = VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
+
+    if (!CheckRemainingSpaceForConsistency (Attributes, &PublicKeyEntry, VariableDataEntry, NULL)) {
+      //
+      // No enough variable space.
+      //
+      return 0;
+    }
+
     CopyMem (mPubKeyStore + mPubKeyNumber * EFI_CERT_TYPE_RSA2048_SIZE, PubKey, EFI_CERT_TYPE_RSA2048_SIZE);
     Index = ++mPubKeyNumber;
     //
@@ -556,13 +575,16 @@ AddPubKeyInStore (
                &gEfiAuthenticatedVariableGuid,
                mPubKeyStore,
                mPubKeyNumber * EFI_CERT_TYPE_RSA2048_SIZE,
-               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS,
+               Attributes,
                0,
                0,
                &Variable,
                NULL
                );
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Update public key database variable failure, Status = %r\n", Status));
+      return 0;
+    }
   }
 
   return Index;
@@ -1268,6 +1290,7 @@ ProcessVariable (
   EFI_CERT_BLOCK_RSA_2048_SHA256  *CertBlock;
   UINT32                          KeyIndex;
   UINT64                          MonotonicCount;
+  VARIABLE_ENTRY_CONSISTENCY      VariableDataEntry;
 
   KeyIndex    = 0;
   CertData    = NULL;
@@ -1393,10 +1416,14 @@ ProcessVariable (
   // Now, the signature has been verified!
   //
   if (IsFirstTime && !IsDeletion) {
+    VariableDataEntry.VariableSize = DataSize - AUTHINFO_SIZE;
+    VariableDataEntry.Guid         = VendorGuid;
+    VariableDataEntry.Name         = VariableName;
+
     //
     // Update public key database variable if need.
     //
-    KeyIndex = AddPubKeyInStore (PubKey);
+    KeyIndex = AddPubKeyInStore (PubKey, &VariableDataEntry);
     if (KeyIndex == 0) {
       return EFI_OUT_OF_RESOURCES;
     }

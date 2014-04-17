@@ -763,37 +763,27 @@ TranslateOfwNodes (
       TargetLun[0],
       TargetLun[1]
       );
-  } else if (NumNodes >= 3 &&
-             SubstringEq (OfwNode[1].DriverName, "ethernet") &&
-             SubstringEq (OfwNode[2].DriverName, "ethernet-phy")
-             ) {
+  } else {
     //
-    // OpenFirmware device path (Ethernet NIC):
+    // Generic OpenFirmware device path for PCI devices:
     //
-    //   /pci@i0cf8/ethernet@3[,2]/ethernet-phy@0
-    //        ^              ^                  ^
-    //        |              |                  fixed
+    //   /pci@i0cf8/ethernet@3[,2]
+    //        ^              ^
     //        |              PCI slot[, function] holding Ethernet card
     //        PCI root at system bus port, PIO
     //
     // UEFI device path prefix (dependent on presence of nonzero PCI function):
     //
-    //   PciRoot(0x0)/Pci(0x3,0x0)/MAC(525400E15EEF,0x1)
-    //   PciRoot(0x0)/Pci(0x3,0x2)/MAC(525400E15EEF,0x1)
-    //                                 ^            ^
-    //                                 MAC address  IfType (1 == Ethernet)
-    //
-    // (Some UEFI NIC drivers don't set 0x1 for IfType.)
+    //   PciRoot(0x0)/Pci(0x3,0x0)
+    //   PciRoot(0x0)/Pci(0x3,0x2)
     //
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)/MAC",
+      "PciRoot(0x0)/Pci(0x%x,0x%x)",
       PciDevFun[0],
       PciDevFun[1]
       );
-  } else {
-    return RETURN_UNSUPPORTED;
   }
 
   //
@@ -1121,6 +1111,47 @@ BootOrderComplete (
 
 
 /**
+  Delete Boot#### variables that stand for such active boot options that have
+  been dropped (ie. have not been selected by either matching or "survival
+  policy").
+
+  @param[in]  ActiveOption  The array of active boot options to scan. Each
+                            entry not marked as appended will trigger the
+                            deletion of the matching Boot#### variable.
+
+  @param[in]  ActiveCount   Number of elements in ActiveOption.
+**/
+STATIC
+VOID
+PruneBootVariables (
+  IN  CONST ACTIVE_OPTION *ActiveOption,
+  IN  UINTN               ActiveCount
+  )
+{
+  UINTN Idx;
+
+  for (Idx = 0; Idx < ActiveCount; ++Idx) {
+    if (!ActiveOption[Idx].Appended) {
+      CHAR16 VariableName[9];
+
+      UnicodeSPrintAsciiFormat (VariableName, sizeof VariableName, "Boot%04x",
+        ActiveOption[Idx].BootOption->BootCurrent);
+
+      //
+      // "The space consumed by the deleted variable may not be available until
+      // the next power cycle", but that's good enough.
+      //
+      gRT->SetVariable (VariableName, &gEfiGlobalVariableGuid,
+             0,   // Attributes, 0 means deletion
+             0,   // DataSize, 0 means deletion
+             NULL // Data
+             );
+    }
+  }
+}
+
+
+/**
 
   Set the boot order based on configuration retrieved from QEMU.
 
@@ -1269,12 +1300,13 @@ SetBootOrderFromQemu (
                     BootOrder.Produced * sizeof (*BootOrder.Data),
                     BootOrder.Data
                     );
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: setting BootOrder: %a\n",
-      __FUNCTION__,
-      Status == EFI_SUCCESS ? "success" : "error"
-      ));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: setting BootOrder: %r\n", __FUNCTION__, Status));
+      goto ErrorFreeActiveOption;
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: setting BootOrder: success\n", __FUNCTION__));
+    PruneBootVariables (ActiveOption, ActiveCount);
   }
 
 ErrorFreeActiveOption:

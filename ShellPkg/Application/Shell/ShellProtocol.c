@@ -1770,6 +1770,19 @@ EfiShellRemoveDupInFileList(
   }
   return (EFI_SUCCESS);
 }
+
+//
+// This is the same structure as the external version, but it has no CONST qualifiers.
+//
+typedef struct {
+  LIST_ENTRY        Link;       ///< Linked list members.
+  EFI_STATUS        Status;     ///< Status of opening the file.  Valid only if Handle != NULL.
+        CHAR16      *FullName;  ///< Fully qualified filename.
+        CHAR16      *FileName;  ///< name of this file.
+  SHELL_FILE_HANDLE Handle;     ///< Handle for interacting with the opened file or NULL if closed.
+  EFI_FILE_INFO     *Info;      ///< Pointer to the FileInfo struct for this file or NULL.
+} EFI_SHELL_FILE_INFO_NO_CONST;
+
 /**
   Allocates and duplicates a EFI_SHELL_FILE_INFO node.
 
@@ -1786,7 +1799,12 @@ InternalDuplicateShellFileInfo(
   IN BOOLEAN                   Save
   )
 {
-  EFI_SHELL_FILE_INFO *NewNode;
+  EFI_SHELL_FILE_INFO_NO_CONST *NewNode;
+
+  //
+  // try to confirm that the objects are in sync
+  //
+  ASSERT(sizeof(EFI_SHELL_FILE_INFO_NO_CONST) == sizeof(EFI_SHELL_FILE_INFO));
 
   NewNode = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
   if (NewNode == NULL) {
@@ -1799,7 +1817,11 @@ InternalDuplicateShellFileInfo(
   if ( NewNode->FullName == NULL
     || NewNode->FileName == NULL
     || NewNode->Info == NULL
-   ){
+  ){
+    SHELL_FREE_NON_NULL(NewNode->FullName);
+    SHELL_FREE_NON_NULL(NewNode->FileName);
+    SHELL_FREE_NON_NULL(NewNode->Info);
+    SHELL_FREE_NON_NULL(NewNode);
     return(NULL);
   }
   NewNode->Status = Node->Status;
@@ -1811,7 +1833,7 @@ InternalDuplicateShellFileInfo(
   StrCpy((CHAR16*)NewNode->FileName, Node->FileName);
   CopyMem(NewNode->Info, Node->Info, (UINTN)Node->Info->Size);
 
-  return(NewNode);
+  return((EFI_SHELL_FILE_INFO*)NewNode);
 }
 
 /**
@@ -1876,7 +1898,7 @@ CreateAndPopulateShellFileInfo(
     TempString = StrnCatGrow(&TempString, &Size, BasePath, 0);
     if (TempString == NULL) {
       FreePool((VOID*)ShellFileListItem->FileName);
-      FreePool(ShellFileListItem->Info);
+      SHELL_FREE_NON_NULL(ShellFileListItem->Info);
       FreePool(ShellFileListItem);
       return (NULL);
     }
@@ -2083,6 +2105,7 @@ ShellSearchHandle(
   EFI_SHELL_FILE_INFO *ShellInfo;
   EFI_SHELL_FILE_INFO *ShellInfoNode;
   EFI_SHELL_FILE_INFO *NewShellNode;
+  EFI_FILE_INFO       *FileInfo;
   BOOLEAN             Directory;
   CHAR16              *NewFullName;
   UINTN               Size;
@@ -2110,30 +2133,44 @@ ShellSearchHandle(
 
   if (CurrentFilePattern[0]   == CHAR_NULL
     &&NextFilePatternStart[0] == CHAR_NULL
-   ){
+    ){
     //
-    // Add the current parameter FileHandle to the list, then end...
+    // we want the parent or root node (if no parent)
     //
     if (ParentNode == NULL) {
-      Status = EFI_INVALID_PARAMETER;
+      //
+      // We want the root node.  create the node.
+      //
+      FileInfo = FileHandleGetInfo(FileHandle);
+      NewShellNode = CreateAndPopulateShellFileInfo(
+        L":",
+        EFI_SUCCESS,
+        L"\\",
+        FileHandle,
+        FileInfo
+        );
+      SHELL_FREE_NON_NULL(FileInfo);
     } else {
+      //
+      // Add the current parameter FileHandle to the list, then end...
+      //
       NewShellNode = InternalDuplicateShellFileInfo((EFI_SHELL_FILE_INFO*)ParentNode, TRUE);
-      if (NewShellNode == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-      } else {
-        NewShellNode->Handle = NULL;
-        if (*FileList == NULL) {
-          *FileList = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
-          InitializeListHead(&((*FileList)->Link));
-        }
-
-        //
-        // Add to the returning to use list
-        //
-        InsertTailList(&(*FileList)->Link, &NewShellNode->Link);
-
-        Status = EFI_SUCCESS;
+    }
+    if (NewShellNode == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    } else {
+      NewShellNode->Handle = NULL;
+      if (*FileList == NULL) {
+        *FileList = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
+        InitializeListHead(&((*FileList)->Link));
       }
+
+      //
+      // Add to the returning to use list
+      //
+      InsertTailList(&(*FileList)->Link, &NewShellNode->Link);
+
+      Status = EFI_SUCCESS;
     }
   } else {
     Status = EfiShellFindFilesInDir(FileHandle, &ShellInfo);
@@ -2995,9 +3032,12 @@ InternalEfiShellGetListAlias(
 /**
   Convert a null-terminated unicode string, in-place, to all lowercase.
   Then return it.
+  
+  @param  Str    The null-terminated string to be converted to all lowercase.
+  
+  @return        The null-terminated string converted into all lowercase.  
 **/
-STATIC
-CHAR16 *
+STATIC CHAR16 *
 ToLower (
   CHAR16 *Str
   )
@@ -3538,3 +3578,4 @@ InernalEfiShellStartMonitor(
   }
   return (Status);
 }
+

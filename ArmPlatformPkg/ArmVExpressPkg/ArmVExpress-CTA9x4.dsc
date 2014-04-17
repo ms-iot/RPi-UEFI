@@ -205,6 +205,9 @@
   #
   gArmTokenSpaceGuid.PcdL2x0ControllerBase|0x1E00A000
 
+  # ISP1761 USB OTG Controller
+  gEmbeddedTokenSpaceGuid.PcdIsp1761BaseAddress|0x4f000000
+
   #
   # LAN9118 Ethernet Driver PCDs
   #

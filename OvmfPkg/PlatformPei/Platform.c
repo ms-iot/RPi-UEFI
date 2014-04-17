@@ -30,6 +30,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/QemuFwCfgLib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
@@ -57,6 +58,11 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
     NULL
   }
 };
+
+
+EFI_BOOT_MODE mBootMode = BOOT_WITH_FULL_CONFIGURATION;
+
+BOOLEAN mS3Supported = FALSE;
 
 
 VOID
@@ -266,11 +272,16 @@ MiscInitialization (
 
 VOID
 BootModeInitialization (
+  VOID
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS    Status;
 
-  Status = PeiServicesSetBootMode (BOOT_WITH_FULL_CONFIGURATION);
+  if (CmosRead8 (0xF) == 0xFE) {
+    mBootMode = BOOT_ON_S3_RESUME;
+  }
+
+  Status = PeiServicesSetBootMode (mBootMode);
   ASSERT_EFI_ERROR (Status);
 
   Status = PeiServicesInstallPpi (mPpiBootMode);
@@ -348,6 +359,11 @@ InitializePlatform (
 
   XenDetect ();
 
+  if (QemuFwCfgS3Enabled ()) {
+    DEBUG ((EFI_D_INFO, "S3 support was detected on QEMU\n"));
+    mS3Supported = TRUE;
+  }
+
   BootModeInitialization ();
 
   PublishPeiMemory ();
@@ -359,11 +375,13 @@ InitializePlatform (
     InitializeXen ();
   }
 
-  ReserveEmuVariableNvStore ();
+  if (mBootMode != BOOT_ON_S3_RESUME) {
+    ReserveEmuVariableNvStore ();
 
-  PeiFvInitialization ();
+    PeiFvInitialization ();
 
-  MemMapInitialization ();
+    MemMapInitialization ();
+  }
 
   MiscInitialization ();
 

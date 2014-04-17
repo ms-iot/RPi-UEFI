@@ -187,9 +187,7 @@ GetHIInputBoolean (
 
   while(1) {
     Print (L"[y/n] ");
-    // Set MaxCmdLine to 3 to give space for carriage return (when the user
-    // hits enter) and terminal '\0'.
-    Status = GetHIInputStr (CmdBoolean, 3);
+    Status = GetHIInputStr (CmdBoolean, 2);
     if (EFI_ERROR(Status)) {
       return Status;
     } else if ((CmdBoolean[0] == L'y') || (CmdBoolean[0] == L'Y')) {

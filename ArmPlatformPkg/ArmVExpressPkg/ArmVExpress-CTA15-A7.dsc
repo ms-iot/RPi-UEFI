@@ -171,7 +171,10 @@
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x2C001000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C002000
-  
+
+  # ISP1761 USB OTG Controller
+  gEmbeddedTokenSpaceGuid.PcdIsp1761BaseAddress|0x1B000000
+
   # Ethernet (SMSC 91C111)
   gArmPlatformTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x1A000000
   

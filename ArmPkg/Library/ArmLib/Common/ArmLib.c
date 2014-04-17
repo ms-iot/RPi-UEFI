@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2012, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -43,25 +43,6 @@ ArmCacheInformation (
 
 VOID
 EFIAPI
-ArmSwitchProcessorMode (
-  IN ARM_PROCESSOR_MODE Mode
-  )
-{
-  CPSRMaskInsert(ARM_PROCESSOR_MODE_MASK, Mode);
-}
-
-
-ARM_PROCESSOR_MODE
-EFIAPI
-ArmProcessorMode (
-  VOID
-  )
-{
-  return (ARM_PROCESSOR_MODE)(CPSRRead() & (UINT32)ARM_PROCESSOR_MODE_MASK);
-}
-
-VOID
-EFIAPI
 ArmSetAuxCrBit (
   IN  UINT32    Bits
   )
@@ -80,4 +61,32 @@ ArmUnsetAuxCrBit (
   UINT32 val = ArmReadAuxCr();
   val &= ~Bits;
   ArmWriteAuxCr(val);
+}
+
+//
+// Helper functions for accessing CPUACTLR
+//
+
+VOID
+EFIAPI
+ArmSetCpuActlrBit (
+  IN  UINTN    Bits
+  )
+{
+  UINTN Value;
+  Value =  ArmReadCpuActlr ();
+  Value |= Bits;
+  ArmWriteCpuActlr (Value);
+}
+
+VOID
+EFIAPI
+ArmUnsetCpuActlrBit (
+  IN  UINTN    Bits
+  )
+{
+  UINTN Value;
+  Value = ArmReadCpuActlr ();
+  Value &= ~Bits;
+  ArmWriteCpuActlr (Value);
 }

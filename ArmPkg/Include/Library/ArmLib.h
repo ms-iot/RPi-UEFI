@@ -212,9 +212,9 @@ ArmReadIdPfr1 (
   VOID
   );
 
-UINT32
+UINTN
 EFIAPI
-Cp15CacheInfo (
+ArmCacheInfo (
   VOID
   );
 
@@ -452,18 +452,6 @@ ArmMmuEnabled (
   
 VOID
 EFIAPI
-ArmSwitchProcessorMode (
-  IN ARM_PROCESSOR_MODE Mode
-  );
-
-ARM_PROCESSOR_MODE
-EFIAPI
-ArmProcessorMode (
-  VOID
-  );
-  
-VOID
-EFIAPI
 ArmEnableBranchPrediction (
   VOID
   );
@@ -635,6 +623,35 @@ VOID
 EFIAPI
 ArmWriteHVBar (
   IN  UINTN   HypModeVectorBase
+  );
+
+
+//
+// Helper functions for accessing CPU ACTLR
+//
+
+UINTN
+EFIAPI
+ArmReadCpuActlr (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCpuActlr (
+  IN  UINTN Val
+  );
+
+VOID
+EFIAPI
+ArmSetCpuActlrBit (
+  IN  UINTN    Bits
+  );
+
+VOID
+EFIAPI
+ArmUnsetCpuActlrBit (
+  IN  UINTN    Bits
   );
 
 #endif // __ARM_LIB__

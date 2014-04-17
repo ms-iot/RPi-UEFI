@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -37,9 +37,17 @@ ArmCpuSetup (
 
   if (ArmIsMpCore ()) {
     // Turn on SMP coherency
-    ArmSetAuxCrBit (A5X_FEATURE_SMP);
+    ArmSetCpuExCrBit (A5X_FEATURE_SMP);
   }
 
+  //
+  // If CPU is CortexA57 r0p0 apply Errata: 806969
+  //
+  if ((ArmReadMidr () & ((ARM_CPU_TYPE_MASK << 4) | ARM_CPU_REV_MASK)) ==
+                         ((ARM_CPU_TYPE_A57 << 4) | ARM_CPU_REV(0,0))) {
+    // DisableLoadStoreWB
+    ArmSetCpuActlrBit (1ULL << 49);
+  }
 }
 
 VOID
@@ -47,4 +55,28 @@ ArmCpuSetupSmpNonSecure (
   IN  UINTN         MpId
   )
 {
+}
+
+VOID
+EFIAPI
+ArmSetCpuExCrBit (
+  IN  UINT64    Bits
+  )
+{
+  UINT64 Value;
+  Value =  ArmReadCpuExCr ();
+  Value |= Bits;
+  ArmWriteCpuExCr (Value);
+}
+
+VOID
+EFIAPI
+ArmUnsetCpuExCrBit (
+  IN  UINT64    Bits
+  )
+{
+  UINT64 Value;
+  Value = ArmReadCpuExCr ();
+  Value &= ~Bits;
+  ArmWriteCpuExCr (Value);
 }

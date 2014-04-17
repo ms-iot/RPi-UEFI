@@ -24,6 +24,7 @@ Module Name:
 //
 // The Library classes this module consumes
 //
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
@@ -99,16 +100,21 @@ PublishPeiMemory (
   UINT64                      MemorySize;
   UINT64                      LowerMemorySize;
 
-  LowerMemorySize = GetSystemMemorySizeBelow4gb ();
+  if (mBootMode == BOOT_ON_S3_RESUME) {
+    MemoryBase = PcdGet32 (PcdS3AcpiReservedMemoryBase);
+    MemorySize = PcdGet32 (PcdS3AcpiReservedMemorySize);
+  } else {
+    LowerMemorySize = GetSystemMemorySizeBelow4gb ();
 
-  //
-  // Determine the range of memory to use during PEI
-  //
-  MemoryBase = PcdGet32 (PcdOvmfDxeMemFvBase) + PcdGet32 (PcdOvmfDxeMemFvSize);
-  MemorySize = LowerMemorySize - MemoryBase;
-  if (MemorySize > SIZE_64MB) {
-    MemoryBase = LowerMemorySize - SIZE_64MB;
-    MemorySize = SIZE_64MB;
+    //
+    // Determine the range of memory to use during PEI
+    //
+    MemoryBase = PcdGet32 (PcdOvmfDxeMemFvBase) + PcdGet32 (PcdOvmfDxeMemFvSize);
+    MemorySize = LowerMemorySize - MemoryBase;
+    if (MemorySize > SIZE_64MB) {
+      MemoryBase = LowerMemorySize - SIZE_64MB;
+      MemorySize = SIZE_64MB;
+    }
   }
 
   //
@@ -142,18 +148,22 @@ QemuInitializeRam (
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
   UpperMemorySize = GetSystemMemorySizeAbove4gb ();
 
-  //
-  // Create memory HOBs
-  //
-  AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
-  AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+  if (mBootMode != BOOT_ON_S3_RESUME) {
+    //
+    // Create memory HOBs
+    //
+    AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
+    AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+  }
 
   MtrrSetMemoryAttribute (BASE_1MB, LowerMemorySize - BASE_1MB, CacheWriteBack);
 
   MtrrSetMemoryAttribute (0, BASE_512KB + BASE_128KB, CacheWriteBack);
 
   if (UpperMemorySize != 0) {
-    AddUntestedMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+    if (mBootMode != BOOT_ON_S3_RESUME) {
+      AddUntestedMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+    }
 
     MtrrSetMemoryAttribute (BASE_4GB, UpperMemorySize, CacheWriteBack);
   }
@@ -172,5 +182,63 @@ InitializeRamRegions (
     QemuInitializeRam ();
   } else {
     XenPublishRamRegions ();
+  }
+
+  if (mS3Supported && mBootMode != BOOT_ON_S3_RESUME) {
+    //
+    // This is the memory range that will be used for PEI on S3 resume
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdS3AcpiReservedMemoryBase),
+      (UINT64)(UINTN) PcdGet32 (PcdS3AcpiReservedMemorySize),
+      EfiACPIMemoryNVS
+      );
+
+    //
+    // Cover the initial RAM area used as stack and temporary PEI heap.
+    //
+    // This is reserved as ACPI NVS so it can be used on S3 resume.
+    //
+    BuildMemoryAllocationHob (
+      PcdGet32 (PcdOvmfSecPeiTempRamBase),
+      PcdGet32 (PcdOvmfSecPeiTempRamSize),
+      EfiACPIMemoryNVS
+      );
+
+#ifdef MDE_CPU_X64
+    //
+    // Reserve the initial page tables built by the reset vector code.
+    //
+    // Since this memory range will be used by the Reset Vector on S3
+    // resume, it must be reserved as ACPI NVS.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfSecPageTablesBase),
+      (UINT64)(UINTN) PcdGet32 (PcdOvmfSecPageTablesSize),
+      EfiACPIMemoryNVS
+      );
+#endif
+  }
+
+  if (mBootMode != BOOT_ON_S3_RESUME) {
+    //
+    // Reserve the lock box storage area
+    //
+    // Since this memory range will be used on S3 resume, it must be
+    // reserved as ACPI NVS.
+    //
+    // If S3 is unsupported, then various drivers might still write to the
+    // LockBox area. We ought to prevent DXE from serving allocation requests
+    // such that they would overlap the LockBox storage.
+    //
+    ZeroMem (
+      (VOID*)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageBase),
+      (UINTN) PcdGet32 (PcdOvmfLockBoxStorageSize)
+      );
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageBase),
+      (UINT64)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageSize),
+      mS3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+      );
   }
 }
