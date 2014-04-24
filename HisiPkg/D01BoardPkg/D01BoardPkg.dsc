@@ -325,4 +325,7 @@
   HisiPkg/D01BoardPkg/Bds/Bds.inf
 
   HisiPkg/Drivers/LinuxAtagList/LinuxAtagList.inf
+
+  #HisiPkg/Drivers/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
   
