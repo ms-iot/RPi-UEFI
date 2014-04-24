@@ -1,0 +1,32 @@
+## @file
+# Component name for module SnpPV600Dxe
+# Copyright (c) Huawei Technologies Co., Ltd. 2013. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SnpPV600Dxe
+  FILE_GUID                      = 3247F15F-3612-4803-BD4E-4104D7EF944A
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeSnpPV600Driver
+  UNLOAD_IMAGE                   = SnpPV600Unload
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+[Binaries.common]
+  PE32|SnpPV600Dxe.efi|*
+
