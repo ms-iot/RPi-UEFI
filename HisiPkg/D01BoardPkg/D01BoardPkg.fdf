@@ -173,6 +173,10 @@ READ_LOCK_STATUS   = TRUE
   INF  RuleOverride = BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
+  
+  INF HisiPkg/Drivers/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+
   #
   # Multimedia Card Interface
   #
