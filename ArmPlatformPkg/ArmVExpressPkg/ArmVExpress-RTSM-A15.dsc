@@ -21,7 +21,11 @@
   PLATFORM_GUID                  = 1665b5b1-529d-4ba1-bd51-c3c9b29a2274
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
+!ifdef $(EDK2_OUT_DIR)
+  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)
+!else
   OUTPUT_DIRECTORY               = Build/ArmVExpress-RTSM-A15
+!endif
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -146,10 +150,19 @@
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x1C050000
   
   #
-  # ARM General Interrupt Controller
+  # Select network device based on build time macro
+!if $(EDK2_ARMVE_SUPPORT_QEMU) == 1
+  # Ethernet (SMSC 9118, for QEMU, matches real hardware)
+  gArmPlatformTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x1A000000
+!else
+  # Ethernet (SMSC 91C111, for RTSM)
+  gArmPlatformTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
+!endif
+
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x2C001000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C002000
+
 
   #
   # ARM OS Loader
