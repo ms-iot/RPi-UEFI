@@ -299,7 +299,6 @@ ArmPlatformSecLib|ArmPlatformPkg/Library/ArmPlatformSecLibNull/ArmPlatformLibNul
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linaro image on SD card"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(3A02E7FE-0649-4FB4-BE4F-A862CA1872A9)/HD(2,MBR,0x00000000,0x2000,0x1A000)/uImage"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(3A02E7FE-0649-4FB4-BE4F-A862CA1872A9)/HD(2,MBR,0x00000000,0x2000,0x1A000)/uInitrd"
-  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L"VenHw(3A02E7FE-0649-4FB4-BE4F-A862CA1872A9)/HD(2,MBR,0x00000000,0x2000,0x1A000)/board.dtb"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"root=/dev/mmcblk1p3 rw rootwait console=ttySAC2,115200n8 init --no-log"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|3
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(3A02E7FE-0649-4FB4-BE4F-A862CA1872A9)/HD(2,MBR,0x00000000,0x2000,0x1A000)/board.dtb"
