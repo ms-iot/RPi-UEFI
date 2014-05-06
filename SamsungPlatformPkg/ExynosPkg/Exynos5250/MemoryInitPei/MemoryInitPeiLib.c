@@ -74,7 +74,7 @@ MemoryPeim (
   BOOLEAN                     Found;
 
   // Ensure PcdSystemMemorySize has been set
-  ASSERT (PcdGet32 (PcdSystemMemorySize) != 0);
+  ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
 
   //
   // Now, the permanent memory has been installed, we can call AllocatePages()
