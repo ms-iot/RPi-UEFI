@@ -21,7 +21,11 @@
   PLATFORM_GUID                  = 0b511920-978d-4b34-acc0-3d9f8e6f9d81
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
+!ifdef $(EDK2_OUT_DIR)
+  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)
+!else
   OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA15-A7
+!endif
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -179,11 +183,12 @@
   #
   # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux: 
   gArmTokenSpaceGuid.PcdArmMachineType|2272
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from NorFlash"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0xE000000,0xE800000)"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,38400 earlyprintk debug verbose"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linaro image on SD card"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/uImage"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/uInitrd"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,38400n8 rootwait root=/dev/mmcblk0p2"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0x0E800000,0x0E803000)"
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/v2p-ca15-tc2.dtb"
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   # PL111 - CLCD
