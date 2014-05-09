@@ -133,6 +133,9 @@
   gEmbeddedTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x0|UINT32|0x00000025
   gEmbeddedTokenSpaceGuid.PcdLan9118DefaultMacAddress|0x0|UINT64|0x00000026
 
+  # LAN91x Ethernet Driver PCDs
+  gEmbeddedTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x0|UINT32|0x000000FE
+
   #
   # Android FastBoot
   #
