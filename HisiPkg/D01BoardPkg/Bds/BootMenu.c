@@ -711,6 +711,43 @@ BootEBL (
 
   return Status;
 }
+
+EFI_STATUS
+BootShell (
+  IN LIST_ENTRY *BootOptionsList
+  )
+{
+  EFI_STATUS Status;
+
+  // Start EFI Shell
+  Status = BdsLoadApplication (mImageHandle, L"Shell", 0, NULL);
+  if (Status == EFI_NOT_FOUND) {
+    Print (L"Error: EFI Application not found.\n");
+  } else if (EFI_ERROR(Status)) {
+    Print (L"Error: Status Code: 0x%X\n",(UINT32)Status);
+  }
+
+  return Status;
+}
+
+EFI_STATUS
+Reboot (
+  IN LIST_ENTRY *BootOptionsList
+  )
+{
+  gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+Shutdown (
+  IN LIST_ENTRY *BootOptionsList
+  )
+{
+  gRT->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+  return EFI_UNSUPPORTED;
+}
+
 EFI_STATUS
 BootLinuxAtagLoader (
   IN LIST_ENTRY *BootOptionsList
@@ -775,6 +812,9 @@ struct BOOT_MAIN_ENTRY {
 } BootMainEntries[] = {
     { L"Boot Manager", BootMenuManager },
     { L"EBL", BootEBL },
+    { L"Shell", BootShell },
+    { L"Reboot", Reboot },
+    { L"Shutdown", Shutdown },
     { L"GO", BootGo },
 };
 
