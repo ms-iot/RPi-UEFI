@@ -203,6 +203,7 @@ READ_LOCK_STATUS   = TRUE
   # UEFI application (Shell Embedded Boot Loader) 
   #  
   INF HisiPkg/D01BoardPkg/Application/Ebl/Ebl.inf
+  INF ShellBinPkg/UefiShell/UefiShell.inf
   
   #
   # Bds
