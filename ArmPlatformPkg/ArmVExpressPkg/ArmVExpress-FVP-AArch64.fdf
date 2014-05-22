@@ -192,6 +192,11 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmFvpDxe.inf
   INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 
+!ifdef EDK2_ENABLE_SMSC_91X
+!include ArmPlatformPkg/ArmVExpressPkg/ArmVExpress-networking.fdf.inc
+  INF EmbeddedPkg/Drivers/LAN91xDxe/LAN91xDxe.inf
+!endif
+
   #
   # UEFI application (Shell Embedded Boot Loader)
   #
