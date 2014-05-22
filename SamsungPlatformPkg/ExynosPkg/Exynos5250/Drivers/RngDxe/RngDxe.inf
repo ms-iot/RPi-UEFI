@@ -1,0 +1,49 @@
+#/** @file
+# CryptRand library implementation
+#
+#
+#  Copyright (c) 2012, Samsung Electronics Co. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RngDxe
+  FILE_GUID                      = cc605e80-ef94-4d5c-9153-364c92b0adc1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                  = RngDxeInitialize
+
+[Sources]
+  RngDxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SamsungPlatformPkg/ExynosPkg/Exynos5250/ExynosPkg.dec
+  SamsungPlatformPkg/SamsungPlatformPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UncachedMemoryAllocationLib
+  DebugLib
+  IoLib
+
+[Guids]
+
+[Protocols]
+  gSamsungPlatformRngProtocolGuid
+
+[Pcd]
+  gExynosPkgTokenSpaceGuid.PcdCryptoBase
+
+[Depex]
+  TRUE

@@ -1,0 +1,54 @@
+#/** @file
+#
+#    Component discription file for Timer module
+#
+#  Copyright (c) 2012, Samsung Electronics Co. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TimerDxe
+  FILE_GUID                      = 494ffd22-3228-4b7e-ad40-7e780fa88301
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = TimerInitialize
+
+[Sources.common]
+  TimerDxe.c
+
+[Packages]
+  SamsungPlatformPkg/ExynosPkg/Exynos5250/ExynosPkg.dec
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  TimerLib
+
+[Guids]
+
+[Protocols]
+  gEfiTimerArchProtocolGuid
+  gHardwareInterruptProtocolGuid
+
+
+[Pcd.common]
+  gEmbeddedTokenSpaceGuid.PcdTimerPeriod
+  gExynosPkgTokenSpaceGuid.PcdPWMTimerBase
+[Depex]
+  gHardwareInterruptProtocolGuid
