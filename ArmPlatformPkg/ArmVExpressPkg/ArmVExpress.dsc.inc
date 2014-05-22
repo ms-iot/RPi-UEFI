@@ -359,6 +359,11 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi()"
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
+!ifdef EDK2_ENABLE_SMSC_91X
+  # Ethernet (SMSC 91C111)
+  gEmbeddedTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
+!endif
+
 [Components.common]
   # Versatile Express FileSystem
   ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
@@ -378,6 +383,10 @@
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+!ifdef EDK2_ENABLE_SMSC_91X
+  # SMSC LAN 91C111
+  EmbeddedPkg/Drivers/LAN91xDxe/LAN91xDxe.inf
+!endif
 
   # ISP1761 USB OTG Controller
   EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf
