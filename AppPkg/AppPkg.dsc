@@ -82,7 +82,7 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
-  PathLib|ShellPkg/Library/BasePathLib/BasePathLib.inf
+  PathLib|MdeModulePkg/Library/BasePathLib/BasePathLib.inf
 
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
 
