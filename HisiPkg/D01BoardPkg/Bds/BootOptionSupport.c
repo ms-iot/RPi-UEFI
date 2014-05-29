@@ -1,7 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
-*  Copyright (c) Huawei Technologies Co., Ltd. 2013. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -26,7 +25,6 @@
 #include <Guid/FileSystemInfo.h>
 
 #define IS_DEVICE_PATH_NODE(node,type,subtype) (((node)->Type == (type)) && ((node)->SubType == (subtype)))
-#define LOCAL_FDT_RESPONSE_LEN 2  // 1 character, plus carriage return
 
 EFI_STATUS
 BdsLoadOptionFileSystemList (
@@ -37,8 +35,7 @@ EFI_STATUS
 BdsLoadOptionFileSystemCreateDevicePath (
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   );
 
 EFI_STATUS
@@ -46,8 +43,7 @@ BdsLoadOptionFileSystemUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   );
 
 BOOLEAN
@@ -64,8 +60,7 @@ EFI_STATUS
 BdsLoadOptionMemMapCreateDevicePath (
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   );
 
 EFI_STATUS
@@ -73,8 +68,7 @@ BdsLoadOptionMemMapUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   );
 
 BOOLEAN
@@ -91,8 +85,7 @@ EFI_STATUS
 BdsLoadOptionPxeCreateDevicePath (
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   );
 
 EFI_STATUS
@@ -100,8 +93,7 @@ BdsLoadOptionPxeUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   );
 
 BOOLEAN
@@ -118,8 +110,7 @@ EFI_STATUS
 BdsLoadOptionTftpCreateDevicePath (
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   );
 
 EFI_STATUS
@@ -127,8 +118,7 @@ BdsLoadOptionTftpUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   );
 
 BOOLEAN
@@ -224,18 +214,44 @@ BootDeviceGetDeviceSupport (
   return EFI_UNSUPPORTED;
 }
 
-STATIC
 EFI_STATUS
 BootDeviceGetType (
-  IN  CHAR16* FileName,
+  IN  EFI_DEVICE_PATH* DevicePath,
   OUT ARM_BDS_LOADER_TYPE *BootType,
   OUT UINT32 *Attributes
   )
 {
-  EFI_STATUS Status;
-  BOOLEAN IsEfiApp;
-  BOOLEAN IsBootLoader;
-  CHAR16  FDTType[ LOCAL_FDT_RESPONSE_LEN ];
+  EFI_STATUS              Status;
+  BOOLEAN                 IsEfiApp;
+  BOOLEAN                 IsBootLoader;
+  BOOLEAN                 HasFDTSupport;
+  CHAR16*                 FileName;
+  EFI_DEVICE_PATH*        PrevDevicePathNode;
+  EFI_DEVICE_PATH*        DevicePathNode;
+  EFI_PHYSICAL_ADDRESS    Image;
+  UINTN                   FileSize;
+  EFI_IMAGE_DOS_HEADER*   DosHeader;
+  UINTN                   PeCoffHeaderOffset;
+  EFI_IMAGE_NT_HEADERS32* NtHeader;
+
+  //
+  // Check if the last node of the device path is a FilePath node
+  //
+  PrevDevicePathNode = NULL;
+  DevicePathNode = DevicePath;
+  while ((DevicePathNode != NULL) && !IsDevicePathEnd (DevicePathNode)) {
+    PrevDevicePathNode = DevicePathNode;
+    DevicePathNode = NextDevicePathNode (DevicePathNode);
+  }
+
+  if ((PrevDevicePathNode != NULL) &&
+      (PrevDevicePathNode->Type == MEDIA_DEVICE_PATH) &&
+      (PrevDevicePathNode->SubType == MEDIA_FILEPATH_DP))
+  {
+    FileName = ((FILEPATH_DEVICE_PATH*)PrevDevicePathNode)->PathName;
+  } else {
+    FileName = NULL;
+  }
 
   if (FileName == NULL) {
     Print(L"Is an EFI Application? ");
@@ -246,7 +262,41 @@ BootDeviceGetType (
   } else if (HasFilePathEfiExtension(FileName)) {
     IsEfiApp = TRUE;
   } else {
-    IsEfiApp = FALSE;
+    // Check if the file exist
+    Status = BdsLoadImage (DevicePath, AllocateAnyPages, &Image, &FileSize);
+    if (!EFI_ERROR (Status)) {
+
+      DosHeader = (EFI_IMAGE_DOS_HEADER *)(UINTN) Image;
+      if (DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+        //
+        // DOS image header is present,
+        // so read the PE header after the DOS image header.
+        //
+        PeCoffHeaderOffset = DosHeader->e_lfanew;
+      } else {
+        PeCoffHeaderOffset = 0;
+      }
+
+      //
+      // Check PE/COFF image.
+      //
+      NtHeader = (EFI_IMAGE_NT_HEADERS32 *)(UINTN) (Image + PeCoffHeaderOffset);
+      if (NtHeader->Signature != EFI_IMAGE_NT_SIGNATURE) {
+        IsEfiApp = FALSE;
+      } else {
+        IsEfiApp = TRUE;
+      }
+
+      // Free memory
+      gBS->FreePages (Image, EFI_SIZE_TO_PAGES(FileSize));
+    } else {
+      // If we did not manage to open it then ask for the type
+      Print(L"Is an EFI Application? ");
+      Status = GetHIInputBoolean (&IsEfiApp);
+      if (EFI_ERROR(Status)) {
+        return EFI_ABORTED;
+      }
+    }
   }
 
   if (IsEfiApp) {
@@ -260,19 +310,15 @@ BootDeviceGetType (
     }
     *BootType = BDS_LOADER_EFI_APPLICATION;
   } else {
-    Print(L"Boot Type: [a] ATAGS, [g] Global FDT or [l] Local FDT? [a/g/l] ");
-    Status = GetHIInputStr (FDTType, LOCAL_FDT_RESPONSE_LEN );
+    Print(L"Has FDT support? ");
+    Status = GetHIInputBoolean (&HasFDTSupport);
     if (EFI_ERROR(Status)) {
       return EFI_ABORTED;
     }
-    if (StrCmp(FDTType, L"g") == 0) {
-      *BootType = BDS_LOADER_KERNEL_LINUX_GLOBAL_FDT;
-    } else if (StrCmp(FDTType, L"l") == 0) {
-      *BootType = BDS_LOADER_KERNEL_LINUX_LOCAL_FDT;
-    } else if (StrCmp(FDTType, L"a") == 0) {
-      *BootType = BDS_LOADER_KERNEL_LINUX_ATAG;
+    if (HasFDTSupport) {
+      *BootType = BDS_LOADER_KERNEL_LINUX_FDT;
     } else {
-      return EFI_ABORTED;
+      *BootType = BDS_LOADER_KERNEL_LINUX_ATAG;
     }
   }
 
@@ -339,8 +385,7 @@ EFI_STATUS
 BdsLoadOptionFileSystemCreateDevicePath (
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   )
 {
   EFI_STATUS  Status;
@@ -367,16 +412,7 @@ BdsLoadOptionFileSystemCreateDevicePath (
   SetDevicePathNodeLength (FilePathDevicePath, SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
   CopyMem (FilePathDevicePath->PathName, BootFilePath, BootFilePathSize);
   SetDevicePathEndNode ((VOID*)((UINTN)FilePathDevicePath + SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize));
-
-  if (BootType != NULL || Attributes != NULL) {
-    Status = BootDeviceGetType (FilePathDevicePath->PathName, BootType, Attributes);
-  }
-
-  if (EFI_ERROR(Status)) {
-    FreePool (FilePathDevicePath);
-  } else {
-    *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL*)FilePathDevicePath;
-  }
+  *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL*)FilePathDevicePath;
 
   return Status;
 }
@@ -386,8 +422,7 @@ BdsLoadOptionFileSystemUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   )
 {
   EFI_STATUS  Status;
@@ -425,10 +460,6 @@ BdsLoadOptionFileSystemUpdateDevicePath (
   SetDevicePathEndNode (EndingDevicePath);
   *NewDevicePath = AppendDevicePathNode (DevicePath, (CONST EFI_DEVICE_PATH_PROTOCOL *)FilePathDevicePath);
   FreePool(DevicePath);
-
-  if (BootType != NULL || Attributes != NULL) {
-    return BootDeviceGetType (FilePathDevicePath->PathName, BootType, Attributes);
-  }
 
   return EFI_SUCCESS;
 }
@@ -541,8 +572,7 @@ EFI_STATUS
 BdsLoadOptionMemMapCreateDevicePath (
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   )
 {
   EFI_STATUS              Status;
@@ -573,16 +603,7 @@ BdsLoadOptionMemMapCreateDevicePath (
 
   // Set a Device Path End Node after the Memory Map Device Path Node
   SetDevicePathEndNode (MemMapDevicePath + 1);
-
-  if (BootType != NULL || Attributes != NULL) {
-    Status = BootDeviceGetType (NULL, BootType, Attributes);
-  }
-
-  if (EFI_ERROR(Status)) {
-    FreePool (MemMapDevicePath);
-  } else {
-    *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL*)MemMapDevicePath;
-  }
+  *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL*)MemMapDevicePath;
 
   return Status;
 }
@@ -592,8 +613,7 @@ BdsLoadOptionMemMapUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   )
 {
   EFI_STATUS          Status;
@@ -621,10 +641,6 @@ BdsLoadOptionMemMapUpdateDevicePath (
 
   EndingDevicePath->StartingAddress = StrHexToUint64 (StrStartingAddress);
   EndingDevicePath->EndingAddress = StrHexToUint64 (StrEndingAddress);
-
-  if (BootType != NULL || Attributes != NULL) {
-    Status = BootDeviceGetType (NULL, BootType, Attributes);
-  }
 
   if (EFI_ERROR(Status)) {
     FreePool(DevicePath);
@@ -699,13 +715,15 @@ EFI_STATUS
 BdsLoadOptionPxeCreateDevicePath (
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   )
 {
   *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
   SetDevicePathEndNode (*DevicePathNodes);
-  *BootType = BDS_LOADER_EFI_APPLICATION;
+
+  if (RequestBootType) {
+    *RequestBootType = FALSE;
+  }
   return EFI_SUCCESS;
 }
 
@@ -714,12 +732,11 @@ BdsLoadOptionPxeUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   )
 {
   ASSERT (0);
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 BOOLEAN
@@ -801,8 +818,7 @@ EFI_STATUS
 BdsLoadOptionTftpCreateDevicePath (
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   )
 {
   EFI_STATUS    Status;
@@ -868,16 +884,7 @@ BdsLoadOptionTftpCreateDevicePath (
 
   // Set the End Device Path Node
   SetDevicePathEndNode ((VOID*)((UINTN)FilePathDevicePath + SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize));
-
-  if (BootType != NULL || Attributes != NULL) {
-    Status = BootDeviceGetType (NULL, BootType, Attributes);
-  }
-
-  if (EFI_ERROR(Status)) {
-    FreePool (IPv4DevicePathNode);
-  } else {
-    *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL*)IPv4DevicePathNode;
-  }
+  *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL*)IPv4DevicePathNode;
 
   return Status;
 }
@@ -887,12 +894,11 @@ BdsLoadOptionTftpUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
   OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT ARM_BDS_LOADER_TYPE       *BootType,
-  OUT UINT32                    *Attributes
+  OUT BOOLEAN                   *RequestBootType
   )
 {
   ASSERT (0);
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 BOOLEAN
