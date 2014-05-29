@@ -20,17 +20,29 @@
 #include <Uefi/UefiBaseType.h>
 #include <Protocol/SerialIo.h>
 
-static int flag=1;
-
-UINT32 UART_UartClkFreq(void)
+VOID SerialInit(VOID)
 {
-    #define UART_CLK_FREQ_ADRS 0x20000020
-    UINT32 ulRegVal = 0x00;
-    UINT32 ulCpllFreq = 0x00;
-    ulRegVal = ((*(UINT32 *)UART_CLK_FREQ_ADRS));
-    ulCpllFreq = ((((25000000 /(ulRegVal&0x3f))) /((ulRegVal>>18)&0x07))
-                                    /((ulRegVal>>21)&0x07))* ((ulRegVal>>6)&0xfff);
-    return ulCpllFreq;
+    UINT32 ulUartClkFreq;
+
+    *(volatile UINT32 *)(UART_LCR_REG) = UART_LCR_DLS8;
+
+    *(volatile UINT32 *)(UART_FCR_REG) = UART_FCR_EN | UART_FCR_RXCLR | UART_FCR_TXCLR;
+
+    *(volatile UINT32 *)(UART_LCR_REG) = UART_LCR_DLAB | UART_LCR_DLS8;
+
+    ulUartClkFreq = TCXO_CLK_FREQ;
+
+    *(volatile UINT32 *)(UART_DLL_REG) = (ulUartClkFreq / (16 * BAUDRATE) ) & 0xff;
+    *(volatile UINT32 *)(UART_DLH_REG) = ((ulUartClkFreq/ (16 * BAUDRATE) ) >> 8 ) & 0xff;
+
+    *(volatile UINT32 *)(UART_LCR_REG) = UART_LCR_DLS8;
+
+    *(volatile UINT32 *)(UART_IEL_REG) = 0x00;
+
+    *(volatile UINT32 *)(UART_THR_REG) = 0x53;
+
+    return ;
+
 }
 
 
@@ -51,22 +63,6 @@ SerialPortInitialize (
   VOID
   )
 {
-    UINT32 ulUartClkFreq;
-
-if(flag>0) return RETURN_SUCCESS;
-    *(volatile UINT8 *)(UART_LCR_REG) = UART_LCR_DLS8;
-    *(volatile UINT8 *)(UART_FCR_REG) = UART_FCR_EN | UART_FCR_RXCLR | UART_FCR_TXCLR;
-    *(volatile UINT8 *)(UART_LCR_REG) = UART_LCR_DLAB | UART_LCR_DLS8;
-    ulUartClkFreq = 168750000;
-    //ulUartClkFreq = 50000000;
-    *(volatile UINT8 *)(UART_DLL_REG) = (ulUartClkFreq / (16 * BAUDRATE) ) & 0xff;
-    *(volatile UINT8 *)(UART_DLH_REG) = ((ulUartClkFreq/ (16 * BAUDRATE) ) >> 8 ) & 0xff;
-    //*(volatile UINT8 *)(UART_DLL_REG) = (ulUartClkFreq / (16 * 2400) ) & 0xff;
-    //*(volatile UINT8 *)(UART_DLH_REG) = ((ulUartClkFreq/ (16 * 2400) ) >> 8 ) & 0xff;
-    //*(volatile UINT8 *)(UART_DLL_REG) = 0x5B;   //115200
-    //*(volatile UINT8 *)(UART_DLH_REG) = 0x00;   //115200
-     *(volatile UINT8 *)(UART_LCR_REG) = UART_LCR_DLS8;
-     *(volatile UINT8 *)(UART_IEL_REG) = 0x00;
     return RETURN_SUCCESS;
 }
 
@@ -191,7 +187,7 @@ VOID SerialPortWriteChar(UINT8 scShowChar)
       
     while(ulLoop < UART_SEND_DELAY)
     {
-        if ((*(volatile UINT8 *)(UART_USR_REG) & 0x02) == 0x02)
+        if ((*(volatile UINT8 *)(UART_USR_REG) & UART_FCR_RXCLR) == UART_FCR_RXCLR)
         {
             break;
         }
@@ -203,7 +199,7 @@ VOID SerialPortWriteChar(UINT8 scShowChar)
     ulLoop = 0;
     while(ulLoop < UART_SEND_DELAY)
     {
-        if ((*(volatile UINT8 *)(UART_USR_REG) & 0x04) == 0x04)
+        if ((*(volatile UINT8 *)(UART_USR_REG) & UART_FCR_TXCLR) == UART_FCR_TXCLR)
         {
             break;
         }
@@ -220,12 +216,11 @@ UINT8 SerialPortReadChar(VOID)
 
     do
     {
-        if ((*(UINT8 *)(UART_LSR_REG) & UART_LSR_DR) == UART_LSR_DR)
+        if ((*(volatile UINT8 *)(UART_LSR_REG) & UART_LSR_DR) == UART_LSR_DR)
         {
             break;
         }
-
-    }while(*(UINT8 *)(UART_USR_REG) & UART_USR_BUSY);
+    }while(1);
 
     recvchar = (*(volatile UINT8 *)(UART_RBR_REG)); 
     
