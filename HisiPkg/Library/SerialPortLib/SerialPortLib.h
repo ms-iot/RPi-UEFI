@@ -15,13 +15,13 @@
 #ifndef __HISIARM_SERIAL_PORT__
 #define __HISIARM_SERIAL_PORT__
 
-
-#define UART_USED_CHANNELS           1    
-#define TCXO_CLK_FREQ           26000000 
-#define SERIAL_0_BASE_ADR       0xe4007000 
-#define REG_VAL               (*(UINT32 *)0x118) & 0xffff
-#define UART_SEND_DELAY         500000    
-#define BAUDRATE 115200
+#include <Library/PcdLib.h>
+#define UART_USED_CHANNELS      1
+#define TCXO_CLK_FREQ           168750000
+#define SERIAL_0_BASE_ADR       0xe4007000
+#define REG_VAL                 (*(UINT32 *)0x118) & 0xffff
+#define UART_SEND_DELAY         500000
+#define BAUDRATE                115200
 
 
 #define UART_THR_REG         (SERIAL_0_BASE_ADR + UART_RBR)
