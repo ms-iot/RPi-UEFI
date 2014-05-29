@@ -52,7 +52,7 @@
   gHwTokenSpaceGuid.PcdtinitrdStart|0x03800000|UINT32|0x01000007
   gHwTokenSpaceGuid.PcdBootcmdAddr|0x00a01000|UINT32|0x010000c
 
-  gHwTokenSpaceGuid.PcdDefaultCmdlineTagCmdline|"mem=256M console=ttyAMA0,9600 quiet"|VOID*|0x010000F
+  gHwTokenSpaceGuid.PcdDefaultCmdlineTagCmdline|"mem=256M console=ttyAMA0,115200 quiet"|VOID*|0x010000F
 
   
   gHwTokenSpaceGuid.PcdNANDCRegBase|0xe4020000|UINT32|0x0030000b

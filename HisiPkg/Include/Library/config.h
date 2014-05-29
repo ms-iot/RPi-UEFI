@@ -88,17 +88,17 @@ extern "C" {
 /* Memory configuration */
 #undef  LOCAL_MEM_AUTOSIZE                    /* run-time memory sizing */
 
-#ifndef _BSP_BUILD_VXWORKS      
+#ifndef _BSP_BUILD_VXWORKS
 #ifdef _CONTROL_SLAVE_CORE_IMG
 #define USER_RESERVED_MEM       HDF_GetMemPoolResSizeConfig(HDF_SLAVE_CORE_FLAG,HDF_BOOTROM_COMPILE_FLAG)
 #else
-#define USER_RESERVED_MEM       HDF_GetMemPoolResSizeConfig(HDF_MASTER_CORE_FLAG,HDF_BOOTROM_COMPILE_FLAG)   
+#define USER_RESERVED_MEM       HDF_GetMemPoolResSizeConfig(HDF_MASTER_CORE_FLAG,HDF_BOOTROM_COMPILE_FLAG)
 #endif
-#else                         
+#else
 #ifdef _CONTROL_SLAVE_CORE_IMG
 #define USER_RESERVED_MEM       HDF_GetMemPoolResSizeConfig(HDF_SLAVE_CORE_FLAG,HDF_VXWORKS_COMPILE_FLAG)
 #else
-#define USER_RESERVED_MEM       HDF_GetMemPoolResSizeConfig(HDF_MASTER_CORE_FLAG,HDF_VXWORKS_COMPILE_FLAG)   
+#define USER_RESERVED_MEM       HDF_GetMemPoolResSizeConfig(HDF_MASTER_CORE_FLAG,HDF_VXWORKS_COMPILE_FLAG)
 #endif
 #endif
 
@@ -106,13 +106,13 @@ extern "C" {
 
 
 
-#ifndef _BSP_BUILD_VXWORKS     
+#ifndef _BSP_BUILD_VXWORKS
 #ifdef _CONTROL_SLAVE_CORE_IMG
 #define LOCAL_MEM_SIZE          HDF_GetMemPoolPhyMemTopConfig(HDF_SLAVE_CORE_FLAG,HDF_BOOTROM_COMPILE_FLAG)
 #else
 #define LOCAL_MEM_SIZE          HDF_GetMemPoolPhyMemTopConfig(HDF_MASTER_CORE_FLAG,HDF_BOOTROM_COMPILE_FLAG)
 #endif
-#else                        
+#else
 #ifdef _CONTROL_SLAVE_CORE_IMG
 #define LOCAL_MEM_SIZE          HDF_GetMemPoolPhyMemTopConfig(HDF_SLAVE_CORE_FLAG,HDF_VXWORKS_COMPILE_FLAG)
 #else
@@ -160,8 +160,8 @@ extern "C" {
 #else
 
 #ifndef _BSP_BUILD_VXWORKS
-#define ROM_BASE_ADRS    (HDFINF_GetTextBase())   
-#define ROM_TEXT_ADRS    (HDFINF_GetTextBase())   
+#define ROM_BASE_ADRS    (HDFINF_GetTextBase())
+#define ROM_TEXT_ADRS    (HDFINF_GetTextBase())
 #define RAM_LOW_ADRS     0x05000000  /* VxWorks image entry point */
 #define RAM_HIGH_ADRS    0x06000000  /* RAM address for ROM boot */
 #else
@@ -189,7 +189,7 @@ extern "C" {
 
 /* Serial port configuration */
 
-#define N_SIO_CHANNELS	   3
+#define N_SIO_CHANNELS    3
 
 #undef  NUM_TTY
 #define NUM_TTY             N_SIO_CHANNELS
@@ -306,7 +306,7 @@ extern "C" {
 #endif  /* INCLUDE_END */
 
 #ifdef _BSP_BUILD_VXWORKS
-#ifndef _CONTROL_SLAVE_CORE_IMG 
+#ifndef _CONTROL_SLAVE_CORE_IMG
 #if 1
 #define INCLUDE_USB
 #define INCLUDE_USB_INIT
@@ -328,7 +328,7 @@ extern "C" {
 #define INCLUDE_USB_MS_CBI_INIT
 #define INCLUDE_NOR_FILESYS
 #endif
-#endif  
+#endif
 #endif
 
 #define INCLUDE_BSP_WATCHDOG
@@ -412,10 +412,10 @@ extern "C" {
 #define INCLUDE_SHELL_INTERP_CMD /* shell command interpreter */
 
 #undef SHELL_COMPATIBLE
-#define SHELL_COMPATIBLE        TRUE 
+#define SHELL_COMPATIBLE        TRUE
 
 #ifndef BSP_BUILD_BASIC_BTRM
-#define INCLUDE_RAWFS 
+#define INCLUDE_RAWFS
 #define INCLUDE_XBD_RAMDRV
 #endif
 #ifndef _CONTROL_SLAVE_CORE_IMG
@@ -434,5 +434,3 @@ extern "C" {
 }
 #endif
 #endif  /* __INCconfigh */
-
-
