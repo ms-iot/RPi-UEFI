@@ -16,7 +16,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PL390GicDxe
+  BASE_NAME                      = HisiliconD01GicDxe
   FILE_GUID                      = DE371F7C-DEC4-4D21-ADF1-593ABCC15882
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -25,8 +25,8 @@
 
 
 [Sources.common]
-  PL390Gic.c
-  PL390GicDxe.c
+  HisiliconD01Gic.c
+  HisiliconD01GicDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
