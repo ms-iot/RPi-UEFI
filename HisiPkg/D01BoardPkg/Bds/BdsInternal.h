@@ -1,7 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-*  Copyright (c) Huawei Technologies Co., Ltd. 2013. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -38,14 +37,12 @@
 #define BOOT_DEVICE_OPTION_MAX        300
 #define BOOT_DEVICE_ADDRESS_MAX       (sizeof(L"0x0000000000000000"))
 
-// Length of the buffer used to hold the user input for the main menu
-// This includes the NULL terminator
-// 1 chars + newline + NULL gives room for up to 9 boot device configs
-#define BOOT_OPTION_LEN   3
-
 #define ARM_BDS_OPTIONAL_DATA_SIGNATURE   SIGNATURE_32('a', 'b', 'o', 'd')
 
-#define IS_ARM_BDS_BOOTENTRY(ptr)  (ReadUnaligned32 ((CONST UINT32*)&((ARM_BDS_LOADER_OPTIONAL_DATA*)((ptr)->OptionalData))->Header.Signature) == ARM_BDS_OPTIONAL_DATA_SIGNATURE)
+#define IS_ARM_BDS_BOOTENTRY(ptr)  \
+  (((ptr)->OptionalData != NULL) && \
+   (ReadUnaligned32 ((CONST UINT32*)&((ARM_BDS_LOADER_OPTIONAL_DATA*)((ptr)->OptionalData))->Header.Signature) \
+      == ARM_BDS_OPTIONAL_DATA_SIGNATURE))
 
 #define UPDATE_BOOT_ENTRY L"Update entry: "
 #define DELETE_BOOT_ENTRY L"Delete entry: "
@@ -53,20 +50,16 @@
 typedef enum {
     BDS_LOADER_EFI_APPLICATION = 0,
     BDS_LOADER_KERNEL_LINUX_ATAG,
-    BDS_LOADER_KERNEL_LINUX_GLOBAL_FDT,
-    BDS_LOADER_KERNEL_LINUX_LOCAL_FDT,
+    BDS_LOADER_KERNEL_LINUX_FDT,
 } ARM_BDS_LOADER_TYPE;
 
 typedef struct {
   UINT16                     CmdLineSize;
   UINT16                     InitrdSize;
 
-  UINT16                     FdtLocalSize;
-
   // These following fields have variable length and are packed:
   //CHAR8                      *CmdLine;
   //EFI_DEVICE_PATH_PROTOCOL   *InitrdPathList;
-  //EFI_DEVICE_PATH_PROTOCOL   *FdtLocalPathList;
 } ARM_BDS_LINUX_ARGUMENTS;
 
 typedef union {
@@ -109,8 +102,8 @@ typedef struct _BDS_LOAD_OPTION_SUPPORT {
   BDS_SUPPORTED_DEVICE_TYPE   Type;
   EFI_STATUS    (*ListDevices)(IN OUT LIST_ENTRY* BdsLoadOptionList);
   BOOLEAN       (*IsSupported)(IN  EFI_DEVICE_PATH *DevicePath);
-  EFI_STATUS    (*CreateDevicePathNode)(IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL **DevicePathNodes, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
-  EFI_STATUS    (*UpdateDevicePathNode)(IN EFI_DEVICE_PATH *OldDevicePath, IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL** NewDevicePath, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
+  EFI_STATUS    (*CreateDevicePathNode)(IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL **DevicePathNodes, OUT BOOLEAN *RequestBootType);
+  EFI_STATUS    (*UpdateDevicePathNode)(IN EFI_DEVICE_PATH *OldDevicePath, IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL** NewDevicePath, OUT BOOLEAN *RequestBootType);
 } BDS_LOAD_OPTION_SUPPORT;
 
 #define LOAD_OPTION_ENTRY_FROM_LINK(a)  BASE_CR(a, BDS_LOAD_OPTION_ENTRY, Link)
@@ -226,7 +219,8 @@ BootOptionCreate (
   IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
   IN  ARM_BDS_LOADER_TYPE       BootType,
-  IN  ARM_BDS_LOADER_ARGUMENTS* BootArguments,
+  IN  UINT8*                    OptionalData,
+  IN  UINTN                     OptionalDataSize,
   OUT BDS_LOAD_OPTION**         BdsLoadOption
   );
 
@@ -237,7 +231,8 @@ BootOptionUpdate (
   IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
   IN  ARM_BDS_LOADER_TYPE       BootType,
-  IN  ARM_BDS_LOADER_ARGUMENTS* BootArguments
+  IN UINT8*                     OptionalData,
+  IN UINTN                      OptionalDataSize
   );
 
 EFI_STATUS
@@ -246,8 +241,41 @@ BootOptionDelete (
   );
 
 EFI_STATUS
+BootDeviceGetType (
+  IN  EFI_DEVICE_PATH* DevicePath,
+  OUT ARM_BDS_LOADER_TYPE *BootType,
+  OUT UINT32 *Attributes
+  );
+
+EFI_STATUS
 BootMenuMain (
   VOID
+  );
+
+BOOLEAN
+IsUnicodeString (
+  IN VOID* String
+  );
+
+/*
+ * Try to detect if the given string is an ASCII or Unicode string
+ *
+ * There are actually few limitation to this function but it is mainly to give
+ * a user friendly output.
+ *
+ * Some limitations:
+ *   - it only supports unicode string that use ASCII character (< 0x100)
+ *   - single character ASCII strings are interpreted as Unicode string
+ *   - string cannot be longer than 2 x BOOT_DEVICE_OPTION_MAX (600 bytes)
+ *
+ * @param String    Buffer that might contain a Unicode or Ascii string
+ * @param IsUnicode If not NULL this boolean value returns if the string is an
+ *                  ASCII or Unicode string.
+ */
+BOOLEAN
+IsPrintableString (
+  IN  VOID*    String,
+  OUT BOOLEAN *IsUnicode
   );
 
 #endif /* _BDSINTERNAL_H_ */

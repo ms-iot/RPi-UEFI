@@ -1,7 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-*  Copyright (c) Huawei Technologies Co., Ltd. 2013. All rights reserved.
+*  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -188,9 +187,7 @@ GetHIInputBoolean (
 
   while(1) {
     Print (L"[y/n] ");
-    // Set MaxCmdLine to 3 to give space for carriage return (when the user
-    // hits enter) and terminal '\0'.
-    Status = GetHIInputStr (CmdBoolean, 3);
+    Status = GetHIInputStr (CmdBoolean, 2);
     if (EFI_ERROR(Status)) {
       return Status;
     } else if ((CmdBoolean[0] == L'y') || (CmdBoolean[0] == L'Y')) {
@@ -326,3 +323,94 @@ GetAlignedDevicePath (
   }
 }
 
+BOOLEAN
+IsUnicodeString (
+  IN VOID* String
+  )
+{
+  // We do not support NULL pointer
+  ASSERT (String != NULL);
+
+  if (*(CHAR16*)String < 0x100) {
+    //Note: We could get issue if the string is an empty Ascii string...
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+/*
+ * Try to detect if the given string is an ASCII or Unicode string
+ *
+ * There are actually few limitation to this function but it is mainly to give
+ * a user friendly output.
+ *
+ * Some limitations:
+ *   - it only supports unicode string that use ASCII character (< 0x100)
+ *   - single character ASCII strings are interpreted as Unicode string
+ *   - string cannot be longer than 2 x BOOT_DEVICE_OPTION_MAX (600 bytes)
+ *
+ * @param String    Buffer that might contain a Unicode or Ascii string
+ * @param IsUnicode If not NULL this boolean value returns if the string is an
+ *                  ASCII or Unicode string.
+ */
+BOOLEAN
+IsPrintableString (
+  IN  VOID*    String,
+  OUT BOOLEAN *IsUnicode
+  )
+{
+  BOOLEAN UnicodeDetected;
+  BOOLEAN IsPrintable;
+  UINTN Index;
+  CHAR16 Character;
+
+  // We do not support NULL pointer
+  ASSERT (String != NULL);
+
+  // Test empty string
+  if (*(CHAR16*)String == L'\0') {
+    if (IsUnicode) {
+      *IsUnicode = TRUE;
+    }
+    return TRUE;
+  } else if (*(CHAR16*)String == '\0') {
+    if (IsUnicode) {
+      *IsUnicode = FALSE;
+    }
+    return TRUE;
+  }
+
+  // Limitation: if the string is an ASCII single character string. This comparison
+  // will assume it is a Unicode string.
+  if (*(CHAR16*)String < 0x100) {
+    UnicodeDetected = TRUE;
+  } else {
+    UnicodeDetected = FALSE;
+  }
+
+  IsPrintable = FALSE;
+  for (Index = 0; Index < BOOT_DEVICE_OPTION_MAX * 2; Index++) {
+    if (UnicodeDetected) {
+      Character = ((CHAR16*)String)[Index];
+    } else {
+      Character = ((CHAR8*)String)[Index];
+    }
+
+    if (Character == '\0') {
+      // End of the string
+      IsPrintable = TRUE;
+      break;
+    } else if ((Character < 0x20) || (Character > 0x7f)) {
+      // We only support the range of printable ASCII character
+      IsPrintable = FALSE;
+      break;
+    }
+  }
+
+  if (IsPrintable && IsUnicode) {
+    *IsUnicode = UnicodeDetected;
+  }
+
+  return IsPrintable;
+}
