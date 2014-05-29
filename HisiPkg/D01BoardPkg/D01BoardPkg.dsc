@@ -190,8 +190,8 @@
   HisiPkg/D01BoardPkg/Sec/Sec/Sec.inf {
     <LibraryClasses>
       # Use the implementation which set the Secure bits
-      ArmGicLib|HisiPkg/Drivers/PL390Gic/PL390GicSecLib.inf
-      #ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+      ArmGicLib|HisiPkg/Drivers/HisiliconD01Gic/HisiliconD01GicSecLib.inf
+      #ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
   }
   
   #
@@ -258,8 +258,9 @@
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
-  HisiPkg/Drivers/PL390Gic/PL390GicDxe.inf
-  #ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
+  HisiPkg/Drivers/HisiliconD01Gic/HisiliconD01GicDxe.inf
+  #ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+
   #ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
   #ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   HisiPkg/Drivers/TimerDxe/TimerDxe.inf
