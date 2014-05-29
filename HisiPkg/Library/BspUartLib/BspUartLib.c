@@ -20,19 +20,6 @@
 #include <Library/ResetWdtLib.h>
 #include <Library/DebugLib.h>
 
-extern U32 get_current_mmu_status( void );
-//extern void WDT_ResetWatchdog(void);
-//extern void romInit();
-extern void TMB_Read(U32* pulValueHigh, U32* pulValueLow);
-//extern U32 GET_ClkFreq(U32* psysClkReg);
-//extern U32 GET_InterTimerRefPreq(void);
-extern void sysUsDelay(U32 delay);
-
-U32 BspUartClkFreq(void);
-void BspSendString(char* pShow);
-void BspSendUintHex(U32 ulData);
-
-#define FEED_WDT WDT_ResetWatchdog()
 
 #define BSP_UartDelay(loop) delayuart(2 * loop)
 void delayuart(unsigned long ulCount)

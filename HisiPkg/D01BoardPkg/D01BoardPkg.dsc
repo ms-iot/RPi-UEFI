@@ -41,12 +41,12 @@
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf 
   
 
-    NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
-    DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
-    HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-    UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
-    UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
-    IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
+  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+  DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
+  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
+  UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
+  IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
@@ -55,7 +55,7 @@
 
 [BuildOptions]
 
-  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A8 --fpu=softvfp -I$(WORKSPACE)/HisiPkg/Include/Platform
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15 --fpu=softvfp -I$(WORKSPACE)/HisiPkg/Include/Platform
 
   GCC:*_*_ARM_PLATFORM_FLAGS == -march=armv7-a -I$(WORKSPACE)/HisiPkg/Include/Platform
 
@@ -105,7 +105,7 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0x40028000
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x8000
 
-  gHwTokenSpaceGuid.PcdEmbeddedBiosVersion|"Linaro_BIOS_V1.6"
+  gHwTokenSpaceGuid.PcdEmbeddedBiosVersion|"Linaro_BIOS_V1.9"
       
  
   # System Memory (1GB) 
@@ -126,10 +126,12 @@
   
   ## PL011 - Serial Terminal
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0xe4007000
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|9600
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
+
+  gEmbeddedTokenSpaceGuid.PcdTimerPeriod|10000
 
   
   #
@@ -142,20 +144,19 @@
   # ARM OS Loader
   #
   # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux: 
-  gArmTokenSpaceGuid.PcdArmMachineType|2272
+  gArmTokenSpaceGuid.PcdArmMachineType|0xffffffff
   #gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"SemiHosting"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Ramdisk"
   #gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/zImage"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenMsg(06ED4DD0-FF78-11D3-BDC4-00A0C94053D1,0000000000000000)/uImage"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenMsg(06ED4DD0-FF78-11D3-BDC4-00A0C94053D1,0000000000000000)/initrd"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"mem=256M console=ttyAMA0,9600"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"mem=256M console=ttyAMA0,115200"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
-  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(9600,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
-  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(9600,8,N,1)/VenPcAnsi()"
-
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(61EDB580-1739-4912-A4E8-D05F90FC8D79)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/board.dtb"
+  #gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
+  #gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"
+  #gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
   #
   # ARM L2x0 PCDs
@@ -171,8 +172,8 @@
 
   gHwTokenSpaceGuid.PcdGPIO0Base|0xe4000000
   gArmTokenSpaceGuid.PcdSysCtrlBase|0xe3e00000
- gArmTokenSpaceGuid.PcdTimerBase|0xe3000000
- gArmTokenSpaceGuid.PcdTimer0InterruptNum|130
+  gArmTokenSpaceGuid.PcdTimerBase|0xe3000000
+  gArmTokenSpaceGuid.PcdTimer0InterruptNum|130
   
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"EVB_SECURE_UEFI_BIOS"
   
