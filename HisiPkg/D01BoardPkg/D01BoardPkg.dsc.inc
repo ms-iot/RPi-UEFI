@@ -70,9 +70,18 @@
   # ARM PL354 SMC Driver
   PL35xSmcLib|ArmPlatformPkg/Drivers/PL35xSmc/PL35xSmc.inf
   # ARM PL011 UART Driver
-  PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
+
+
   SerialPortLib|HisiPkg/Library/SerialPortLib/SerialPortLib.inf
   SerialPortExtLib|HisiPkg/Library/SerialPortLib/SerialPortLib.inf
+
+  SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
+  #SerialPortLib|ArmPkg/Library/SemiHostingSerialPortLib/SemiHostingSerialPortLib.inf
+  #SerialPortExtLib|EmbeddedPkg/Library/TemplateSerialPortExtLib/TemplateSerialPortExtLib.inf
+
+  #PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
+  #SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
+  #SerialPortExtLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortExtLib.inf
   ResetWdtLib|HisiPkg/D01BoardPkg/Library/ResetWdtLib/ResetWdtLib.inf
   BspUartLib|HisiPkg/Library/BspUartLib/BspUartLib.inf
   PinIoLib|HisiPkg/Library/PinIoLib/PinIoLib.inf
@@ -92,10 +101,7 @@
 
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   DebugAgentTimerLib|EmbeddedPkg/Library/DebugAgentTimerLibNull/DebugAgentTimerLibNull.inf
-
-  SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf  
   
-  #SerialPortExtLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortExtLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
 
   # BDS Libraries
@@ -336,7 +342,7 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
   
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
-  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi();VenHw(CE660500-824D-11E0-AC72-0002A5D5C51B)"
-  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi()"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi();VenHw(CE660500-824D-11E0-AC72-0002A5D5C51B)"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
