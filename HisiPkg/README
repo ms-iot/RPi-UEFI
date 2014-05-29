@@ -46,4 +46,4 @@ D01 >updateL1 D01.fd
 * Connect the Uart cable from the D01 device to the PC terminal.
 * Power ON the Device.
 * The boot message should be visible on the termial.
-* Finally, it should give boot options. 
+* Finally, it should give boot options.

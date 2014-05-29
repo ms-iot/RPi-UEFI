@@ -1,5 +1,5 @@
 #/** @file
-#  
+#
 #  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 #  Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
 #  Copyright Huawei Technologies Co., Ltd. 1998-2013. All rights reserved.
@@ -8,16 +8,16 @@
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 #**/
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PL390GicDxe
-  FILE_GUID                      = DE371F7C-DEC4-4D21-ADF1-593ABCC15882 
+  FILE_GUID                      = DE371F7C-DEC4-4D21-ADF1-593ABCC15882
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
@@ -47,11 +47,11 @@
 [Protocols]
   gHardwareInterruptProtocolGuid
   gEfiCpuArchProtocolGuid
-  
+
 [FixedPcd.common]
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
-  
+
   gArmTokenSpaceGuid.PcdArmPrimaryCore
   gHwTokenSpaceGuid.PcdGicPrimaryCoreId
 
