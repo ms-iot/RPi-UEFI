@@ -85,14 +85,8 @@
 #define NULL 0
 #endif
 
-extern void BspUartInit(void);
 extern void BspSendChar(char scShowChar);
 extern char BspGetChar(U32 ulTimeout);
-extern void BspSendString(char* pShow);
-extern void BspSendUintHex(U32 ulData);
-extern void BspSendUshortHex(U16 usData);
-extern U32 BspUartClkFreq(void);
-extern void BspUartAgingStatDet(void);
 
 #ifdef __cplusplus
      }

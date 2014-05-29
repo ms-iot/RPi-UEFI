@@ -2,16 +2,16 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR> 
+Portions copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
 Copyright (c) Huawei Technologies Co., Ltd. 2013. All rights reserved.
 
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.   
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -75,7 +75,7 @@ RegisterInterruptSource (
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   if ((Handler == NULL) && (gRegisteredInterruptHandlers[Source] == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -88,9 +88,9 @@ RegisterInterruptSource (
 
   // If the interrupt handler is unregistered then disable the interrupt
   if (NULL == Handler){
-  	return This->DisableInterruptSource (This, Source);
+       return This->DisableInterruptSource (This, Source);
   } else {
-  	return This->EnableInterruptSource (This, Source);
+       return This->EnableInterruptSource (This, Source);
   }
 }
 
@@ -113,19 +113,19 @@ EnableInterruptSource (
 {
   UINT32    RegOffset;
   UINTN     RegShift;
-  
+
   if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   // calculate enable register offset and bit position
   RegOffset = Source / 32;
   RegShift = Source % 32;
 
   // write set-enable register
   MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDISER + (4*RegOffset), 1 << RegShift);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -148,19 +148,19 @@ DisableInterruptSource (
 {
   UINT32    RegOffset;
   UINTN     RegShift;
-  
+
   if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   // Calculate enable register offset and bit position
   RegOffset = Source / 32;
   RegShift = Source % 32;
 
   // Write set-enable register
   MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDICER + (4*RegOffset), 1 << RegShift);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -185,27 +185,27 @@ GetInterruptSourceState (
 {
   UINT32    RegOffset;
   UINTN     RegShift;
-  
+
   if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   // calculate enable register offset and bit position
   RegOffset = Source / 32;
   RegShift = Source % 32;
-    
+
   if ((MmioRead32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDISER + (4*RegOffset)) & (1<<RegShift)) == 0) {
     *InterruptState = FALSE;
   } else {
     *InterruptState = TRUE;
   }
-  
+
   return EFI_SUCCESS;
 }
 
 /**
-  Signal to the hardware that the End Of Intrrupt state 
+  Signal to the hardware that the End Of Intrrupt state
   has been reached.
 
   @param This     Instance pointer for this protocol
@@ -259,7 +259,7 @@ IrqInterruptHandler (
     // The special interrupt do not need to be acknowledge
     return;
   }
-  
+
   InterruptHandler = gRegisteredInterruptHandlers[GicInterrupt];
   if (InterruptHandler != NULL) {
     // Call the registered interrupt handler.
@@ -289,7 +289,7 @@ EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptProtocol = {
 
 /**
   Shutdown our hardware
-  
+
   DXE Core will disable interrupts and turn off the timer and disable interrupts
   after all the event handlers have run.
 
@@ -304,7 +304,7 @@ ExitBootServicesEvent (
   )
 {
   UINTN    Index;
-  
+
   // Acknowledge all pending interrupts
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
     DisableInterruptSource (&gHardwareInterruptProtocol, Index);
@@ -345,7 +345,7 @@ InterruptDxeInitialize (
   UINTN                   RegShift;
   EFI_CPU_ARCH_PROTOCOL   *Cpu;
   UINT32                  CpuTarget;
-  
+
   // Check PcdGicPrimaryCoreId has been set in case the Primary Core is not the core 0 of Cluster 0
   DEBUG_CODE_BEGIN();
   if ((PcdGet32(PcdArmPrimaryCore) != 0) && (PcdGet32 (PcdGicPrimaryCoreId) == 0)) {
@@ -360,13 +360,13 @@ InterruptDxeInitialize (
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
     DisableInterruptSource (&gHardwareInterruptProtocol, Index);
-    
-    // Set Priority 
+
+    // Set Priority
     RegOffset = Index / 4;
     RegShift = (Index % 4) * 8;
     MmioAndThenOr32 (
       PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDIPR + (4*RegOffset),
-      ~(0xff << RegShift), 
+      ~(0xff << RegShift),
       ARM_GIC_DEFAULT_PRIORITY << RegShift
       );
   }
@@ -382,23 +382,23 @@ InterruptDxeInitialize (
 
   // Set priority mask reg to 0xff to allow all priorities through
   MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCPMR, 0xff);
-  
+
   // Enable gic cpu interface
   MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCICR, 0x1);
 
   // Enable gic distributor
   MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDDCR, 0x1);
-  
+
   // Initialize the array for the Interrupt Handlers
   gRegisteredInterruptHandlers = (HARDWARE_INTERRUPT_HANDLER*)AllocateZeroPool (sizeof(HARDWARE_INTERRUPT_HANDLER) * mGicNumInterrupts);
-  
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gHardwareInterruptHandle,
                   &gHardwareInterruptProtocolGuid,   &gHardwareInterruptProtocol,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   //
   // Get the CPU protocol that this driver requires.
   //
