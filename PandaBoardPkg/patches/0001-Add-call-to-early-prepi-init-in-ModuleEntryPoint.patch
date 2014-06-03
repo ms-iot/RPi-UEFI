@@ -1,0 +1,35 @@
+From 9a22e1fed42e2ece74ae06546bc300bd0202e1ad Mon Sep 17 00:00:00 2001
+From: Olivier Deprez <o-deprez@ti.com>
+Date: Fri, 1 Mar 2013 16:03:11 +0100
+Subject: [PATCH] Add call to early prepi init in ModuleEntryPoint
+
+omap4 requires an early call to an inner asm function to work
+around a rom mask issue tied to dram initialization.
+---
+ ArmPlatformPkg/PrePi/ModuleEntryPoint.S |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ArmPlatformPkg/PrePi/ModuleEntryPoint.S b/ArmPlatformPkg/PrePi/ModuleEntryPoint.S
+index c0c20a9..66f0701 100755
+--- a/ArmPlatformPkg/PrePi/ModuleEntryPoint.S
++++ b/ArmPlatformPkg/PrePi/ModuleEntryPoint.S
+@@ -24,12 +24,16 @@
+ GCC_ASM_IMPORT(CEntryPoint)
+ GCC_ASM_IMPORT(ArmReadMpidr)
+ GCC_ASM_IMPORT(ArmPlatformStackSet)
++GCC_ASM_IMPORT(ArmPlatformPrePiBootAction)
+ GCC_ASM_EXPORT(_ModuleEntryPoint)
+ 
+ StartupAddr: .word    CEntryPoint
+ 
+ 
+ ASM_PFX(_ModuleEntryPoint):
++  // Perform early PrePi init
++  bl ASM_PFX(ArmPlatformPrePiBootAction)
++
+   // Get ID of this CPU in Multicore system
+   bl    ASM_PFX(ArmReadMpidr)
+   LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCoreMask), r1)
+-- 
+1.7.9.5
+
