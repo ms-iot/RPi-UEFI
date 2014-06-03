@@ -1,0 +1,59 @@
+## @file
+#
+#  Component description file for GraphicsConsole module
+#
+#  This is the main routine for initializing the Graphics Console support routines.
+#
+#  Copyright (c) 2012, Samsung Electronics Co. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EthDxe
+  FILE_GUID                        = 25ac458a-cf60-476e-861a-211c757657a6
+  MODULE_TYPE                   = UEFI_DRIVER
+  VERSION_STRING              = 1.0
+  ENTRY_POINT                    = EthDxeInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  
+#  COMPONENT_NAME                =  
+#  COMPONENT_NAME2               =  
+#
+
+[Sources]
+  EthDxe.c
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SamsungPlatformPkg/ExynosPkg/Exynos4210/ExynosPkg.dec
+  SamsungPlatformPkg/SamsungPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  IoLib
+  TimerLib
+
+[Protocols]
+  gEfiSimpleNetworkProtocolGuid                ## TO_START
+
+[Guids]
+
+[Pcd]
+  gExynosPkgTokenSpaceGuid.PcdSMC911XBase
