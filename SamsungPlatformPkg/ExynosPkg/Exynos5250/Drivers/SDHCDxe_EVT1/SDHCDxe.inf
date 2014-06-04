@@ -1,0 +1,58 @@
+#/** @file
+#
+#  Copyright (c) 2012, Samsung Electronics Co. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SDHCDxe
+  FILE_GUID                      = 7B857F59-CD4D-4403-A866-CFAD3A7C1381
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = SDHCInitialize
+
+
+[Sources.common]
+  SDHCDxe.c
+  SDHCDxe_5250.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SamsungPlatformPkg/ExynosPkg/Exynos5250/ExynosPkg.dec
+  SamsungPlatformPkg/SamsungPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec  
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  IoLib
+  TimerLib
+  MemoryAllocationLib  
+  UefiLib  
+
+[Guids]
+
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gSamsungPlatformGpioProtocolGuid			## GPIO Protocol
+  gEfiEblAddCommandProtocolGuid
+  
+
+[Pcd]
+  gExynosPkgTokenSpaceGuid.PcdCmuBase
+  gExynosPkgTokenSpaceGuid.PcdSdMmcBase
+  gExynosPkgTokenSpaceGuid.PcdEmmcDMABufferBase
+
+[Depex]
+	TRUE
+
+

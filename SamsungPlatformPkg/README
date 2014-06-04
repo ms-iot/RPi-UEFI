@@ -1,0 +1,48 @@
+
+=== ArndaleBoard OVERVIEW ===
+
+The project aims to support UEFI for Exynos 5250 Soc using the edk2
+code base.
+
+=== STATUS ===
+
+Current capabilities:
+* Uefi Boot from microSD card
+
+=== FUTURE PLANS ===
+
+* Support for PXE, SATA, ACPI, USB
+  - KeyBoard, Mouse and MassStorage
+
+=== BUILDING ARNDALE Board ===
+
+Pre-requisites:
+* Build environment capable of build the edk2 MdeModulePkg.
+* A properly configured ASL compiler:
+  - Intel ASL compiler: Available from http://www.acpica.org
+  - Microsoft ASL compiler: Available from http://www.acpi.info
+
+Getting bl1:
+Download the bl1 from https://wiki.linaro.org/Boards/Arndale/Setup/EnterpriseUbuntuServer?action=AttachFile&do=view&target=arndale-bl1.img
+
+Build the ArndaleBoardPkg by running from the Workspace
+build -p SamsungPlatformPkg/ArndaleBoardPkg/arndale-Exynos5250.dsc -a ARM -t ARMGCC -b RELEASE -D EXYNOS5250_EVT1 -D DDR3 for release version
+
+Following the edk2 build process, you will find the Arndale binaries
+under the $WORKSPACE/Build/*/*/FV directory. You can find the below
+mentioned binary image.
+* ARNDALE_EFI.FD
+
+=== RUNNING ArndaleBoardPkg on the Arndale board ===
+* need to be in Linux Environment to do the below procedure
+* Insert the microSD card.
+* copy the arndale-bl1.img to the SD/MMC card by using the comand
+  sudo dd if=arndale-bl1.img of=/dev/sdX bs=512 seek=1
+* Copy the Uefi Image to SD/MMC with below command from the Workspace.
+  sudo dd if=Build/ArndaleBoard-Exynos/RELEASE_ARMGCC/FV/ARNDALE_EFI.fd of=/dev/sdX bs=512 seek=49
+* Now the booting device is ready to be used.
+* Insert the SDMMC card in the Arndale board reader slot MMC Ch2.
+* Connect the Uart cable from the Arndale device to the PC terminal.
+* Power ON the Device.
+* The boot message should be visible on the termial.
+* Finally, it should give boot options. 

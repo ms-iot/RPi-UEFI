@@ -1,0 +1,46 @@
+## @file HashServicesTest.inf
+#
+#  Samsung S.LSI HashServicesTest application
+#
+#  Copyright (c) 2012-2013, Samsung Electronics Inc. All rights reserved.
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HashServicesTest
+  FILE_GUID                      = 95434237-90a5-4cb2-85ff-2300be4520de
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = HashTestMain
+
+[Sources]
+  HashServicesTest.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SamsungPlatformPkg/ExynosPkg/Exynos5250/ExynosPkg.dec
+  SamsungPlatformPkg/ArndaleBoardPkg/ArndaleBoardPkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UncachedMemoryAllocationLib
+  UefiLib
+  PcdLib
+  DebugLib
+
+[Protocols]
+  gEfiHashProtocolGuid
+  gEfiPciIoProtocolGuid
+
+[Guids]
+  gEfiHashAlgorithmSha1Guid
+  gEfiHashAlgorithmSha256Guid
