@@ -1,0 +1,43 @@
+#/** @file
+# Arm RealView EB package.
+#
+# Copyright (c) 2012, Samsung Electronics Co. All rights reserved.<BR>
+#
+#  This program and the accompanying materials are licensed and made
+#  available under the terms and conditions of the BSD License which
+#  accompanies this distribution.
+#  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = ArndalePkg
+  PACKAGE_GUID                   = 4c9e432c-b84e-44fd-a796-f4545deec144
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER
+#  DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+#  Include                        # Root include for the package
+
+[Guids.common] #bc92b024-79f8-11e0-a039-0026b9733e2c
+  gArndaleBoardPkgTokenSpaceGuid    =  { 0xbc92b024, 0x79f8, 0x11e0, { 0xa0, 0x39, 0x00, 0x26, 0xb9, 0x73, 0x3e, 0x2c} }
+
+[PcdsFeatureFlag.common]
+
+[PcdsFixedAtBuild.common]
+
+[Protocols.common]
