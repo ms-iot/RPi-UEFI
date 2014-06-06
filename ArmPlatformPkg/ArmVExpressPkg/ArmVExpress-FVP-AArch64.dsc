@@ -301,3 +301,5 @@
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   ArmPlatformPkg/Bds/Bds.inf
+
+  MdeModulePkg/Universal/Fdt/FdtTableDxe/FdtTableDxe.inf
