@@ -207,6 +207,7 @@ READ_LOCK_STATUS   = TRUE
 !ifdef ARM_FOUNDATION_FVP
     SECTION RAW = ArmPlatformPkg/ArmVExpressPkg/fvp-foundation-gicv2-psci.dtb
 !else
+    SECTION RAW = ArmPlatformPkg/ArmVExpressPkg/fvp-base-gicv2-psci.dtb
 !endif
   }
 
