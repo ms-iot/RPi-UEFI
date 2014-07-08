@@ -12,7 +12,9 @@
 //
 
 #include <AsmMacroIoLibV8.h>
+#include <Chipset/AArch64.h>
 
+#ifndef __clang__
 // Register definitions used by GCC for GICv3 access.
 // These are defined by ARMCC, so keep them in the GCC specific code for now.
 #define ICC_SRE_EL2     S3_4_C12_C9_5
@@ -20,6 +22,7 @@
 #define ICC_CTLR_EL1    S3_0_C12_C12_4
 #define ICC_CTLR_EL3    S3_6_C12_C12_4
 #define ICC_PMR_EL1     S3_0_C4_C6_0
+#endif
 
 .text
 .align 3
@@ -62,6 +65,6 @@ ASM_PFX(InitializeGicV3):
 
   // Remove the SCR.NS bit
   mrs     x0, scr_el3
-  bic     x0, x0, #1
+  and     x0, x0, #~SCR_NS
   msr     scr_el3, x0
   ret

@@ -1,0 +1,80 @@
+#
+#  
+#  Copyright (c) Huawei Technologies Co., Ltd. 2013. All rights reserved.
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+#**/
+
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = HisiPlatformPkg
+  PACKAGE_GUID                   = c6013a10-758c-4c0d-bd07-e601e6721f86
+  PACKAGE_VERSION                = 0.1
+
+[Includes]              
+  Include
+  Include/Protocol
+  Include/Ppi
+  Include/Library
+  Include/Guid
+  
+[Ppis]
+  
+
+
+[Protocols]
+  gWatchDogProtocolGuid = {0x707ac059, 0xf335, 0x4643, 0xa6, 0x99, 0x5e, 0x3b, 0x9b, 0x82, 0x60, 0x74}
+  gLinuxAtagListProtocolGuid = {0x46f1ef63, 0x24d3, 0x423b, {0x9d, 0x9, 0x8f, 0xc6, 0x77, 0xd0, 0x24, 0x9d}}
+  gUniNorFlashProtocolGuid = {0x86F305EA, 0xDFAC, 0x4A6B, {0x92, 0x77, 0x47, 0x31, 0x2E, 0xCE, 0x42, 0xA}} 
+  gNANDDriverProtocolGuid = {0xf355bcc3, 0x252d, 0x4dee, 0xad, 0x05, 0x94, 0xbb, 0x29, 0xc8, 0x4d, 0x46}
+  
+[Guids]
+  gHwTokenSpaceGuid = { 0x99999999, 0x74c5, 0x4043, { 0xb4, 0x17, 0xa3, 0x22, 0x38, 0x14, 0xce, 0x76 } }
+
+[PcdsFixedAtBuild]
+  gHwTokenSpaceGuid.PcdDefaultCoreTagFlags|1|UINT32|0x010000006
+  gHwTokenSpaceGuid.PcdDefaultCoreTagPageSize|0x00001000|UINT32|0x01000024
+  gHwTokenSpaceGuid.PcdDefaultCoreTagRootdev|0|UINT32|0x01000002
+  
+  gHwTokenSpaceGuid.PcdDefaultMemTagStart|0x0|UINT32|0x01000003
+  gHwTokenSpaceGuid.PcdDefaultMemTagSize|0x10000000|UINT32|0x01000004
+  
+  gHwTokenSpaceGuid.PcdNorFlashBase|0x30000000|UINT32|0x01000008
+
+  gHwTokenSpaceGuid.PcduImageStart|0x03300000|UINT32|0x01000005
+  gHwTokenSpaceGuid.PcdtinitrdStart|0x03800000|UINT32|0x01000007
+  gHwTokenSpaceGuid.PcdBootcmdAddr|0x00a01000|UINT32|0x010000c
+
+  gHwTokenSpaceGuid.PcdDefaultCmdlineTagCmdline|"mem=256M console=ttyAMA0,115200 quiet"|VOID*|0x010000F
+
+  
+  gHwTokenSpaceGuid.PcdNANDCRegBase|0xe4020000|UINT32|0x0030000b
+  gHwTokenSpaceGuid.PcdNANDBufBase|0xe5000000|UINT32|0x0030000c
+
+  
+  gHwTokenSpaceGuid.PcdGPIO0Base|0x14000000|UINT32|0x00300001
+  gHwTokenSpaceGuid.PcdGPIO1Base|0x14001000|UINT32|0x00300002
+  gHwTokenSpaceGuid.PcdGPIO2Base|0x14002000|UINT32|0x00300003
+  gHwTokenSpaceGuid.PcdGPIO3Base|0x14003000|UINT32|0x00300004
+  gHwTokenSpaceGuid.PcdGPIO4Base|0x14004000|UINT32|0x00300005
+  
+  gArmTokenSpaceGuid.PcdSysCtrlBase|0x00000000|UINT32|0x01000009
+  gArmTokenSpaceGuid.PcdTimerBase|0x00000000|UINT32|0x0100000a
+  gArmTokenSpaceGuid.PcdTimer0InterruptNum|0x00000000|UINT32|0x0100000b
+
+  gHwTokenSpaceGuid.PcdEmbeddedBiosVersion|"ARM Platform"|VOID*|0x00000088
+
+  gHwTokenSpaceGuid.PcdGicPrimaryCoreId|0|UINT32|0x00000043
+
+
+[PcdsFeatureFlag]
+
+
+

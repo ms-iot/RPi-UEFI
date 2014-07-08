@@ -144,14 +144,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
   
-!if $(EDK2_ARMVE_SUPPORT_QEMU) == 1
-  # LAN9118Dxe.inf for QEMU (matches use of 9118 on real VExpress board)
-  INF ArmPlatformPkg/Drivers/LAN9118Dxe/LAN9118Dxe.inf
-!else
-  # LAN91xDxe.inf for RTSM
-  INF ArmPlatformPkg/Drivers/LAN91xDxe/LAN91xDxe.inf
-!endif
-
   #
   # Multiple Console IO support
   #
@@ -206,6 +198,8 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF ArmPlatformPkg/Bds/Bds.inf
 
+  # FV Filesystem
+  INF MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8

@@ -417,7 +417,6 @@ FvbRead (
   IN OUT    UINT8                                 *Buffer
   )
 {
-  EFI_STATUS    Status;
   EFI_STATUS    TempStatus;
   UINTN         BlockSize;
   NOR_FLASH_INSTANCE *Instance;
@@ -430,8 +429,7 @@ FvbRead (
     Instance->Initialize(Instance);
   }
 
-  Status = EFI_SUCCESS;
-  TempStatus = Status;
+  TempStatus = EFI_SUCCESS;
 
   // Cache the block size to avoid de-referencing pointers all the time
   BlockSize = Instance->Media.BlockSize;
@@ -452,25 +450,21 @@ FvbRead (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  // Check we did get some memory
-  if (Instance->FvbBuffer == NULL) {
-    DEBUG ((EFI_D_ERROR, "FvbRead: ERROR - Buffer not ready\n"));
-    return EFI_DEVICE_ERROR;
+  // Decide if we are doing full block reads or not.
+  if (*NumBytes % BlockSize != 0) {
+    TempStatus = NorFlashRead (Instance, Instance->StartLba + Lba, Offset, *NumBytes, Buffer);
+    if (EFI_ERROR (TempStatus)) {
+      return EFI_DEVICE_ERROR;
+    }
+  } else {
+    // Read NOR Flash data into shadow buffer
+    TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, Buffer);
+    if (EFI_ERROR (TempStatus)) {
+      // Return one of the pre-approved error statuses
+      return EFI_DEVICE_ERROR;
+    }
   }
-
-  // Read NOR Flash data into shadow buffer
-  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, Instance->FvbBuffer);
-  if (EFI_ERROR (TempStatus)) {
-    // Return one of the pre-approved error statuses
-    return EFI_DEVICE_ERROR;
-  }
-
-  // Put the data at the appropriate location inside the buffer area
-  DEBUG ((DEBUG_BLKIO, "FvbRead: CopyMem( Dst=0x%08x, Src=0x%08x, Size=0x%x ).\n", Buffer, (UINTN)Instance->FvbBuffer + Offset, *NumBytes));
-
-  CopyMem (Buffer, (VOID*)((UINTN)Instance->FvbBuffer + Offset), *NumBytes);
-
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -537,71 +531,11 @@ FvbWrite (
   IN        UINT8                                 *Buffer
   )
 {
-  EFI_STATUS  Status;
-  EFI_STATUS  TempStatus;
-  UINTN       BlockSize;
   NOR_FLASH_INSTANCE *Instance;
 
-  Instance = INSTANCE_FROM_FVB_THIS(This);
+  Instance = INSTANCE_FROM_FVB_THIS (This);
 
-  if (!Instance->Initialized && Instance->Initialize) {
-    Instance->Initialize(Instance);
-  }
-
-  DEBUG ((DEBUG_BLKIO, "FvbWrite(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Instance->StartLba + Lba, Offset, *NumBytes, Buffer));
-
-  Status = EFI_SUCCESS;
-  TempStatus = Status;
-
-  // Detect WriteDisabled state
-  if (Instance->Media.ReadOnly == TRUE) {
-    DEBUG ((EFI_D_ERROR, "FvbWrite: ERROR - Can not write: Device is in WriteDisabled state.\n"));
-    // It is in WriteDisabled state, return an error right away
-    return EFI_ACCESS_DENIED;
-  }
-
-  // Cache the block size to avoid de-referencing pointers all the time
-  BlockSize = Instance->Media.BlockSize;
-
-  // The write must not span block boundaries.
-  // We need to check each variable individually because adding two large values together overflows.
-  if ( ( Offset               >= BlockSize ) ||
-       ( *NumBytes            >  BlockSize ) ||
-       ( (Offset + *NumBytes) >  BlockSize )    ) {
-    DEBUG ((EFI_D_ERROR, "FvbWrite: ERROR - EFI_BAD_BUFFER_SIZE: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n", Offset, *NumBytes, BlockSize ));
-    return EFI_BAD_BUFFER_SIZE;
-  }
-
-  // We must have some bytes to write
-  if (*NumBytes == 0) {
-    DEBUG ((EFI_D_ERROR, "FvbWrite: ERROR - EFI_BAD_BUFFER_SIZE: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n", Offset, *NumBytes, BlockSize ));
-    return EFI_BAD_BUFFER_SIZE;
-  }
-
-  // Check we did get some memory
-  if (Instance->FvbBuffer == NULL) {
-    DEBUG ((EFI_D_ERROR, "FvbWrite: ERROR - Buffer not ready\n"));
-    return EFI_DEVICE_ERROR;
-  }
-
-  // Read NOR Flash data into shadow buffer
-  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, Instance->FvbBuffer);
-  if (EFI_ERROR (TempStatus)) {
-    // Return one of the pre-approved error statuses
-    return EFI_DEVICE_ERROR;
-  }
-
-  // Put the data at the appropriate location inside the buffer area
-  CopyMem ((VOID*)((UINTN)Instance->FvbBuffer + Offset), Buffer, *NumBytes);
-
-  // Write the modified buffer back to the NorFlash
-  TempStatus = NorFlashWriteBlocks (Instance, Instance->StartLba + Lba, BlockSize, Instance->FvbBuffer);
-  if (EFI_ERROR (TempStatus)) {
-    // Return one of the pre-approved error statuses
-    return EFI_DEVICE_ERROR;
-  }
-
-  return Status;
+  return NorFlashWriteSingleBlock (Instance, Instance->StartLba + Lba, Offset, NumBytes, Buffer);
 }
 
 /**

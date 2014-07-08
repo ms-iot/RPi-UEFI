@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -84,8 +84,14 @@
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Fixed Virtual Platform"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ARM-FVP"
 
+!ifndef ARM_FOUNDATION_FVP
   # Up to 8 cores on Base models. This works fine if model happens to have less.
   gArmPlatformTokenSpaceGuid.PcdCoreCount|8
+  gArmPlatformTokenSpaceGuid.PcdClusterCount|2
+!else
+  # Up to 4 cores on Foundation models. This works fine if model happens to have less.
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|4
+!endif
 
   #
   # NV Storage PCDs. Use base of 0x0C000000 for NOR1
@@ -112,9 +118,9 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x1000
 
-  # System Memory (2GB)
+  # System Memory (2GB - 16MB of Trusted DRAM at the top of the 32bit address space)
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0x80000000
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0x7F000000
 
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
@@ -162,8 +168,6 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C000000
 !endif
 
-  # Ethernet (SMSC 91C111)
-  gArmPlatformTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
   #
   # ARM OS Loader
   #
@@ -172,14 +176,13 @@
 !ifdef $(EDK2_USE_ANDROID_CONFIG)
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/kernel"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/ramdisk.img"
-  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fvp-base-gicv2-psci.dtb"
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fvp-base-gicv2-psci.dtb"
 !else
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/Image"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0 earlyprintk=pl011,0x1c090000 debug user_debug=31 loglevel=9 root=/dev/vda2"
-  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fdt.dtb"
-!endif
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|3
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fdt.dtb"
+!endif
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
@@ -318,3 +321,5 @@
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   ArmPlatformPkg/Bds/Bds.inf
+
+  MdeModulePkg/Universal/Fdt/FdtTableDxe/FdtTableDxe.inf

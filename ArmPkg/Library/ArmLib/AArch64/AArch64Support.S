@@ -46,7 +46,6 @@ GCC_ASM_EXPORT (ArmDataSyncronizationBarrier)
 GCC_ASM_EXPORT (ArmInstructionSynchronizationBarrier)
 GCC_ASM_EXPORT (ArmWriteVBar)
 GCC_ASM_EXPORT (ArmReadVBar)
-GCC_ASM_EXPORT (ArmVFPImplemented)
 GCC_ASM_EXPORT (ArmEnableVFP)
 GCC_ASM_EXPORT (ArmCallWFI)
 GCC_ASM_EXPORT (ArmInvalidateInstructionAndDataTlb)
@@ -147,7 +146,7 @@ ASM_PFX(ArmDisableMmu):
 2: mrs     x0, sctlr_el2        // Read System Control Register EL2
    b       4f
 3: mrs     x0, sctlr_el3        // Read System Control Register EL3
-4: bic     x0, x0, #CTRL_M_BIT  // Clear MMU enable bit
+4: and     x0, x0, #~CTRL_M_BIT  // Clear MMU enable bit
    EL1_OR_EL2_OR_EL3(x1)
 1: msr     sctlr_el1, x0        // Write back
    tlbi    vmalle1
@@ -169,9 +168,8 @@ ASM_PFX(ArmDisableCachesAndMmu):
 2: mrs     x0, sctlr_el2        // Get control register EL2
    b       4f
 3: mrs     x0, sctlr_el3        // Get control register EL3
-4: bic     x0, x0, #CTRL_M_BIT  // Disable MMU
-   bic     x0, x0, #CTRL_C_BIT  // Disable D Cache
-   bic     x0, x0, #CTRL_I_BIT  // Disable I Cache
+4: mov     x1, #~(CTRL_M_BIT | CTRL_C_BIT | CTRL_I_BIT)  // Disable MMU, D & I caches
+   and     x0, x0, x1
    EL1_OR_EL2_OR_EL3(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
@@ -220,7 +218,7 @@ ASM_PFX(ArmDisableDataCache):
 2: mrs     x0, sctlr_el2        // Get control register EL2
    b       4f
 3: mrs     x0, sctlr_el3        // Get control register EL3
-4: bic     x0, x0, #CTRL_C_BIT  // Clear C bit
+4: and     x0, x0, #~CTRL_C_BIT  // Clear C bit
    EL1_OR_EL2_OR_EL3(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
@@ -258,7 +256,7 @@ ASM_PFX(ArmDisableInstructionCache):
 2: mrs     x0, sctlr_el2        // Get control register EL2
    b       4f
 3: mrs     x0, sctlr_el3        // Get control register EL3
-4: bic     x0, x0, #CTRL_I_BIT  // Clear I bit
+4: and     x0, x0, #~CTRL_I_BIT  // Clear I bit
    EL1_OR_EL2_OR_EL3(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
@@ -292,7 +290,7 @@ ASM_PFX(ArmDisableAlignmentCheck):
 2: mrs     x0, sctlr_el2        // Get control register EL2
    b       4f
 3: mrs     x0, sctlr_el3        // Get control register EL3
-4: bic     x0, x0, #CTRL_A_BIT  // Clear A (alignment check) bit
+4: and     x0, x0, #~CTRL_A_BIT  // Clear A (alignment check) bit
    EL1_OR_EL2_OR_EL3(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f

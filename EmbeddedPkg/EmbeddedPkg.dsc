@@ -100,6 +100,11 @@
 
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
+  # Networking Requirements
+  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf  
+
 [LibraryClasses.common.DXE_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
@@ -256,9 +261,11 @@
 
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
+  EmbeddedPkg/Drivers/AndroidFastbootTransportTcpDxe/FastbootTransportTcpDxe.inf
 
   # Drivers
   EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf
+  EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
 
 [Components.IA32, Components.X64, Components.IPF, Components.ARM]
   EmbeddedPkg/GdbStub/GdbStub.inf

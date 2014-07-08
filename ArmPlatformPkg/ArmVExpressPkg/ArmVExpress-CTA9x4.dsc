@@ -49,14 +49,6 @@
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressLib.inf
   ArmTrustZoneLib|ArmPlatformPkg/Drivers/ArmTrustZone/ArmTrustZone.inf
 
-#!ifdef $(EDK2_ARMVE_NETWORK)
-  # Networking Requirements
-  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
-  DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
-  UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
-  IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
-#!endif
-
   # ARM PL310 L2 Cache Driver
   L2X0CacheLib|ArmPlatformPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
   # ARM PL354 SMC Driver
@@ -191,9 +183,8 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linaro image on SD card"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/uImage"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/uInitrd"
-  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/v2p-ca9.dtb"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,38400n8 rootwait root=/dev/mmcblk0p2"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|3
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/v2p-ca9.dtb"
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
@@ -208,10 +199,8 @@
   # ISP1761 USB OTG Controller
   gEmbeddedTokenSpaceGuid.PcdIsp1761BaseAddress|0x4f000000
 
-  #
   # LAN9118 Ethernet Driver PCDs
-  #
-  gArmPlatformTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x4E000000
+  gEmbeddedTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x4E000000
 
 ################################################################################
 #
@@ -313,7 +302,10 @@
   #
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
-  
+
+  # SMSC LAN 9118
+  EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
+
   #
   # FAT filesystem + GPT/MBR partitioning
   #
@@ -321,6 +313,7 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
+  #
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf

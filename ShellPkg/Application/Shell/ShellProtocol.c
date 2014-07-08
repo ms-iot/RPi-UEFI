@@ -1359,19 +1359,20 @@ EfiShellEnablePageBreak (
 /**
   internal worker function to load and run an image via device path.
 
-  @param ParentImageHandle  A handle of the image that is executing the specified
-                            command line.
-  @param DevicePath         device path of the file to execute
-  @param CommandLine        Points to the NULL-terminated UCS-2 encoded string
-                            containing the command line. If NULL then the command-
-                            line will be empty.
-  @param Environment        Points to a NULL-terminated array of environment
-                            variables with the format 'x=y', where x is the
-                            environment variable name and y is the value. If this
-                            is NULL, then the current shell environment is used.
-
-  @param[out] ExitDataSize  ExitDataSize as returned from gBS->StartImage
-  @param[out] ExitData      ExitData as returned from gBS->StartImage
+  @param ParentImageHandle      A handle of the image that is executing the specified
+                                command line.
+  @param DevicePath             device path of the file to execute
+  @param CommandLine            Points to the NULL-terminated UCS-2 encoded string
+                                containing the command line. If NULL then the command-
+                                line will be empty.
+  @param Environment            Points to a NULL-terminated array of environment
+                                variables with the format 'x=y', where x is the
+                                environment variable name and y is the value. If this
+                                is NULL, then the current shell environment is used.
+                            
+  @param[out] StartImageStatus  Returned status from gBS->StartImage.
+  @param[out] ExitDataSize      ExitDataSize as returned from gBS->StartImage
+  @param[out] ExitData          ExitData as returned from gBS->StartImage
 
   @retval EFI_SUCCESS       The command executed successfully. The  status code
                             returned by the command is pointed to by StatusCode.
@@ -1386,11 +1387,13 @@ InternalShellExecuteDevicePath(
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
   IN CONST CHAR16                   *CommandLine OPTIONAL,
   IN CONST CHAR16                   **Environment OPTIONAL,
+  OUT EFI_STATUS                    *StartImageStatus OPTIONAL,
   OUT UINTN                         *ExitDataSize OPTIONAL,
   OUT CHAR16                        **ExitData OPTIONAL
   )
 {
   EFI_STATUS                    Status;
+  EFI_STATUS                    StartStatus;
   EFI_STATUS                    CleanupStatus;
   EFI_HANDLE                    NewHandle;
   EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
@@ -1504,11 +1507,14 @@ InternalShellExecuteDevicePath(
     // now start the image, passing up exit data if the caller requested it
     //
     if (!EFI_ERROR(Status)) {
-      Status      = gBS->StartImage(
+      StartStatus      = gBS->StartImage(
                           NewHandle,
                           ExitDataSizePtr,
                           ExitData
                           );
+      if (StartImageStatus != NULL) {
+        *StartImageStatus = StartStatus;
+      }
 
       CleanupStatus = gBS->UninstallProtocolInterface(
                             NewHandle,
@@ -1620,6 +1626,7 @@ EfiShellExecute(
     DevPath,
     Temp,
     (CONST CHAR16**)Environment,
+    StatusCode,
     &ExitDataSize,
     &ExitData);
 
@@ -1644,8 +1651,6 @@ EfiShellExecute(
       }
       FreePool (ExitData);
       Status = EFI_SUCCESS;
-    } else if ((StatusCode != NULL) && !EFI_ERROR(Status)) {
-      *StatusCode = EFI_SUCCESS;
     }
 
   //
@@ -1914,6 +1919,8 @@ CreateAndPopulateShellFileInfo(
     }
   }
 
+  TempString = PathCleanUpDirectories(TempString);
+
   ShellFileListItem->FullName = TempString;
   ShellFileListItem->Status   = Status;
   ShellFileListItem->Handle   = Handle;
@@ -2143,7 +2150,7 @@ ShellSearchHandle(
       //
       FileInfo = FileHandleGetInfo(FileHandle);
       NewShellNode = CreateAndPopulateShellFileInfo(
-        L":",
+        MapName,
         EFI_SUCCESS,
         L"\\",
         FileHandle,

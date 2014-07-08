@@ -433,18 +433,19 @@ EfiShellEnablePageBreak (
 /**
   internal worker function to run a command via Device Path
 
-  @param ParentImageHandle  A handle of the image that is executing the specified
-                            command line.
-  @param DevicePath         device path of the file to execute
-  @param CommandLine        Points to the NULL-terminated UCS-2 encoded string
-                            containing the command line. If NULL then the command-
-                            line will be empty.
-  @param Environment        Points to a NULL-terminated array of environment
-                            variables with the format 'x=y', where x is the
-                            environment variable name and y is the value. If this
-                            is NULL, then the current shell environment is used.
-  @param[out] ExitDataSize  ExitDataSize as returned from gBS->StartImage
-  @param[out] ExitData      ExitData as returned from gBS->StartImage
+  @param ParentImageHandle      A handle of the image that is executing the specified
+                                command line.
+  @param DevicePath             device path of the file to execute
+  @param CommandLine            Points to the NULL-terminated UCS-2 encoded string
+                                containing the command line. If NULL then the command-
+                                line will be empty.
+  @param Environment            Points to a NULL-terminated array of environment
+                                variables with the format 'x=y', where x is the
+                                environment variable name and y is the value. If this
+                                is NULL, then the current shell environment is used.
+  @param[out] StartImageStatus  Returned status from gBS->StartImage.
+  @param[out] ExitDataSize      ExitDataSize as returned from gBS->StartImage
+  @param[out] ExitData          ExitData as returned from gBS->StartImage
 
   @retval EFI_SUCCESS       The command executed successfully. The  status code
                             returned by the command is pointed to by StatusCode.
@@ -455,10 +456,11 @@ EfiShellEnablePageBreak (
 EFI_STATUS
 EFIAPI
 InternalShellExecuteDevicePath(
-  IN CONST EFI_HANDLE *ParentImageHandle,
+  IN CONST EFI_HANDLE               *ParentImageHandle,
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
-  IN CONST CHAR16 *CommandLine OPTIONAL,
-  IN CONST CHAR16 **Environment OPTIONAL,
+  IN CONST CHAR16                   *CommandLine OPTIONAL,
+  IN CONST CHAR16                   **Environment OPTIONAL,
+  OUT EFI_STATUS                    *StartImageStatus OPTIONAL,
   OUT UINTN                         *ExitDataSize OPTIONAL,
   OUT CHAR16                        **ExitData OPTIONAL
   );

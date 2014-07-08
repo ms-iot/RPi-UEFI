@@ -76,7 +76,7 @@
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Juno"
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"0.1"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"0.2"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmJuno"
 
   #
@@ -89,9 +89,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0BFE0000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x00010000
 
-  # System Memory (2GB)
+  # System Memory (2GB - 16MB of Trusted DRAM at the top of the 32bit address space)
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0x80000000
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0x7F000000
 
   # Juno Dual-Cluster profile
   gArmPlatformTokenSpaceGuid.PcdCoreCount|6
@@ -112,6 +112,10 @@
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x1C170000
 
+  # LAN9118 Ethernet Driver
+  gEmbeddedTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x18000000
+  gEmbeddedTokenSpaceGuid.PcdLan9118DefaultMacAddress|0x1215161822242628
+
   #
   # ARM General Interrupt Controller
   #
@@ -127,7 +131,7 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from NOR Flash"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/Image"
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,115200 earlyprintk=pl011,0x7ff80000 root=/dev/sda1 rootwait verbose debug"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,115200 earlyprintk=pl011,0x7ff80000 rootwait verbose debug root=/dev/sda2"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
@@ -208,6 +212,9 @@
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+
+  # Networking stack
+  EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
 
   #
   # Usb Support

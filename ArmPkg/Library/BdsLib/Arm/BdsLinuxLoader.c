@@ -258,19 +258,18 @@ BdsBootLinuxFdt (
       Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImageBase, &InitrdImageBaseSize);
     }
     if (EFI_ERROR(Status)) {
-      Print (L"ERROR: Did not find initrd image, you may need to update your config. Attempting to continue without it.\n");
-      InitrdImageBase = 0;
+      Print (L"ERROR: Did not find initrd image.\n");
+      goto EXIT_FREE_LINUX;
     }
-    else {
-      // Check if the initrd is a uInitrd
-      if (*(UINT32*)((UINTN)InitrdImageBase) == LINUX_UIMAGE_SIGNATURE) {
-        // Skip the 64-byte image header
-        InitrdImage = (EFI_PHYSICAL_ADDRESS)((UINTN)InitrdImageBase + 64);
-        InitrdImageSize = InitrdImageBaseSize - 64;
-      } else {
-        InitrdImage = InitrdImageBase;
-        InitrdImageSize = InitrdImageBaseSize;
-      }
+
+    // Check if the initrd is a uInitrd
+    if (*(UINT32*)((UINTN)InitrdImageBase) == LINUX_UIMAGE_SIGNATURE) {
+      // Skip the 64-byte image header
+      InitrdImage = (EFI_PHYSICAL_ADDRESS)((UINTN)InitrdImageBase + 64);
+      InitrdImageSize = InitrdImageBaseSize - 64;
+    } else {
+      InitrdImage = InitrdImageBase;
+      InitrdImageSize = InitrdImageBaseSize;
     }
   }
 
@@ -300,6 +299,7 @@ EXIT_FREE_INITRD:
     gBS->FreePages (InitrdImageBase, EFI_SIZE_TO_PAGES (InitrdImageBaseSize));
   }
 
+EXIT_FREE_LINUX:
   gBS->FreePages (LinuxImage, EFI_SIZE_TO_PAGES (LinuxImageSize));
 
   return Status;

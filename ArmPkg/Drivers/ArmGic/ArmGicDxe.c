@@ -320,9 +320,6 @@ ExitBootServicesEvent (
 
   // Disable Gic Distributor
   MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDDCR, 0x0);
-
-  // Mask interrupts globally
-  ArmDisableInterrupts ();
 }
 
 /**

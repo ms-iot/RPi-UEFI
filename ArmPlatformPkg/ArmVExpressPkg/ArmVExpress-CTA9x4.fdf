@@ -233,6 +233,7 @@ READ_LOCK_STATUS   = TRUE
   INF EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressFastBootDxe/ArmVExpressFastBootDxe.inf
 
+  #
   # Networking stack
   #
   INF MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
@@ -247,19 +248,21 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-  INF ArmPlatformPkg/Drivers/LAN9118Dxe/LAN9118Dxe.inf
+  INF EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
 
   #
-  # UEFI application (Shell Embedded Boot Loader) 
-  #  
-  INF ShellBinPkg/UefiShell/UefiShell.inf 
-    
+  # UEFI application (Shell Embedded Boot Loader)
+  #
+  INF ShellBinPkg/UefiShell/UefiShell.inf
+
   #
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF ArmPlatformPkg/Bds/Bds.inf
 
+  # FV Filesystem
+  INF MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8

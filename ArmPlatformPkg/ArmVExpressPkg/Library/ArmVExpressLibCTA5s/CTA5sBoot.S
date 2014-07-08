@@ -208,18 +208,18 @@ dmc_init:
 	LDR     r0, = ARM_VE_DMC_BASE
 	LDR     r1, = ARM_VE_BOARD_PERIPH_BASE
 
-	// On entry:- 
+	// On entry:-
 	// r0 = base address of ssmc controller
 	// r1 = address of system registers
 
 	// Initializes V2P_CA5 dynamic memory controller
 
-	MOV     r2, r1 
+	MOV     r2, r1
 
 	// set config mode
 	MOV     r1, #0x4
 	STR     r1, [r0, #DMC_COMMAND_REG]
-    
+
 	// initialise memory controlller
 
 	// refresh period
@@ -253,7 +253,7 @@ dmc_init:
 	// t_rfc
 	LDR     r1, =0x00001022
 	STR     r1, [r0, #DMC_T_RFC_REG]
-    
+
 	// t_rp
 	LDR     r1, =0x00000104
 	STR     r1, [r0, #DMC_T_RP_REG]
@@ -306,7 +306,7 @@ dmc_init:
 	STR     r1, [r0, #DMC_DIRECT_CMD_REG]
 
 	// delay
-	MOV     r1, #0	     
+	MOV     r1, #0
 B1: LDR     r3, [r0, #DMC_STATUS_REG]    	// read status register
 	ADD     r1, r1, #1
 	CMP     r1, #10
@@ -317,7 +317,7 @@ B1: LDR     r3, [r0, #DMC_STATUS_REG]    	// read status register
 	STR     r1, [r0, #DMC_DIRECT_CMD_REG]
 
 	// delay
-	MOV     r1, #0	     
+	MOV     r1, #0
 B2:       LDR     r3, [r0, #DMC_STATUS_REG]    	// read status register
 	ADD     r1, r1, #1
 	CMP     r1, #10
@@ -329,11 +329,11 @@ B2:       LDR     r3, [r0, #DMC_STATUS_REG]    	// read status register
 
 	// set extended mode register 3
 	MOV     r1, #0x000B0000
-	STR     r1, [r0, #DMC_DIRECT_CMD_REG]   
+	STR     r1, [r0, #DMC_DIRECT_CMD_REG]
 
-	// set extended mode register 
+	// set extended mode register
 	LDR     r1, =0x00094005
-	STR     r1, [r0, #DMC_DIRECT_CMD_REG]   
+	STR     r1, [r0, #DMC_DIRECT_CMD_REG]
 
 	// set mode register -DLL reset
 	LDR     r1, =0x00080552
@@ -344,13 +344,13 @@ B2:       LDR     r3, [r0, #DMC_STATUS_REG]    	// read status register
 B3:	LDR     r3, [r0, #DMC_STATUS_REG]    	// read status register
 	ADD     r1, r1, #1
 	CMP     r1, #10
-	BLT     B3	  
+	BLT     B3
 
-	// pre-charge all 
+	// pre-charge all
 	MOV     r1, #0x0
 	STR     r1, [r0, #DMC_DIRECT_CMD_REG]
 	
-	// auto-refresh 
+	// auto-refresh
 	MOV     r1, #0x00040000
 	STR     r1, [r0, #DMC_DIRECT_CMD_REG]
 	
@@ -364,13 +364,13 @@ B3:	LDR     r3, [r0, #DMC_STATUS_REG]    	// read status register
 
 	// set extended mode register - Enable OCD defaults
 	LDR     r1, =0x000943C5
-	STR     r1, [r0, #DMC_DIRECT_CMD_REG]   
+	STR     r1, [r0, #DMC_DIRECT_CMD_REG]
 	
 	// set extended mode register - OCD Exit
 	LDR     r1, =0x00094047
-	STR     r1, [r0, #DMC_DIRECT_CMD_REG]   
+	STR     r1, [r0, #DMC_DIRECT_CMD_REG]
 
-	//----------------------------------------    
+	//----------------------------------------
 	// go command
 	MOV     r1, #0x0
 	STR     r1, [r0, #DMC_COMMAND_REG]

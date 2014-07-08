@@ -33,7 +33,6 @@
   ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
-  ArmLib
   BaseLib
   UefiLib
   UefiBootServicesTableLib

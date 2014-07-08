@@ -143,7 +143,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-  INF ArmPlatformPkg/Drivers/LAN91xDxe/LAN91xDxe.inf
 
   #
   # Multiple Console IO support
@@ -205,6 +204,8 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF ArmPlatformPkg/Bds/Bds.inf
 
+  # FV Filesystem
+  INF MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8

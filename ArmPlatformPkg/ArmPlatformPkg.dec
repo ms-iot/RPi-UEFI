@@ -131,7 +131,7 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Default Boot Device"|VOID*|0x0000000C
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L""|VOID*|0x0000000D
   gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L""|VOID*|0x0000000E
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|""|VOID*|0x000000F
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|L""|VOID*|0x000000F
   # PcdDefaultBootType define the type of the binary pointed by PcdDefaultBootDevicePath: 
   #  - 0 = an EFI application
   #  - 1 = a Linux kernel with ATAG support
@@ -139,8 +139,6 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|0|UINT32|0x00000010
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L""|VOID*|0x00000011
   
-  gArmPlatformTokenSpaceGuid.PcdDefaultFdtLocalDevicePath|L""|VOID*|0x0000002E
-
   ## Timeout value for displaying progressing bar in before boot OS.
   #  According to UEFI 2.0 spec, the default TimeOut should be 0xffff.
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x0000001A
@@ -148,16 +146,6 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L""|VOID*|0x0000001B
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L""|VOID*|0x0000001C
 
-  #
-  # LAN9118 Ethernet Driver PCDs
-  #
-  gArmPlatformTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x0|UINT32|0x000000FF
-
-  #
-  # LAN91x Ethernet Driver PCDs
-  #
-  gArmPlatformTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x0|UINT32|0x000000FE
-  
 [PcdsFixedAtBuild.ARM]
   # Stack for CPU Cores in Secure Monitor Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007

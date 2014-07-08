@@ -89,90 +89,95 @@ BootMonFsComputeFooterChecksum (
 }
 
 BOOLEAN
-BootMonFsImageInThisBlock (
-  IN  VOID                  *Buf,
-  IN  UINTN                  Size,
-  IN  UINT32                 Block,
-  OUT HW_IMAGE_DESCRIPTION  *Image
+BootMonFsIsImageValid (
+  IN HW_IMAGE_DESCRIPTION  *Desc,
+  IN EFI_LBA                Lba
   )
 {
   EFI_STATUS            Status;
-  HW_IMAGE_FOOTER      *Ptr;
-  HW_IMAGE_DESCRIPTION *Footer;
+  HW_IMAGE_FOOTER      *Footer;
   UINT32                Checksum;
 
-  // The footer is stored as the last thing in the block
-  Ptr = (HW_IMAGE_FOOTER *)((UINT8 *)Buf + Size - sizeof (HW_IMAGE_FOOTER));
+  Footer = &Desc->Footer;
 
   // Check that the verification bytes are present
-  if ((Ptr->FooterSignature1 != HW_IMAGE_FOOTER_SIGNATURE_1) || (Ptr->FooterSignature2 != HW_IMAGE_FOOTER_SIGNATURE_2)) {
+  if ((Footer->FooterSignature1 != HW_IMAGE_FOOTER_SIGNATURE_1) ||
+      (Footer->FooterSignature2 != HW_IMAGE_FOOTER_SIGNATURE_2)) {
     return FALSE;
   }
 
-  if (Ptr->Version == HW_IMAGE_FOOTER_VERSION) {
-    if (Ptr->Offset != HW_IMAGE_FOOTER_OFFSET) {
+  if (Footer->Version == HW_IMAGE_FOOTER_VERSION) {
+    if (Footer->Offset != HW_IMAGE_FOOTER_OFFSET) {
       return FALSE;
     }
-  } else if (Ptr->Version == HW_IMAGE_FOOTER_VERSION2) {
-    if (Ptr->Offset != HW_IMAGE_FOOTER_OFFSET2) {
+  } else if (Footer->Version == HW_IMAGE_FOOTER_VERSION2) {
+    if (Footer->Offset != HW_IMAGE_FOOTER_OFFSET2) {
       return FALSE;
     }
   } else {
     return FALSE;
   }
 
-  Footer = (HW_IMAGE_DESCRIPTION *)(((UINT8 *)Buf + Size - sizeof (HW_IMAGE_DESCRIPTION)));
-  Checksum = Footer->FooterChecksum;
-  Status = BootMonFsComputeFooterChecksum (Footer);
+  Checksum = Desc->FooterChecksum;
+  Status = BootMonFsComputeFooterChecksum (Desc);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Warning: failed to compute checksum for image '%a'\n", Footer->Footer.Filename));
+    DEBUG ((DEBUG_ERROR, "Warning: failed to compute checksum for image '%a'\n", Desc->Footer.Filename));
   }
 
-  if (Footer->FooterChecksum != Checksum) {
-    DEBUG ((DEBUG_ERROR, "Warning: image '%a' checksum mismatch.\n", Footer->Footer.Filename));
+  if (Desc->FooterChecksum != Checksum) {
+    DEBUG ((DEBUG_ERROR, "Warning: image '%a' checksum mismatch.\n", Desc->Footer.Filename));
   }
 
-  if ((Footer->BlockEnd != Block) || (Footer->BlockStart > Footer->BlockEnd)) {
+  if ((Desc->BlockEnd != Lba) || (Desc->BlockStart > Desc->BlockEnd)) {
     return FALSE;
   }
-
-  // Copy the image out
-  CopyMem (Image, Footer, sizeof (HW_IMAGE_DESCRIPTION));
 
   return TRUE;
 }
 
+STATIC
 EFI_STATUS
 BootMonFsDiscoverNextImage (
-  IN BOOTMON_FS_INSTANCE      *Instance,
-  IN EFI_LBA                  *LbaStart,
-  OUT HW_IMAGE_DESCRIPTION    *Image
+  IN     BOOTMON_FS_INSTANCE      *Instance,
+  IN OUT EFI_LBA                  *LbaStart,
+  IN OUT BOOTMON_FS_FILE          *File
   )
 {
-  EFI_BLOCK_IO_PROTOCOL *Blocks;
+  EFI_DISK_IO_PROTOCOL  *DiskIo;
   EFI_LBA                CurrentLba;
-  VOID                  *Out;
+  UINT64                 DescOffset;
+  EFI_STATUS             Status;
 
-  Blocks = Instance->BlockIo;
+  DiskIo = Instance->DiskIo;
 
-  // Allocate an output buffer
-  Out = AllocatePool (Instance->Media->BlockSize);
-  if (Out == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  Blocks->Reset (Blocks, FALSE);
   CurrentLba = *LbaStart;
 
   // Look for images in the rest of this block
   while (CurrentLba <= Instance->Media->LastBlock) {
-    // Read in the next block
-    Blocks->ReadBlocks (Blocks, Instance->Media->MediaId, CurrentLba, Instance->Media->BlockSize, Out);
-    // Check for an image in the current block
-    if (BootMonFsImageInThisBlock (Out, Instance->Media->BlockSize, (CurrentLba - Instance->Media->LowestAlignedLba), Image)) {
-      DEBUG ((EFI_D_ERROR, "Found image: %a in block %d.\n", &(Image->Footer.Filename), (UINTN)(CurrentLba - Instance->Media->LowestAlignedLba)));
-      FreePool (Out);
-      *LbaStart = Image->BlockEnd + 1;
+    // Work out the byte offset into media of the image description in this block
+    // If present, the image description is at the very end of the block.
+    DescOffset = ((CurrentLba + 1) * Instance->Media->BlockSize) - sizeof (HW_IMAGE_DESCRIPTION);
+
+    // Read the image description from media
+    Status = DiskIo->ReadDisk (DiskIo,
+                       Instance->Media->MediaId,
+                       DescOffset,
+                       sizeof (HW_IMAGE_DESCRIPTION),
+                       &File->HwDescription
+                       );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    // If we found a valid image description...
+    if (BootMonFsIsImageValid (&File->HwDescription, (CurrentLba - Instance->Media->LowestAlignedLba))) {
+      DEBUG ((EFI_D_ERROR, "Found image: %a in block %d.\n",
+        &(File->HwDescription.Footer.Filename),
+        (UINTN)(CurrentLba - Instance->Media->LowestAlignedLba)
+        ));
+      File->HwDescAddress = DescOffset;
+
+      *LbaStart = CurrentLba + 1;
       return EFI_SUCCESS;
     } else {
       CurrentLba++;
@@ -180,7 +185,6 @@ BootMonFsDiscoverNextImage (
   }
 
   *LbaStart = CurrentLba;
-  FreePool (Out);
   return EFI_NOT_FOUND;
 }
 
@@ -203,7 +207,7 @@ BootMonFsInitialize (
       return Status;
     }
 
-    Status = BootMonFsDiscoverNextImage (Instance, &Lba, &(NewFile->HwDescription));
+    Status = BootMonFsDiscoverNextImage (Instance, &Lba, NewFile);
     if (EFI_ERROR (Status)) {
       // Free NewFile allocated by BootMonFsCreateFile ()
       FreePool (NewFile);

@@ -157,15 +157,6 @@ PartitionInstallMbrChildHandles (
                      BlockSize,
                      Mbr
                      );
-
-  // RMH - hack - Linaro's development boards use SD cards, currently we have
-  // a problem where each unique SD card has a different UUID when created
-  // with linaro-media-create / linaro-android-media create.
-  // This means that no one Boot Device configuration can boot Linaro images
-  // without some manual intervention from the user.
-  // This hack will zero the signature (UUID) read from the card.
-  ZeroMem(&(Mbr->UniqueMbrSignature[0]), sizeof (Mbr->UniqueMbrSignature));
-
   if (EFI_ERROR (Status)) {
     Found = Status;
     goto Done;

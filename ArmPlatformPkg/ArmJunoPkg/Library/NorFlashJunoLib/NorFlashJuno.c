@@ -45,7 +45,7 @@ NorFlashPlatformInitialization (
   if ((MmioRead32 (ARM_VE_SYS_FLASH) & 0x1) == 0) {
     // Writing to NOR FLASH is disabled, so enable it
     MmioWrite32 (ARM_VE_SYS_FLASH, 1);
-    DEBUG((DEBUG_BLKIO, "NorFlashWriteBlocks: informational - Had to enable HSYS_FLASH flag.\n" ));
+    DEBUG((DEBUG_BLKIO, "NorFlashPlatformInitialization: informational - Had to enable HSYS_FLASH flag.\n" ));
   }
 
   return EFI_SUCCESS;

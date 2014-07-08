@@ -103,6 +103,22 @@ ArpCreateService (
   }
 
   //
+  // Get the underlayer Snp mode data.
+  //
+  Status = ArpService->Mnp->GetModeData (ArpService->Mnp, NULL, &ArpService->SnpMode);
+  if ((Status != EFI_NOT_STARTED) && EFI_ERROR (Status)) {
+    goto ERROR_EXIT;
+  }
+
+  if (ArpService->SnpMode.IfType != NET_IFTYPE_ETHERNET) {
+    //
+    // Only support the ethernet.
+    //
+    Status = EFI_UNSUPPORTED;
+    goto ERROR_EXIT;
+  }
+
+  //
   // Set the Mnp config parameters.
   //
   ArpService->MnpConfigData.ReceivedQueueTimeoutValue = 0;
@@ -121,23 +137,6 @@ ArpCreateService (
   //
   Status = ArpService->Mnp->Configure (ArpService->Mnp, &ArpService->MnpConfigData);
   if (EFI_ERROR (Status)) {
-    goto ERROR_EXIT;
-  }
-
-  //
-  // Get the underlayer Snp mode data. Must do this after MNP configuration else some parameters
-  // (e.g. current address) may not be set
-  //
-  Status = ArpService->Mnp->GetModeData (ArpService->Mnp, NULL, &ArpService->SnpMode);
-  if ((Status != EFI_NOT_STARTED) && EFI_ERROR (Status)) {
-    goto ERROR_EXIT;
-  }
-
-  if (ArpService->SnpMode.IfType != NET_IFTYPE_ETHERNET) {
-    //
-    // Only support the ethernet.
-    //
-    Status = EFI_UNSUPPORTED;
     goto ERROR_EXIT;
   }
 
