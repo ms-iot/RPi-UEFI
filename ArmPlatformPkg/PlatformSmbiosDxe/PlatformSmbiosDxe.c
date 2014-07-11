@@ -190,7 +190,7 @@ SMBIOS_TABLE_TYPE3  mEnclosureInfoType3 = {
   0,    // NumberofPowerCords;
   0,    // ContainedElementCount;
   0,    // ContainedElementRecordLength;
-  { 0 },    // ContainedElements[1];
+  { { 0 } },    // ContainedElements[1];
 };
 CHAR8  *mEnclosureInfoType3Strings[] = {
   "ARM",
