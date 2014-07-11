@@ -1,0 +1,49 @@
+
+=== D01Board OVERVIEW ===
+
+The project aims to support UEFI for D01 Board using the edk2
+code base.
+
+=== STATUS ===
+
+Current capabilities:
+* Uefi Boot from NORFLASH
+
+=== FUTURE PLANS ===
+
+* Support for PXE, SATA, ACPI, USB
+  - KeyBoard, Mouse and MassStorage
+
+=== BUILDING D01 Board ===
+
+Pre-requisites:
+* Build environment capable of build the edk2 MdeModulePkg.
+* A properly configured ASL compiler:
+  - Intel ASL compiler: Available from http://www.acpica.org
+  - Microsoft ASL compiler: Available from http://www.acpi.info
+
+Build the D01BoardPkg by running from the Workspace
+If you are using armcc as your compiler, you can build the project:
+build -D BIOS_L1 -p HisiPkg/D01BoardPkg/D01BoardPkg.dsc -b DEBUG
+If you are using gcc as your compiler, you can build the project:
+ ./uefi-build.sh -b DEBUG d01
+
+Following the edk2 build process, you will find the D01 binaries
+under the $WORKSPACE/Build/*/*/FV directory. You can find the below
+mentioned binary image.
+D01.fd
+
+=== RUNNING D01BoardPkg on the D01 board ===
+* If you can enter into the shell, connet the network cable from the D01 device to the PC terminal
+* Write BIOS to NORFLASH by using comands as follows:
+D01 >ifconfig -s eth0 192.168.10.50 255.255.255.0 192.168.10.1
+D01 >provision 192.168.10.100  -u admin -p admin -f norflash_header
+D01 >writefiletonor 0 norflash_header
+D01 >provision 192.168.10.100  -u admin -p admin -f D01.fd
+D01 >updateL1 D01.fd
+* If the NORFLASH in your board have nothing, you should adopt other method such as JTAG
+* Now the booting device is ready to be used.
+* Connect the Uart cable from the D01 device to the PC terminal.
+* Power ON the Device.
+* The boot message should be visible on the termial.
+* Finally, it should give boot options.
