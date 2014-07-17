@@ -24,7 +24,7 @@
 #include <libfdt_env.h>
 #include <Protocol/NandFlashProtocol.h>
 
-char gpoint3[2][100] = {0};
+char gpoint3[2][100] = {{0}};
 
 #ifndef U8
 typedef unsigned char   U8;
