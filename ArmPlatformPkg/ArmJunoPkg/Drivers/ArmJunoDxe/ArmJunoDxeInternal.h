@@ -17,6 +17,7 @@
 
 #include <Uefi.h>
 
+#include <Library/AcpiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
