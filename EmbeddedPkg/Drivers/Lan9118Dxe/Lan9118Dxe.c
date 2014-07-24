@@ -26,14 +26,13 @@ LAN9118_DEVICE_PATH Lan9118PathTemplate =  {
       MESSAGING_DEVICE_PATH, MSG_MAC_ADDR_DP,
       { (UINT8) (sizeof(MAC_ADDR_DEVICE_PATH)), (UINT8) ((sizeof(MAC_ADDR_DEVICE_PATH)) >> 8) }
     },
-    { 0 },
+    { { 0 } },
     0
   },
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    sizeof(EFI_DEVICE_PATH_PROTOCOL),
-    0
+    { sizeof(EFI_DEVICE_PATH_PROTOCOL), 0 }
   }
 };
 
@@ -276,7 +275,8 @@ SnpInitialize (
   }
 
   // Initiate a PHY reset
-  if (PhySoftReset (PHY_RESET_PMT | PHY_RESET_CHECK_LINK, Snp) < 0) {
+  Status = PhySoftReset (PHY_RESET_PMT | PHY_RESET_CHECK_LINK, Snp);
+  if (EFI_ERROR (Status)) {
     Snp->Mode->State = EfiSimpleNetworkStopped;
     DEBUG ((EFI_D_WARN, "Warning: Link not ready after TimeOut. Check ethernet cable\n"));
     return EFI_NOT_STARTED;
@@ -376,9 +376,10 @@ SnpReset (
   IN        BOOLEAN Verification
   )
 {
-  UINT32 PmConf;
-  UINT32 HwConf;
-  UINT32 ResetFlags;
+  UINT32     PmConf;
+  UINT32     HwConf;
+  UINT32     ResetFlags;
+  EFI_STATUS Status;
 
   PmConf = 0;
   HwConf = 0;
@@ -399,7 +400,8 @@ SnpReset (
   }
 
   // Initiate a PHY reset
-  if (PhySoftReset (PHY_RESET_PMT | PHY_RESET_CHECK_LINK, Snp) < 0) {
+  Status = PhySoftReset (PHY_RESET_PMT | PHY_RESET_CHECK_LINK, Snp);
+  if (EFI_ERROR (Status)) {
     Snp->Mode->State = EfiSimpleNetworkStopped;
     return EFI_NOT_STARTED;
   }
@@ -411,7 +413,8 @@ SnpReset (
     ResetFlags |= SOFT_RESET_SELF_TEST;
   }
 
-  if (SoftReset (ResetFlags, Snp) < 0) {
+  Status = SoftReset (ResetFlags, Snp);
+  if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_WARN, "Warning: Soft Reset Failed: Hardware Error\n"));
     return EFI_DEVICE_ERROR;
   }
@@ -458,6 +461,8 @@ SnpShutdown (
   IN        EFI_SIMPLE_NETWORK_PROTOCOL* Snp
   )
 {
+  EFI_STATUS Status;
+
   // Check Snp Instance
   if (Snp == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -473,12 +478,16 @@ SnpShutdown (
   }
 
   // Initiate a PHY reset
-  PhySoftReset (PHY_RESET_PMT, Snp);
+  Status = PhySoftReset (PHY_RESET_PMT, Snp);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   // Initiate a software reset
-  if (SoftReset (0, Snp) < 0) {
+  Status = SoftReset (0, Snp);
+  if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_WARN, "Warning: Soft Reset Failed: Hardware Error\n"));
-    return EFI_DEVICE_ERROR;
+    return Status;
   }
 
   return EFI_SUCCESS;
@@ -942,7 +951,8 @@ SnpGetStatus (
     DEBUG ((EFI_D_ERROR, "LAN9118: Transmitter error. Restarting..."));
 
     // Initiate a software reset
-    if (SoftReset (0, Snp) < 0) {
+    Status = SoftReset (0, Snp);
+    if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "\n\tSoft Reset Failed: Hardware Error\n"));
       return EFI_DEVICE_ERROR;
     }
@@ -1161,18 +1171,19 @@ SnpReceive (
       OUT   UINT16 *Protocol              OPTIONAL
   )
 {
-  LAN9118_DRIVER *LanDriver;
-  UINT32 RxFifoStatus;
-  UINT32 NumPackets;
-  UINT32 RxCfgValue;
-  UINT32 PLength; // Packet length
-  UINT32 ReadLimit;
-  UINT32 Count;
-  UINT32 Padding;
-  UINT32 *RawData;
+  LAN9118_DRIVER  *LanDriver;
+  UINT32          RxFifoStatus;
+  UINT32          NumPackets;
+  UINT32          RxCfgValue;
+  UINT32          PLength; // Packet length
+  UINT32          ReadLimit;
+  UINT32          Count;
+  UINT32          Padding;
+  UINT32          *RawData;
   EFI_MAC_ADDRESS Dst;
   EFI_MAC_ADDRESS Src;
-  UINTN  DroppedFrames;
+  UINTN           DroppedFrames;
+  EFI_STATUS      Status;
 
   LanDriver = INSTANCE_FROM_SNP_THIS (Snp);
 
@@ -1302,7 +1313,8 @@ SnpReceive (
     DEBUG ((EFI_D_WARN, "Warning: Receiver Error. Restarting...\n"));
 
     // Initiate a software reset
-    if (SoftReset (0, Snp) < 0) {
+    Status = SoftReset (0, Snp);
+    if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "Error: Soft Reset Failed: Hardware Error.\n"));
       return EFI_DEVICE_ERROR;
     }

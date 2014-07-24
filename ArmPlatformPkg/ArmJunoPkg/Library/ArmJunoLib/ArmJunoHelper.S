@@ -26,7 +26,7 @@ GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
 
 
-PrimaryCoreMpid:  .word
+PrimaryCoreMpid:  .word    0x0
 
 //UINTN
 //ArmPlatformGetCorePosition (

@@ -214,10 +214,12 @@ FindAndReportModuleImageInfo (
     if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
       //
       // DOS image header is present, so read the PE header after the DOS image header.
-      // Check if address overflow firstly.
       //
-      if ((MAX_ADDRESS - (UINTN)DosHdr->e_lfanew) > Pe32Data) {
-        Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Pe32Data + (UINTN)(DosHdr->e_lfanew));
+      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
+      //
+      // Make sure PE header address does not overflow and is less than the initial address.
+      //
+      if (((UINTN)Hdr.Pe32 > Pe32Data) && ((UINTN)Hdr.Pe32 < (UINTN)mErrorMsgVersionAlert)) {
         if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
           //
           // It's PE image.
@@ -587,7 +589,7 @@ ReadRemainingBreakPacket (
   //
   // Has received start symbol, try to read the rest part
   //
-  if (DebugPortReadBuffer (Handle, &DebugHeader->Command, sizeof (DEBUG_PACKET_HEADER) - 1, READ_PACKET_TIMEOUT) == 0) {
+  if (DebugPortReadBuffer (Handle, (UINT8 *)DebugHeader + OFFSET_OF (DEBUG_PACKET_HEADER, Command), sizeof (DEBUG_PACKET_HEADER) - OFFSET_OF (DEBUG_PACKET_HEADER, Command), READ_PACKET_TIMEOUT) == 0) {
     //
     // Timeout occur, exit
     //
@@ -1014,7 +1016,7 @@ ReceivePacket (
     //
     Received = DebugPortReadBuffer (
                  Handle,
-                 &DebugHeader->Command,
+                 (UINT8 *)DebugHeader + OFFSET_OF (DEBUG_PACKET_HEADER, Command),
                  OFFSET_OF (DEBUG_PACKET_HEADER, Length) + sizeof (DebugHeader->Length) - sizeof (DebugHeader->StartSymbol),
                  Timeout
                  );
@@ -2104,6 +2106,7 @@ InterruptProcess (
   UINT32                           IssuedViewPoint;
   DEBUG_AGENT_EXCEPTION_BUFFER     *ExceptionBuffer;
 
+  InputCharacter  = 0;
   ProcessorIndex  = 0;
   IssuedViewPoint = 0;
   BreakReceived   = FALSE;

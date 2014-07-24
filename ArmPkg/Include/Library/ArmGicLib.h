@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -57,7 +57,7 @@
 #define ARM_GIC_ICCRPR          0x14  // Running Priority Register
 #define ARM_GIC_ICCPIR          0x18  // Highest Pending Interrupt Register
 #define ARM_GIC_ICCABPR         0x1C  // Aliased Binary Point Register
-#define ARM_GIC_ICCIDR          0xFC  // Identification Register
+#define ARM_GIC_ICCIIDR         0xFC  // Identification Register
 
 #define ARM_GIC_ICDSGIR_FILTER_TARGETLIST       0x0
 #define ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE     0x1
@@ -71,10 +71,16 @@
 #define ARM_GIC_ICCICR_USE_SBPR                 0x10
 
 // Bit Mask for GICC_IIDR
-#define ARM_GIC_ICCIDR_GET_PRODUCT_ID(IccIdr)   (((IccIdr) >> 20) & 0xFFF)
-#define ARM_GIC_ICCIDR_GET_ARCH_VERSION(IccIdr) (((IccIdr) >> 16) & 0xF)
-#define ARM_GIC_ICCIDR_GET_REVISION(IccIdr)     (((IccIdr) >> 12) & 0xF)
-#define ARM_GIC_ICCIDR_GET_IMPLEMENTER(IccIdr)  ((IccIdr) & 0xFFF)
+#define ARM_GIC_ICCIIDR_GET_PRODUCT_ID(IccIidr)   (((IccIidr) >> 20) & 0xFFF)
+#define ARM_GIC_ICCIIDR_GET_ARCH_VERSION(IccIidr) (((IccIidr) >> 16) & 0xF)
+#define ARM_GIC_ICCIIDR_GET_REVISION(IccIidr)     (((IccIidr) >> 12) & 0xF)
+#define ARM_GIC_ICCIIDR_GET_IMPLEMENTER(IccIidr)  ((IccIidr) & 0xFFF)
+
+UINTN
+EFIAPI
+ArmGicGetInterfaceIdentification (
+  IN  INTN          GicInterruptInterfaceBase
+  );
 
 //
 // GIC Secure interfaces
@@ -113,6 +119,12 @@ ArmGicEnableDistributor (
   IN  INTN          GicDistributorBase
   );
 
+VOID
+EFIAPI
+ArmGicDisableDistributor (
+  IN  INTN          GicDistributorBase
+  );
+
 UINTN
 EFIAPI
 ArmGicGetMaxNumInterrupts (
@@ -128,13 +140,31 @@ ArmGicSendSgiTo (
   IN  INTN          SgiId
   );
 
-RETURN_STATUS
+/*
+ * Acknowledge and return the value of the Interrupt Acknowledge Register
+ *
+ * InterruptId is returned separately from the register value because in
+ * the GICv2 the register value contains the CpuId and InterruptId while
+ * in the GICv3 the register value is only the InterruptId.
+ *
+ * @param GicInterruptInterfaceBase   Base Address of the GIC CPU Interface
+ * @param InterruptId                 InterruptId read from the Interrupt Acknowledge Register
+ *
+ * @retval value returned by the Interrupt Acknowledge Register
+ *
+ */
+UINTN
 EFIAPI
 ArmGicAcknowledgeInterrupt (
-  IN  UINTN          GicDistributorBase,
   IN  UINTN          GicInterruptInterfaceBase,
-  OUT UINTN          *CoreId,
   OUT UINTN          *InterruptId
+  );
+
+VOID
+EFIAPI
+ArmGicEndOfInterrupt (
+  IN  UINTN                 GicInterruptInterfaceBase,
+  IN UINTN                  Source
   );
 
 UINTN
@@ -142,6 +172,27 @@ EFIAPI
 ArmGicSetPriorityMask (
   IN  INTN          GicInterruptInterfaceBase,
   IN  INTN          PriorityMask
+  );
+
+VOID
+EFIAPI
+ArmGicEnableInterrupt (
+  IN UINTN                  GicDistributorBase,
+  IN UINTN                  Source
+  );
+
+VOID
+EFIAPI
+ArmGicDisableInterrupt (
+  IN UINTN                  GicDistributorBase,
+  IN UINTN                  Source
+  );
+
+BOOLEAN
+EFIAPI
+ArmGicIsInterruptEnabled (
+  IN UINTN                  GicDistributorBase,
+  IN UINTN                  Source
   );
 
 #endif

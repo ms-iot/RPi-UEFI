@@ -397,8 +397,11 @@ UpdateHotkeyList (
     HotKey = BROWSER_HOT_KEY_FROM_LINK (Link);
 
     CopyKey             = AllocateCopyPool(sizeof (BROWSER_HOT_KEY), HotKey);
+    ASSERT (CopyKey != NULL);
     CopyKey->KeyData    = AllocateCopyPool(sizeof (EFI_INPUT_KEY), HotKey->KeyData);
+    ASSERT (CopyKey->KeyData != NULL);
     CopyKey->HelpString = AllocateCopyPool(StrSize (HotKey->HelpString), HotKey->HelpString);
+    ASSERT (CopyKey->HelpString != NULL);
 
     InsertTailList(&gDisplayFormData.HotKeyListHead, &CopyKey->Link);
 
@@ -902,8 +905,6 @@ ProcessAction (
   IN UINT16        DefaultId
   )
 {
-  EFI_STATUS    Status;
-
   //
   // This is caused by use press ESC, and it should not combine with other action type.
   //
@@ -925,10 +926,7 @@ ProcessAction (
   }
 
   if ((Action & BROWSER_ACTION_SUBMIT) == BROWSER_ACTION_SUBMIT) {
-    Status = SubmitForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
-    if (EFI_ERROR (Status)) {
-      PopupErrorMessage(BROWSER_SUBMIT_FAIL, NULL, NULL);
-    }
+    SubmitForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
   }
 
   if ((Action & BROWSER_ACTION_RESET) == BROWSER_ACTION_RESET) {
@@ -1183,7 +1181,8 @@ ProcessChangedData (
   IN     BROWSER_SETTING_SCOPE   Scope
   )
 {
-  BOOLEAN  RetValue;
+  BOOLEAN    RetValue;
+  EFI_STATUS Status;
 
   RetValue = TRUE;
   switch (mFormDisplay->ConfirmDataChange()) {
@@ -1192,7 +1191,10 @@ ProcessChangedData (
       break;
   
     case BROWSER_ACTION_SUBMIT:
-      SubmitForm (Selection->FormSet, Selection->Form, Scope);
+      Status = SubmitForm (Selection->FormSet, Selection->Form, Scope);
+      if (EFI_ERROR (Status)) {
+        RetValue = FALSE;
+      }
       break;
 
     case BROWSER_ACTION_NONE:
@@ -1303,7 +1305,7 @@ ProcessGotoOpCode (
       //
       // Not found the EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL protocol.
       //
-      PopupErrorMessage(BROWSER_PROTOCOL_NOT_FOUND, NULL, NULL);
+      PopupErrorMessage(BROWSER_PROTOCOL_NOT_FOUND, NULL, NULL, NULL);
       FreePool (StringPtr);
       return Status;
     }
@@ -1380,7 +1382,7 @@ ProcessGotoOpCode (
         //
         // Form is suppressed. 
         //
-        PopupErrorMessage(BROWSER_FORM_SUPPRESS, NULL, NULL);
+        PopupErrorMessage(BROWSER_FORM_SUPPRESS, NULL, NULL, NULL);
         return EFI_SUCCESS;
       }
     }
@@ -1627,6 +1629,12 @@ DisplayForm (
                                  gCurrentSelection->FormId, gCurrentSelection->QuestionId);
     ASSERT (CurrentMenu != NULL);
   }
+
+  //
+  // Back up the form view history data for this form.
+  //
+  UiCopyMenuList(&gCurrentSelection->Form->FormViewListHead, &mPrivateData.FormBrowserEx2.FormViewHistoryHead);
+
   gCurrentSelection->CurrentMenu = CurrentMenu;
 
   //
@@ -1657,6 +1665,7 @@ DisplayForm (
   //                        and an valid value has return.
   // EFI_SUCCESS:           Success shows form and get user input in UserInput paramenter.
   //
+  ASSERT (gDisplayFormData.BrowserStatus == BROWSER_SUCCESS);
   Status = mFormDisplay->FormDisplay (&gDisplayFormData, &UserInput);
   if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
     FreeDisplayFormData();
@@ -1846,7 +1855,7 @@ FindNextMenu (
   //
   if ((gBrowserSettingScope == FormLevel && IsNvUpdateRequiredForForm (Selection->Form)) ||
       (gBrowserSettingScope == FormSetLevel && IsNvUpdateRequiredForFormSet(Selection->FormSet) && Scope == FormSetLevel)) {
-    if (!ProcessChangedData(Selection, Scope)) {
+    if (!ProcessChangedData(Selection, gBrowserSettingScope)) {
       return FALSE;
     }
   }
@@ -1977,6 +1986,7 @@ ProcessCallBackFunction (
     if (Action == EFI_BROWSER_ACTION_CHANGING) {
       if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
         BackUpBuffer = AllocateCopyPool(Statement->StorageWidth + sizeof(CHAR16), Statement->BufferValue);
+        ASSERT (BackUpBuffer != NULL);
       } else {
         CopyMem (&BackUpValue, &HiiValue->Value, sizeof (EFI_IFR_TYPE_VALUE));
       }
@@ -2305,7 +2315,7 @@ SetupBrowser (
         //
         // Form is suppressed. 
         //
-        PopupErrorMessage(BROWSER_FORM_SUPPRESS, NULL, NULL);
+        PopupErrorMessage(BROWSER_FORM_SUPPRESS, NULL, NULL, NULL);
         Status = EFI_NOT_FOUND;
         goto Done;
       }

@@ -190,8 +190,8 @@
   HisiPkg/D01BoardPkg/Sec/Sec/Sec.inf {
     <LibraryClasses>
       # Use the implementation which set the Secure bits
-      ArmGicLib|HisiPkg/Drivers/HisiliconD01Gic/HisiliconD01GicSecLib.inf
-      #ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
+      #ArmGicLib|HisiPkg/Drivers/HisiliconD01Gic/HisiliconD01GicSecLib.inf
+      ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
   }
   
   #

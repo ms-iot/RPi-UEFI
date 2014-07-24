@@ -61,16 +61,28 @@ UINT32		GetDiskSize( EFI_HANDLE ImageHandle );
 /* EFI device path definition */
 static RAM_DISK_DEVICE_PATH RamDiskDevicePath =
 {
-	MESSAGING_DEVICE_PATH,
-	MSG_VENDOR_DP,
-	sizeof(RAM_DISK_DEVICE_PATH) - END_DEVICE_PATH_LENGTH,
-	0,
+    {
+       MESSAGING_DEVICE_PATH,
+       MSG_VENDOR_DP,
+       {
+            sizeof(RAM_DISK_DEVICE_PATH) - END_DEVICE_PATH_LENGTH,
+           0
+       },
+    },
 	// {06ED4DD0-FF78-11d3-BDC4-00A0C94053D1}
-	0x6ed4dd0, 0xff78, 0x11d3, 0xbd, 0xc4, 0x0, 0xa0, 0xc9, 0x40, 0x53, 0xd1,
-	0,0,0,0,0,0,0,0,	// ID assigned below
-	END_DEVICE_PATH_TYPE,
-	END_ENTIRE_DEVICE_PATH_SUBTYPE,
-	END_DEVICE_PATH_LENGTH
+       {
+        0x6ed4dd0, 0xff78, 0x11d3,
+        {0xbd, 0xc4, 0x0, 0xa0, 0xc9, 0x40, 0x53, 0xd1},
+    },
+       {0,0,0,0,0,0,0,0},      // ID assigned below
+       {
+        END_DEVICE_PATH_TYPE,
+           END_ENTIRE_DEVICE_PATH_SUBTYPE,
+        {
+            END_DEVICE_PATH_LENGTH,
+               0
+        },
+    },
 };
 
 /* Lookup table of total sectors vs. cluster size.

@@ -864,6 +864,7 @@ BdsAddNonExistingLegacyBootOptions (
                 &BootOrderSize
                 );
       if (!EFI_ERROR (Status)) {
+        ASSERT (BootOrder != NULL);
         BbsIndex     = Index;
         OptionNumber = BootOrder[BootOrderSize / sizeof (UINT16) - 1];
       }
@@ -3219,9 +3220,16 @@ BdsLibEnumerateAllBootOption (
                       (VOID **) &BlkIo
                       );
       //
-      // skip the fixed block io then the removable block io
+      // skip the logical partition
       //
-      if (EFI_ERROR (Status) || (BlkIo->Media->RemovableMedia == Removable[RemovableIndex])) {
+      if (EFI_ERROR (Status) || BlkIo->Media->LogicalPartition) {
+        continue;
+      }
+
+      //
+      // firstly fixed block io then the removable block io
+      //
+      if (BlkIo->Media->RemovableMedia == Removable[RemovableIndex]) {
         continue;
       }
       DevicePath  = DevicePathFromHandle (BlockIoHandles[Index]);
@@ -3283,6 +3291,7 @@ BdsLibEnumerateAllBootOption (
         break;
 
       case BDS_EFI_MESSAGE_MISC_BOOT:
+      default:
         if (MiscNumber != 0) {
           UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC)), MiscNumber);
         } else {
@@ -3290,9 +3299,6 @@ BdsLibEnumerateAllBootOption (
         }
         BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
         MiscNumber++;
-        break;
-
-      default:
         break;
       }
     }
@@ -4347,6 +4353,7 @@ BdsLibUpdateFvFileDevicePath (
     NewDevicePath = DevicePathFromHandle (FoundFvHandle);
     EfiInitializeFwVolDevicepathNode (&FvFileNode, FileGuid);
     NewDevicePath = AppendDevicePathNode (NewDevicePath, (EFI_DEVICE_PATH_PROTOCOL *) &FvFileNode);
+    ASSERT (NewDevicePath != NULL);
     *DevicePath = NewDevicePath;
     return EFI_SUCCESS;
   }

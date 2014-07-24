@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -30,18 +30,25 @@ NonSecureWaitForFirmware (
   VOID
   )
 {
-  VOID (*secondary_start)(VOID);
+  VOID (*SecondaryStart)(VOID);
+  UINTN AcknowledgeInterrupt;
+  UINTN InterruptId;
 
   // The secondary cores will execute the firmware once wake from WFI.
-  secondary_start = (VOID (*)())PcdGet32(PcdFvBaseAddress);
+  SecondaryStart = (VOID (*)())PcdGet32 (PcdFvBaseAddress);
 
-  ArmCallWFI();
+  ArmCallWFI ();
 
   // Acknowledge the interrupt and send End of Interrupt signal.
-  ArmGicAcknowledgeInterrupt (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase), NULL, NULL);
+  AcknowledgeInterrupt = ArmGicAcknowledgeInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), &InterruptId);
+  // Check if it is a valid interrupt ID
+  if (InterruptId < ArmGicGetMaxNumInterrupts (PcdGet32 (PcdGicDistributorBase))) {
+    // Got a valid SGI number hence signal End of Interrupt
+    ArmGicEndOfInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), AcknowledgeInterrupt);
+  }
 
   // Jump to secondary core entry point.
-  secondary_start ();
+  SecondaryStart ();
 
   // PEI Core should always load and never return
   ASSERT (FALSE);
