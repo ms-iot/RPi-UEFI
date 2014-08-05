@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2013-2014, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -24,14 +24,14 @@
 #
 ################################################################################
 
-[FD.FVP_AARCH64_EFI_SEC]
-BaseAddress   = 0x00000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in SecureROM.
-Size          = 0x04000000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
+[FD.BL32_AP_UEFI]
+BaseAddress   = 0xE0000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in NOR Flash.
+Size          = 0x000F0000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
 ErasePolarity = 1
 
 # This one is tricky, it must be: BlockSize * NumBlocks = Size
 BlockSize     = 0x00001000
-NumBlocks     = 0x4000
+NumBlocks     = 0xF0
 
 ################################################################################
 #
@@ -49,26 +49,10 @@ NumBlocks     = 0x4000
 #
 ################################################################################
 
-0x00000000|0x00080000
-gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvSize
-FV = FVMAIN_SEC
-
-[FD.FVP_AARCH64_EFI]
-!ifdef ARM_FVP_RUN_NORFLASH
-BaseAddress   = 0x08000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in Flash0.
-!else
-BaseAddress   = 0x88000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
-!endif
-Size          = 0x04000000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
-ErasePolarity = 1
-
-# This one is tricky, it must be: BlockSize * NumBlocks = Size
-BlockSize     = 0x00001000
-NumBlocks     = 0x4000
-
-0x00000000|0x00280000
+0x00000000|0x000F0000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
+
 
 ################################################################################
 #
@@ -81,33 +65,10 @@ FV = FVMAIN_COMPACT
 #
 ################################################################################
 
-[FV.FVMAIN_SEC]
-FvBaseAddress      = 0x0  # Secure ROM
-FvForceRebase      = TRUE
-FvAlignment        = 16
-ERASE_POLARITY     = 1
-MEMORY_MAPPED      = TRUE
-STICKY_WRITE       = TRUE
-LOCK_CAP           = TRUE
-LOCK_STATUS        = TRUE
-WRITE_DISABLED_CAP = TRUE
-WRITE_ENABLED_CAP  = TRUE
-WRITE_STATUS       = TRUE
-WRITE_LOCK_CAP     = TRUE
-WRITE_LOCK_STATUS  = TRUE
-READ_DISABLED_CAP  = TRUE
-READ_ENABLED_CAP   = TRUE
-READ_STATUS        = TRUE
-READ_LOCK_CAP      = TRUE
-READ_LOCK_STATUS   = TRUE
-
-  INF ArmPlatformPkg/Sec/Sec.inf
-
-
 [FV.FvMain]
 BlockSize          = 0x40
 NumBlocks          = 0         # This FV gets compressed so make it just big enough
-FvAlignment        = 16        # FV alignment and FV attributes setting.
+FvAlignment        = 8         # FV alignment and FV attributes setting.
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
 STICKY_WRITE       = TRUE
@@ -124,24 +85,25 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  INF MdeModulePkg/Core/Dxe/DxeMain.inf
+  INF MdeModulePkg/Core/Dxe/DxeMain.inf 
 
   #
-  # PI DXE Drivers producing Architectural Protocols (EFI Services)
+  # PI DXE Drivers producing Architectural Protocols (EFI Services) 
   #
   INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
-  INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
+  INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+  
   #
   # Multiple Console IO support
   #
@@ -153,16 +115,13 @@ READ_LOCK_STATUS   = TRUE
 
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
-!ifndef ARM_FOUNDATION_FVP
-  INF ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf
-!endif
-  INF ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
+  INF ArmPlatformPkg/ArmJunoPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
 
-  #
-  # Semi-hosting filesystem
-  #
-  INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
+  # NOR Flash driver
+  INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
+
+  # Versatile Express FileSystem
+  INF ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning
@@ -172,41 +131,53 @@ READ_LOCK_STATUS   = TRUE
   INF FatBinPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
-!ifndef ARM_FOUNDATION_FVP
-  #
-  # Multimedia Card Interface
-  #
-  INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
-  INF ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
-!endif
+  # FV Filesystem^M
+  INF MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
 
   #
-  # Platform Driver
+  # Usb Support
   #
-  INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmFvpDxe.inf
-  INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
-
-!ifdef EDK2_ENABLE_SMSC_91X
-!include ArmPlatformPkg/ArmVExpressPkg/ArmVExpress-networking.fdf.inc
-  INF EmbeddedPkg/Drivers/LAN91xDxe/LAN91xDxe.inf
-!endif
+  INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 
   #
-  # UEFI application (Shell Embedded Boot Loader)
+  # Networking stack
+  #
+  INF MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
+  INF MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
+  INF MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
+  INF MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
+  INF MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
+  INF MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
+  INF MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
+  INF MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
+  INF MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
+  INF MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+  INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
+  INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+  INF EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
+
+  #
+  # UEFI applications
   #
   INF ShellBinPkg/UefiShell/UefiShell.inf
+
+  #
+  # Juno platform driver
+  #
+  INF ArmPlatformPkg/ArmJunoPkg/Drivers/ArmJunoDxe/ArmJunoDxe.inf
 
   #
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-  INF ArmPlatformPkg/Bds/Bds.inf
-
-  # FV Filesystem
-  INF MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
+  INF ArmPlatformPkg/Bds/Bds.inf  
 
 [FV.FVMAIN_COMPACT]
-FvAlignment        = 16
+FvAlignment        = 8
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
 STICKY_WRITE       = TRUE
@@ -223,20 +194,8 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-!if $(EDK2_SKIP_PEICORE) == 1
   INF ArmPlatformPkg/PrePi/PeiMPCore.inf
-!else
-  INF ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf
-  INF MdeModulePkg/Core/Pei/PeiMain.inf
-  INF ArmPlatformPkg/PlatformPei/PlatformPeim.inf
-  INF ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
-  INF ArmPkg/Drivers/CpuPei/CpuPei.inf
-  INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-  INF IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
-  INF MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-  INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-!endif
-
+  
   FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
       SECTION FV_IMAGE = FVMAIN
@@ -255,7 +214,7 @@ READ_LOCK_STATUS   = TRUE
 
 
 ############################################################################
-# Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   #
+# Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   # 
 ############################################################################
 #
 #[Rule.Common.DXE_DRIVER]
@@ -274,20 +233,20 @@ READ_LOCK_STATUS   = TRUE
 
 [Rule.Common.SEC]
   FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
-    TE  TE Align = 4K                  $(INF_OUTPUT)/$(MODULE_NAME).efi
+    TE  TE    Align = 1K                $(INF_OUTPUT)/$(MODULE_NAME).efi
   }
 
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) {
-    TE     TE Align = 8                 $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI     STRING ="$(MODULE_NAME)" Optional
+    TE     TE                           $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI     STRING ="$(MODULE_NAME)" Optional         
   }
 
 [Rule.Common.PEIM]
   FILE PEIM = $(NAMED_GUID) {
      PEI_DEPEX PEI_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
-     TE       TE Align = 8              $(INF_OUTPUT)/$(MODULE_NAME).efi
-     UI       STRING="$(MODULE_NAME)" Optional
+     TE       TE                        $(INF_OUTPUT)/$(MODULE_NAME).efi
+     UI       STRING="$(MODULE_NAME)" Optional         
   }
 
 [Rule.Common.PEIM.TIANOCOMPRESSED]
@@ -328,7 +287,7 @@ READ_LOCK_STATUS   = TRUE
 
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
-    UI     STRING ="$(MODULE_NAME)"     Optional
+    UI     STRING ="$(MODULE_NAME)" Optional         
     PE32   PE32                         $(INF_OUTPUT)/$(MODULE_NAME).efi
   }
 
