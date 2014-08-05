@@ -82,6 +82,7 @@
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
 
   SerialPortLib|TexasInstrumentsPkg/BeagleBoneBlackPkg/Library/SerialPortLib/SerialPortLib.inf
+  SerialPortExtLib|EmbeddedPkg/Library/TemplateSerialPortExtLib/TemplateSerialPortExtLib.inf
   TimerLib|TexasInstrumentsPkg/BeagleBoneBlackPkg/Library/Am335xTimerLib/Am335xTimerLib.inf
   EfiResetSystemLib|EmbeddedPkg/Library/TemplateResetSystemLib/TemplateResetSystemLib.inf
   RealTimeClockLib|EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
@@ -228,7 +229,7 @@
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM BeagleBoneBlack"
 
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"BBB"
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"BeagleBoneBlack"
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
@@ -347,7 +348,13 @@
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
-  EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf  
+  EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
+
+  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  #MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  EmbeddedPkg/SerialDxe/SerialDxe.inf
+  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf 
   
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
@@ -356,27 +363,29 @@
   # Simple TextIn/TextOut for UEFI Terminal
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
   
+  EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+
   #
   #
   # Semi-hosting filesystem
   #
-  ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
+  #ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
   
   #
   # FAT filesystem + GPT/MBR partitioning
   #
-  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  #MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  #MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  #MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   
   #
   # Application
   #  
   EmbeddedPkg/Ebl/Ebl.inf
-
+  #ShellBinPkg/UefiShell/UefiShell.inf
   #
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-  ArmPlatformPkg/Bds/Bds.inf
+  TexasInstrumentsPkg/BeagleBoneBlackPkg/Bds/Bds.inf
   
