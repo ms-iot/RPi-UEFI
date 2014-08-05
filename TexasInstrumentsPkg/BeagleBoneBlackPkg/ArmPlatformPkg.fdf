@@ -96,7 +96,7 @@ FV = FVMAIN_COMPACT
 
 [FV.FvMain]
 BlockSize          = 0x1000
-NumBlocks          = 0xC0         # This FV gets compressed so make it just big enough
+NumBlocks          = 0x200         # This FV gets compressed so make it just big enough
 FvAlignment        = 8         # FV alignment and FV attributes setting.
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
@@ -129,6 +129,13 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   INF MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   INF EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
+
+  INF MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  INF MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  #INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  INF EmbeddedPkg/SerialDxe/SerialDxe.inf
+  INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+
   INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
@@ -139,27 +146,32 @@ READ_LOCK_STATUS   = TRUE
   #
   # Semi-hosting filesystem (Required the Hardware Debugger to be connected)
   #
-  INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
+  #INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
+
+  #
+  # MMC/SD
+  #
+  INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning
   #
-  INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-  INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  INF FatBinPkg/EnhancedFatDxe/Fat.inf
-  INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  #INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  #INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  #INF FatBinPkg/EnhancedFatDxe/Fat.inf
+  #INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   #
   # UEFI application (Shell Embedded Boot Loader)
   #
   INF EmbeddedPkg/Ebl/Ebl.inf
-  #INF ShellBinPkg/UefiShell/UefiShell.inf
+  INF ShellBinPkg/UefiShell/UefiShell.inf
 
   #
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-  INF ArmPlatformPkg/Bds/Bds.inf
+  INF TexasInstrumentsPkg/BeagleBoneBlackPkg/Bds/Bds.inf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8
@@ -333,4 +345,19 @@ READ_LOCK_STATUS   = TRUE
   FILE APPLICATION = $(NAMED_GUID) {
     UI     STRING ="$(MODULE_NAME)" Optional
     PE32   PE32                         $(INF_OUTPUT)/$(MODULE_NAME).efi
+  }
+
+[Rule.Common.UEFI_DRIVER.BINARY]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional      |.depex
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.UEFI_APPLICATION.BINARY]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
