@@ -1,0 +1,68 @@
+#/** @file
+#  Component name for module WatchdogDriver
+#  Copyright (c) Huawei Technologies Co., Ltd. 2013. All rights reserved.
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LinuxAtagListInitialize
+  FILE_GUID                      = 49ea041e-6752-42ca-b0b1-4444333346b7 
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = LinuxAtagListInitialize
+
+[Sources.common]
+  LinuxAtagList.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  HisiPkg/HisiPlatformPkg.dec 
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+
+[Guids]
+
+[Protocols]
+  gLinuxAtagListProtocolGuid
+  gUniNorFlashProtocolGuid
+  
+[Pcd]
+  gHwTokenSpaceGuid.PcdDefaultCoreTagFlags
+  gHwTokenSpaceGuid.PcdDefaultCoreTagPageSize
+  gHwTokenSpaceGuid.PcdDefaultCoreTagRootdev
+
+  gHwTokenSpaceGuid.PcdDefaultMemTagStart
+  gHwTokenSpaceGuid.PcdDefaultMemTagSize
+
+  #gHwTokenSpaceGuid.PcdDefaultInitrd2TagStart
+  #gHwTokenSpaceGuid.PcdDefaultInitrd2TagSize
+
+  gHwTokenSpaceGuid.PcduImageStart
+  gHwTokenSpaceGuid.PcdtinitrdStart
+  gHwTokenSpaceGuid.PcdBootcmdAddr
+
+  gHwTokenSpaceGuid.PcdDefaultCmdlineTagCmdline
+
+[Depex]
+  TRUE
+
