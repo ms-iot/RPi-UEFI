@@ -160,6 +160,12 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
   #
+  # SMBIOS Support
+  #
+  INF ArmPlatformPkg/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+
+  #
   # Semi-hosting filesystem
   #
   INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
