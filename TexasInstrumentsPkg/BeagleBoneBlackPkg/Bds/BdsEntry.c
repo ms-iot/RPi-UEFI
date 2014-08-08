@@ -83,7 +83,7 @@ BdsEntry (
   gST->FirmwareVendor = AllocateRuntimePool (Size);
   ASSERT (gST->FirmwareVendor != NULL);
   
-  UnicodeSPrint (gST->FirmwareVendor, Size, L"BeagleBoard EFI %a %a", __DATE__, __TIME__);
+  UnicodeSPrint (gST->FirmwareVendor, Size, L"BeagleBoneBlack EFI %a %a", __DATE__, __TIME__);
 
   //
   // Now we need to setup the EFI System Table with information about the console devices.
@@ -196,7 +196,7 @@ BdsEntry (
   // Search all the FVs for an application with a UI Section of Ebl. A .FDF file can be used
   // to control the names of UI sections in an FV.
   //
-  Status = FindApplicationMatchingUiSection (L"Ebl", &FvHandle, &NameGuid);
+  Status = FindApplicationMatchingUiSection (L"Shell", &FvHandle, &NameGuid);
   if (!EFI_ERROR (Status)) {
 
     //Boot to Shell.
