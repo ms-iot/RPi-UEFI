@@ -28,6 +28,9 @@ TimerConstructor (
   VOID
   )
 {
+  UINT32 TimerControlRegister = DMTIMER0_BASE + DMTIMER_TCLR;
+  MmioOr32 (TimerControlRegister, 0x01);
+
   return EFI_SUCCESS;
 }
 
