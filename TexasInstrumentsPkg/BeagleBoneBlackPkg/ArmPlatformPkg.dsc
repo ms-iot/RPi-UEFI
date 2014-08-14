@@ -377,6 +377,7 @@
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
   
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+  TexasInstrumentsPkg/BeagleBoneBlackPkg/Drivers/MmcHostDxe/MmcHostDxe.inf
 
   #
   #
@@ -387,8 +388,8 @@
   #
   # FAT filesystem + GPT/MBR partitioning
   #
-  #MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-  #MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   
   #
