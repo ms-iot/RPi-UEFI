@@ -12,7 +12,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = MMC
-  FILE_GUID                      = 100c2cfa-b586-4198-9b4c-1683d195b1da
+  FILE_GUID                      = ba16face-f583-475b-a0c6-77b234c62fd0
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 

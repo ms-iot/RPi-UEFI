@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BeagleBoneBlackTimerLib
-  FILE_GUID                      = 6e19de87-4c42-4636-aa21-704f689054a2
+  FILE_GUID                      = da70f01c-525a-42ca-9222-87250f4a4bf8
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = TimerLib 
