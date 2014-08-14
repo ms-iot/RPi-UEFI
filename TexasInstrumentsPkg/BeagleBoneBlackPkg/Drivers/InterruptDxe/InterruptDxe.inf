@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BeagleBoneBlackInterruptDxe
-  FILE_GUID                      = 23eed05d-1b93-4a1a-8e1b-931d69e37952
+  FILE_GUID                      = 4b656e1b-62bc-445b-9d7a-5fbaf0359d65
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
