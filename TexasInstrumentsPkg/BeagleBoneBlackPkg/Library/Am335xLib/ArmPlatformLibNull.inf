@@ -14,7 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010016
   BASE_NAME                      = BeagleBoneBlackPlatformLib
-  FILE_GUID                      = 97dea43b-2728-493a-99e6-d5786dd2004f
+  FILE_GUID                      = 54b14ef4-10ef-4c4f-8b2f-f02672cdf758
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = BeagleBoneBlackPlatformLib
