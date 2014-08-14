@@ -380,12 +380,6 @@
   TexasInstrumentsPkg/BeagleBoneBlackPkg/Drivers/MmcHostDxe/MmcHostDxe.inf
 
   #
-  #
-  # Semi-hosting filesystem
-  #
-  #ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
-  
-  #
   # FAT filesystem + GPT/MBR partitioning
   #
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
