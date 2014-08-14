@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BeagleBoneBlackTimerDxe
-  FILE_GUID                      = 6ddbf08b-cfc9-43cc-9e81-0784ba312ca0
+  FILE_GUID                      = 9dc06c06-a5e0-4914-b7ea-71c8fdda6322
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
