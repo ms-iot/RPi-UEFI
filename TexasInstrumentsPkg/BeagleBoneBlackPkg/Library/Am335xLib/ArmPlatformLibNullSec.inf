@@ -14,7 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ArmPlatformLibNull
-  FILE_GUID                      = cb494bad-23ff-427e-8608-d7e138d3363b
+  FILE_GUID                      = 9ce019cd-853b-4f28-a31f-96b31cdc09b3
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmPlatformLib
