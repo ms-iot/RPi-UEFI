@@ -327,7 +327,7 @@
   #
   # PEI Phase modules
   #
-  TexasInstrumentsPkg/BeagleBoneBlackPkg/PrePi/PeiUniCore.inf
+  ArmPlatformPkg/PrePi/PeiUniCore.inf
 
   #
   # DXE
