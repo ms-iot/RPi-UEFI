@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SerialPortLib
-  FILE_GUID                      = 9E7C00CF-355A-4d4e-BF60-0428CFF95540
+  FILE_GUID                      = 4449c844-66ff-4359-ab6b-67714b4f84a0
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib

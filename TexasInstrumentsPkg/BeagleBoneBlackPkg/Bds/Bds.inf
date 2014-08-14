@@ -18,7 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BeagleBoardBds
-  FILE_GUID                      = 934431fe-5745-402e-913d-17b4434eb0f3
+  FILE_GUID                      = 3783e0e2-5880-4d83-953c-c1c3ebc62dd9
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
