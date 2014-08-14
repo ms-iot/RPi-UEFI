@@ -15,7 +15,6 @@
 
 #include "MmcHostDxe.h"
 
-EMBEDDED_EXTERNAL_DEVICE   *gTPS65950;
 UINT8                      mMaxDataTransferRate = 0;
 UINT32                     mRca = 0;
 BOOLEAN                    mBitModeSet = FALSE;
@@ -250,32 +249,6 @@ InitializeMMCHS (
   VOID
   )
 {
-  //UINT8      Data;
-  //EFI_STATUS Status;
-
-  DEBUG ((DEBUG_BLKIO, "InitializeMMCHS()\n"));
-  DEBUG ((EFI_D_ERROR, "--InitializeMMCHS()--\n"));
-/*
-  // Select Device group to belong to P1 device group in Power IC.
-  Data = DEV_GRP_P1;
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VMMC1_DEV_GRP), 1, &Data);
-  ASSERT_EFI_ERROR(Status);
-
-  // Configure voltage regulator for MMC1 in Power IC to output 3.0 voltage.
-  Data = VSEL_3_00V;
-  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VMMC1_DEDICATED_REG), 1, &Data);
-  ASSERT_EFI_ERROR(Status);
-  
-  // After ramping up voltage, set VDDS stable bit to indicate that voltage level is stable.
-  MmioOr32 (CONTROL_PBIAS_LITE, (PBIASLITEVMODE0 | PBIASLITEPWRDNZ0 | PBIASSPEEDCTRL0 | PBIASLITEVMODE1 | PBIASLITEWRDNZ1));
-
-  // Enable WP GPIO
-  MmioAndThenOr32 (GPIO1_BASE + GPIO_OE, ~BIT23, BIT23);
-
-  // Enable Card Detect
-  Data = CARD_DETECT_ENABLE;
-  gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID2, TPS65950_GPIO_CTRL), 1, &Data);
-*/
   return EFI_SUCCESS;
 }
 
@@ -284,19 +257,6 @@ MMCIsCardPresent (
   IN EFI_MMC_HOST_PROTOCOL     *This
   )
 {
-  //EFI_STATUS  Status;
-  //UINT8       Data;
-/*
-  //
-  // Card detect is a GPIO0 on the TPS65950
-  //
-  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID2, GPIODATAIN1), 1, &Data);
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  return !(Data & CARD_DETECT_BIT);
-  */
   return TRUE;
 }
 
@@ -305,15 +265,7 @@ MMCIsReadOnly (
   IN EFI_MMC_HOST_PROTOCOL     *This
   )
 {
-  /* Note:
-   * On our BeagleBoard the SD card WP pin is always read as TRUE. 
-   * Probably something wrong with GPIO configuration.
-   * BeagleBoard-xM uses microSD cards so there is no write protect at all.
-   * Hence commenting out SD card WP pin read status.  
-   */
-  //return (MmioRead32 (GPIO1_BASE + GPIO_DATAIN) & BIT23) == BIT23;
   return 0;
-
 }
 
 // TODO
@@ -665,10 +617,6 @@ MMCInitialize (
   EFI_HANDLE    Handle = NULL;
 
   DEBUG ((DEBUG_BLKIO, "MMCInitialize()\n"));
-  DEBUG ((EFI_D_ERROR, "-MMCInitialize()-\n"));
-
-  //Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
-  //ASSERT_EFI_ERROR(Status);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle, 
