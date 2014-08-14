@@ -155,13 +155,19 @@ READ_LOCK_STATUS   = TRUE
   # MMC/SD
   #
   INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+  INF TexasInstrumentsPkg/BeagleBoneBlackPkg/Drivers/MmcHostDxe/MmcHostDxe.inf
+  
+  #
+  # Power IC
+  #
+  #INF Omap35xxPkg/TPS65950Dxe/TPS65950.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning
   #
-  #INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-  #INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  #INF FatBinPkg/EnhancedFatDxe/Fat.inf
+  INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  INF FatBinPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   #
