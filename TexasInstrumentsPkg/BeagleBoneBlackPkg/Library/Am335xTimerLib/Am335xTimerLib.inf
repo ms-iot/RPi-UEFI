@@ -25,7 +25,7 @@
   TimerLib.c
 
 [Packages]
-  TexasInstrumentsPkg/BeagleBoneBlackPkg/ArmPlatformPkg.dec
+  TexasInstrumentsPkg/BeagleBoneBlackPkg/BeagleBoneBlackPkg.dec
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
 
