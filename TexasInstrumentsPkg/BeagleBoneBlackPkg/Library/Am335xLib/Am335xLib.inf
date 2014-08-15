@@ -13,18 +13,18 @@
 
 [Defines]
   INF_VERSION                    = 0x00010016
-  BASE_NAME                      = BeagleBoneBlackPlatformLib
+  BASE_NAME                      = Am335xLib
   FILE_GUID                      = 54b14ef4-10ef-4c4f-8b2f-f02672cdf758
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BeagleBoneBlackPlatformLib
+  LIBRARY_CLASS                  = Am335xLib
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ArmPkg/ArmPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  TexasInstrumentsPkg/BeagleBoneBlackPkg/ArmPlatformPkg.dec
+  TexasInstrumentsPkg/BeagleBoneBlackPkg/BeagleBoneBlackPkg.dec
 
 [LibraryClasses]
   ArmLib
@@ -32,11 +32,11 @@
   MemoryAllocationLib
 
 [Sources.common]
-  ArmPlatformLibNull.c
-  ArmPlatformLibNullMem.c
+  Am335xLib.c
+  Am335xLibMem.c
 
 [Sources.Arm]
-  ArmPlatformHelper.S    | GCC
+  Am335xHelper.S    | GCC
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
