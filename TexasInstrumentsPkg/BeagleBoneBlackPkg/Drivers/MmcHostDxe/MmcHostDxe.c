@@ -1,7 +1,8 @@
 /** @file
-*
 *  Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.
 *  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+* 
+*  Adapted from Omap35xxPkg/MmcHostDxe.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
