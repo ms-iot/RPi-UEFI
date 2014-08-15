@@ -1,5 +1,6 @@
 /** @file
-  Handle AM335X interrupt controller 
+  Handle AM335X interrupt controller.
+  Adapted from Omap35xxPkg/InterruptDxe.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   

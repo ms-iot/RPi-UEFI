@@ -1,5 +1,5 @@
 /** @file
-  Template for Timer Architecture Protocol driver of the ARM flavor
+  Adapted from Omap35xxPkg/TimerDxe
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   
