@@ -23,7 +23,7 @@
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
-#include <Library/ArmPlatformLib.h>
+#include <Library/BeagleBoneBlack.h>
 
 #include <Protocol/Timer.h>
 #include <Protocol/HardwareInterrupt.h>

@@ -12,7 +12,7 @@
 *
 **/
 
-#include <Library/ArmPlatformLib.h>
+#include <Library/BeagleBoneBlack.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
