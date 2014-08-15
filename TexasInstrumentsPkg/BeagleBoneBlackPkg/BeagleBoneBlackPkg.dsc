@@ -24,10 +24,10 @@
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = TexasInstrumentsPkg/BeagleBoneBlackPkg/ArmPlatformPkg.fdf
+  FLASH_DEFINITION               = TexasInstrumentsPkg/BeagleBoneBlackPkg/BeagleBoneBlackPkg.fdf
 
 [LibraryClasses.common]
-  ArmPlatformLib|TexasInstrumentsPkg/BeagleBoneBlackPkg/Library/Am335xLib/ArmPlatformLibNull.inf
+  ArmPlatformLib|TexasInstrumentsPkg/BeagleBoneBlackPkg/Library/Am335xLib/Am335xLib.inf
 
 !if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
