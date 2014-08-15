@@ -13,7 +13,7 @@
 **/
 
 #include <Library/ArmLib.h>
-#include <Library/ArmPlatformLib.h>
+#include <Library/BeagleBoneBlack.h>
 
 /**
   Return the current Boot Mode
