@@ -1095,6 +1095,12 @@ EhcAsyncInterruptTransfer (
   EhcLinkQhToPeriod (Ehc, Urb->Qh);
   InsertHeadList (&Ehc->AsyncIntTransfers, &Urb->UrbList);
 
+  // ARM: Force an asynchonous transfer after waiting an interval
+  //      Polling interval is in milliseconds while BS.Stall except
+  //      Microseconds.
+  gBS->Stall (PollingInterval * 1000);
+  EhcMonitorAsyncRequests (Ehc->PollTimer, Ehc);
+
 ON_EXIT:
   Ehc->PciIo->Flush (Ehc->PciIo);
   gBS->RestoreTPL (OldTpl);
