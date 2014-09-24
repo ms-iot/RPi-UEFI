@@ -22,7 +22,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiLib.h>
-#include <Library/ArmArchTimerLib.h>
+#include <Library/ArmGenericTimerCounterLib.h>
 
 #include <Protocol/WatchdogTimer.h>
 #include <Protocol/HardwareInterrupt.h>
@@ -210,7 +210,7 @@ WatchdogSetTimerPeriod (
       return Status;
     }
     WatchdogEnable ();
-    TimerVal = ArmArchTimerGetTimerVal ();
+    TimerVal = ArmGenericTimerGetTimerVal ();
     Status = WatchdogWriteCompareRegister (TimerVal + mNumTimerTicks);
   } else {
     Status = WatchdogWriteOffsetRegister ((UINT32)mNumTimerTicks);
@@ -309,7 +309,7 @@ GenericWatchdogEntry (
   //
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiWatchdogTimerArchProtocolGuid);
 
-  mTimerFrequencyHz = ArmArchTimerGetTimerFreq ();
+  mTimerFrequencyHz = ArmGenericTimerGetTimerFreq ();
   ASSERT (mTimerFrequencyHz != 0);
 
   // Register for an ExitBootServicesEvent
