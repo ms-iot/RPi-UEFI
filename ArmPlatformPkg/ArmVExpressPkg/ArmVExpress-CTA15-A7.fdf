@@ -111,6 +111,12 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
 
   #
+  # SMBIOS Support
+  #
+  INF ArmPlatformPkg/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  
+  #
   # Filesystems
   #
 !ifndef $(ARM_BIGLITTLE_TC2)
