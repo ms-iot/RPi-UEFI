@@ -56,15 +56,42 @@
 #define ARM_CPU_REV(rn, pn)     ((((rn) & 0xF) << 20) | ((pn) & 0xF))
 
 // Hypervisor Configuration Register
-#define ARM_HCR_FMO				BIT3
-#define ARM_HCR_IMO				BIT4
-#define ARM_HCR_AMO				BIT5
-#define ARM_HCR_TGE				BIT27
+#define ARM_HCR_FMO       BIT3
+#define ARM_HCR_IMO       BIT4
+#define ARM_HCR_AMO       BIT5
+#define ARM_HCR_TSC       BIT19
+#define ARM_HCR_TGE       BIT27
+
+// Exception Syndrome Register
+#define AARCH64_ESR_EC(Ecr)    ((0x3F << 26) & (Ecr))
+#define AARCH64_ESR_ISS(Ecr)   ((0x1FFFFFF) & (Ecr))
+
+#define AARCH64_ESR_EC_SMC32   (0x13 << 26)
+#define AARCH64_ESR_EC_SMC64   (0x17 << 26)
 
 // AArch64 Exception Level
 #define AARCH64_EL3       0xC
 #define AARCH64_EL2       0x8
 #define AARCH64_EL1       0x4
+
+// Saved Program Status Register definitions
+#define SPSR_A                  BIT8
+#define SPSR_I                  BIT7
+#define SPSR_F                  BIT6
+
+#define SPSR_AARCH32            BIT4
+
+#define SPSR_AARCH32_MODE_USER  0x0
+#define SPSR_AARCH32_MODE_FIQ   0x1
+#define SPSR_AARCH32_MODE_IRQ   0x2
+#define SPSR_AARCH32_MODE_SVC   0x3
+#define SPSR_AARCH32_MODE_ABORT 0x7
+#define SPSR_AARCH32_MODE_UNDEF 0xB
+#define SPSR_AARCH32_MODE_SYS   0xF
+
+// Counter-timer Hypervisor Control register definitions
+#define CNTHCTL_EL2_EL1PCTEN    BIT0
+#define CNTHCTL_EL2_EL1PCEN     BIT1
 
 #define ARM_VECTOR_TABLE_ALIGNMENT ((1 << 11)-1)
 

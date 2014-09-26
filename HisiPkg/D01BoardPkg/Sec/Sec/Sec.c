@@ -106,7 +106,7 @@ CEntryPoint (
             ((PcdGet32(PcdCPUCoresSecMonStackBase) != 0) && (PcdGet32(PcdCPUCoreSecMonStackSize) != 0)));
 
     // Enter Monitor Mode
-    enter_monitor_mode ((UINTN)TrustedWorldInitialization, MpId, SecBootMode, (VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
+    enter_monitor_mode ((UINTN)TrustedWorldInitialization, MpId, SecBootMode, (VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (ArmPlatformGetCorePosition(MpId) + 1))));
   } else {
     if (((MpId) & PcdGet32(PcdArmPrimaryCoreMask)) == PcdGet32(PcdArmPrimaryCore)) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");

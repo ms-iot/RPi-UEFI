@@ -1,6 +1,7 @@
-/**
+/** @file
+This file contains functions required to generate a Firmware File System file.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  GenFfs.c
-
-Abstract:
-
-  This file contains functions required to generate a Firmware File System
-  file.
 
 **/
 
@@ -119,7 +111,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -317,7 +309,7 @@ Returns:
     // 
     // Open file and read contents
     //
-    InFile = fopen (InputFileName[Index], "rb");
+    InFile = fopen (LongFilePath (InputFileName[Index]), "rb");
     if (InFile == NULL) {
       Error (NULL, 0, 0001, "Error opening file", InputFileName[Index]);
       return EFI_ABORTED;
@@ -899,7 +891,7 @@ Returns:
   // Open output file to write ffs data.
   //
   remove(OutputFileName);
-  FfsFile = fopen (OutputFileName, "wb");
+  FfsFile = fopen (LongFilePath (OutputFileName), "wb");
   if (FfsFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", OutputFileName);
     goto Finish;

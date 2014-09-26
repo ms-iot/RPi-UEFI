@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -39,6 +39,7 @@ IsDirectoryEmpty (
 
   RetVal = TRUE;
   NoFile = FALSE;
+  FileInfo = NULL;
 
   for (FileHandleFindFirstFile(FileHandle, &FileInfo)
     ;  !NoFile
@@ -76,6 +77,7 @@ CascadeDelete(
   EFI_STATUS            Status;
   SHELL_PROMPT_RESPONSE *Resp;
   CHAR16                *TempName;
+  UINTN                 NewSize;
 
   Resp                  = NULL;
   ShellStatus           = SHELL_SUCCESS;
@@ -124,13 +126,14 @@ CascadeDelete(
           //
           // Update the node filename to have full path with file system identifier
           //
-          TempName = AllocateZeroPool(StrSize(Node->FullName) + StrSize(Node2->FullName));
+          NewSize = StrSize(Node->FullName) + StrSize(Node2->FullName);
+          TempName = AllocateZeroPool(NewSize);
           if (TempName == NULL) {
             ShellStatus = SHELL_OUT_OF_RESOURCES;
           } else {
-            StrCpy(TempName, Node->FullName);
+            StrnCpy(TempName, Node->FullName, NewSize/sizeof(CHAR16) -1);
             TempName[StrStr(TempName, L":")+1-TempName] = CHAR_NULL;
-            StrCat(TempName, Node2->FullName);
+            StrnCat(TempName, Node2->FullName, NewSize/sizeof(CHAR16) -1 - StrLen(TempName));
             FreePool((VOID*)Node2->FullName);
             Node2->FullName = TempName;
 
@@ -162,7 +165,9 @@ CascadeDelete(
     //
     // now delete the current node...
     //
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE), gShellLevel2HiiHandle, Node->FullName);
+    if (!Quiet) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE), gShellLevel2HiiHandle, Node->FullName);
+    }
     Status = gEfiShellProtocol->DeleteFile(Node->Handle);
     Node->Handle = NULL;
   }
@@ -174,7 +179,9 @@ CascadeDelete(
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_ERR), gShellLevel2HiiHandle, Status);
     return (SHELL_ACCESS_DENIED);
   } else {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_COMP), gShellLevel2HiiHandle);
+    if (!Quiet) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_COMP), gShellLevel2HiiHandle);
+    }
     return (SHELL_SUCCESS);
   }
 }

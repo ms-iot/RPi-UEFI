@@ -149,7 +149,7 @@ struct _NOR_FLASH_INSTANCE {
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL FvbProtocol;
   VOID*                               ShadowBuffer;
 
-  NOR_FLASH_DEVICE_PATH	              DevicePath;
+  NOR_FLASH_DEVICE_PATH               DevicePath;
 };
 
 EFI_STATUS
@@ -362,12 +362,6 @@ NorFlashWrite (
 EFI_STATUS
 NorFlashReset (
   IN  NOR_FLASH_INSTANCE *Instance
-  );
-
-EFI_STATUS
-NorFlashUnlockSingleBlockIfNecessary (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN UINTN                  BlockAddress
   );
 
 #endif /* __NOR_FLASH_DXE_H__ */

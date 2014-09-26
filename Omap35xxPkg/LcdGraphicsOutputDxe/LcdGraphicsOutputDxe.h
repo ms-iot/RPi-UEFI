@@ -89,15 +89,15 @@ EFI_STATUS
 EFIAPI
 LcdGraphicsBlt (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
-	IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
-	IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION   BltOperation,
-	IN UINTN                               SourceX,
-	IN UINTN                               SourceY,
-	IN UINTN                               DestinationX,
-	IN UINTN                               DestinationY,
-	IN UINTN                               Width,
-	IN UINTN                               Height,
-	IN UINTN                               Delta           OPTIONAL   // Number of BYTES in a row of the BltBuffer
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION   BltOperation,
+  IN UINTN                               SourceX,
+  IN UINTN                               SourceY,
+  IN UINTN                               DestinationX,
+  IN UINTN                               DestinationY,
+  IN UINTN                               Width,
+  IN UINTN                               Height,
+  IN UINTN                               Delta           OPTIONAL   // Number of BYTES in a row of the BltBuffer
 );
 
 // HW registers
@@ -144,7 +144,7 @@ LcdGraphicsBlt (
 #define LCDENABLE       BIT0
 #define ACTIVEMATRIX    BIT3
 #define GOLCD           BIT5
-#define DATALINES24     (BIT8 | BIT9)   
+#define DATALINES24     (BIT8 | BIT9)
 #define LCDENABLESIGNAL BIT28
 
 #define GFXENABLE       BIT0

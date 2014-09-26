@@ -1,7 +1,7 @@
 /** @file   
-  ACPI 5.0 definitions from the ACPI Specification Revision 5.0 December 6, 2011
+  ACPI 5.0 definitions from the ACPI Specification Revision 5.0a November 13, 2013.
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -160,7 +160,8 @@ typedef struct {
 #define EFI_ACPI_5_0_PCI_CONFIGURATION_SPACE    2
 #define EFI_ACPI_5_0_EMBEDDED_CONTROLLER        3
 #define EFI_ACPI_5_0_SMBUS                      4
-#define EFI_ACPI_5_0_FUNCTIONAL_FIXED_HARDWARE  0x7F
+#define EFI_ACPI_5_0_PLATFORM_COMMUNICATION_CHANNEL  0x0A
+#define EFI_ACPI_5_0_FUNCTIONAL_FIXED_HARDWARE       0x7F
 
 //
 // Generic Address Space Access Sizes
@@ -1094,8 +1095,10 @@ typedef struct {
 ///
 /// BGRT Status
 ///
-#define EFI_ACPI_5_0_BGRT_STATUS_INVALID  0x00
-#define EFI_ACPI_5_0_BGRT_STATUS_VALID    0x01
+#define EFI_ACPI_5_0_BGRT_STATUS_NOT_DISPLAYED 0x00
+#define EFI_ACPI_5_0_BGRT_STATUS_DISPLAYED     0x01
+#define EFI_ACPI_5_0_BGRT_STATUS_INVALID       EFI_ACPI_5_0_BGRT_STATUS_NOT_DISPLAYED
+#define EFI_ACPI_5_0_BGRT_STATUS_VALID         EFI_ACPI_5_0_BGRT_STATUS_DISPLAYED
 
 ///
 /// BGRT Image Type
@@ -2019,6 +2022,11 @@ typedef struct {
 #define EFI_ACPI_5_0_DMA_REMAPPING_TABLE_SIGNATURE  SIGNATURE_32('D', 'M', 'A', 'R')
 
 ///
+/// "DRTM" Dynamic Root of Trust for Measurement Table
+///
+#define EFI_ACPI_5_0_DYNAMIC_ROOT_OF_TRUST_FOR_MEASUREMENT_TABLE_SIGNATURE  SIGNATURE_32('D', 'R', 'T', 'M')
+
+///
 /// "ETDT" Event Timer Description Table
 ///
 #define EFI_ACPI_5_0_EVENT_TIMER_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('E', 'T', 'D', 'T')
@@ -2084,9 +2092,10 @@ typedef struct {
 #define EFI_ACPI_5_0_UEFI_ACPI_DATA_TABLE_SIGNATURE  SIGNATURE_32('U', 'E', 'F', 'I')
 
 ///
-/// "WAET" Windows ACPI Enlightenment Table
+/// "WAET" Windows ACPI Emulated Devices Table
 ///
-#define EFI_ACPI_5_0_WINDOWS_ACPI_ENLIGHTENMENT_TABLE_SIGNATURE  SIGNATURE_32('W', 'A', 'E', 'T')
+#define EFI_ACPI_5_0_WINDOWS_ACPI_EMULATED_DEVICES_TABLE_SIGNATURE  SIGNATURE_32('W', 'A', 'E', 'T')
+#define EFI_ACPI_5_0_WINDOWS_ACPI_ENLIGHTENMENT_TABLE_SIGNATURE  EFI_ACPI_5_0_WINDOWS_ACPI_EMULATED_DEVICES_TABLE_SIGNATURE
 
 ///
 /// "WDAT" Watchdog Action Table

@@ -142,14 +142,14 @@ DssSetMode (
   )
 {
   // Make sure the interface clock is running
-  MmioWrite32 (CM_ICLKEN_DSS, EN_DSS);  
+  MmioWrite32 (CM_ICLKEN_DSS, EN_DSS);
 
   // Stop the functional clocks
   MmioAnd32 (CM_FCLKEN_DSS, ~(EN_DSS1 | EN_DSS2 | EN_TV));
 
   // Program the DSS clock divisor
   MmioWrite32 (CM_CLKSEL_DSS, 0x1000 | (LcdModes[ModeNumber].DssDivisor));
-  
+
   // Start the functional clocks
   MmioOr32 (CM_FCLKEN_DSS, (EN_DSS1 | EN_DSS2 | EN_TV));
 
@@ -159,10 +159,10 @@ DssSetMode (
   // Reset the subsystem
   MmioWrite32(DSS_SYSCONFIG, DSS_SOFTRESET);
   while (!(MmioRead32 (DSS_SYSSTATUS) & DSS_RESETDONE));
-  
+
   // Configure LCD parameters
   MmioWrite32 (DISPC_SIZE_LCD,
-               ((LcdModes[ModeNumber].HorizontalResolution - 1) 
+               ((LcdModes[ModeNumber].HorizontalResolution - 1)
                | ((LcdModes[ModeNumber].VerticalResolution - 1) << 16))
               );
   MmioWrite32 (DISPC_TIMING_H,
@@ -187,7 +187,7 @@ DssSetMode (
   MmioWrite32 (DISPC_GFX_PRELD, 0x2D8);
   MmioWrite32 (DISPC_GFX_BA0, VramBaseAddress);
   MmioWrite32 (DISPC_GFX_SIZE,
-               ((LcdModes[ModeNumber].HorizontalResolution - 1) 
+               ((LcdModes[ModeNumber].HorizontalResolution - 1)
                | ((LcdModes[ModeNumber].VerticalResolution - 1) << 16))
               );
 
@@ -213,7 +213,7 @@ HwInitializeDisplay (
 
   // Enable power lines used by TFP410
   Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
-  ASSERT_EFI_ERROR (Status);  
+  ASSERT_EFI_ERROR (Status);
 
   OldTpl = gBS->RaiseTPL(TPL_NOTIFY);
   Data = VAUX_DEV_GRP_P1;
@@ -222,7 +222,7 @@ HwInitializeDisplay (
 
   Data = VAUX_DEDICATED_18V;
   Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VPLL2_DEDICATED), 1, &Data);
-  ASSERT_EFI_ERROR (Status);  
+  ASSERT_EFI_ERROR (Status);
 
   // Power up TFP410 (set GPIO2 on TPS - for BeagleBoard-xM)
   Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID2, GPIODATADIR1), 1, &Data);
@@ -239,7 +239,7 @@ HwInitializeDisplay (
 
   // Power up TFP410 (set GPIO 170 - for older BeagleBoards)
   MmioAnd32 (GPIO6_BASE + GPIO_OE, ~BIT10);
-  MmioOr32  (GPIO6_BASE + GPIO_SETDATAOUT, BIT10);  
+  MmioOr32  (GPIO6_BASE + GPIO_SETDATAOUT, BIT10);
 
   return EFI_SUCCESS;
 }
@@ -249,7 +249,7 @@ InitializeDisplay (
   IN LCD_INSTANCE* Instance
   )
 {
-  EFI_STATUS           Status; 
+  EFI_STATUS           Status;
   UINTN                VramSize;
   EFI_PHYSICAL_ADDRESS VramBaseAddress;
 
@@ -273,24 +273,24 @@ EFI_STATUS
 EFIAPI
 LcdGraphicsQueryMode (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL            *This,
-	IN UINT32                                  ModeNumber,
-	OUT UINTN                                  *SizeOfInfo,
-	OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   **Info
-	)
+  IN UINT32                                  ModeNumber,
+  OUT UINTN                                  *SizeOfInfo,
+  OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   **Info
+  )
 {
-	LCD_INSTANCE  *Instance;
+  LCD_INSTANCE  *Instance;
 
-	Instance = LCD_INSTANCE_FROM_GOP_THIS(This);
+  Instance = LCD_INSTANCE_FROM_GOP_THIS(This);
 
   if (!mDisplayInitialized) {
     InitializeDisplay (Instance);
   }
 
   // Error checking
-	if ( (This == NULL) || (Info == NULL) || (SizeOfInfo == NULL) || (ModeNumber >= This->Mode->MaxMode) ) {
-	  DEBUG((DEBUG_ERROR, "LcdGraphicsQueryMode: ERROR - For mode number %d : Invalid Parameter.\n", ModeNumber ));
-		return EFI_INVALID_PARAMETER;
-	}
+  if ( (This == NULL) || (Info == NULL) || (SizeOfInfo == NULL) || (ModeNumber >= This->Mode->MaxMode) ) {
+    DEBUG((DEBUG_ERROR, "LcdGraphicsQueryMode: ERROR - For mode number %d : Invalid Parameter.\n", ModeNumber ));
+    return EFI_INVALID_PARAMETER;
+  }
 
   *Info = AllocateCopyPool(sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION), &Instance->ModeInfo);
   if (*Info == NULL) {
@@ -311,12 +311,12 @@ EFI_STATUS
 EFIAPI
 LcdGraphicsSetMode (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL   *This,
-	IN UINT32                         ModeNumber
-	)
+  IN UINT32                         ModeNumber
+  )
 {
-	LCD_INSTANCE  *Instance;
+  LCD_INSTANCE  *Instance;
 
-	Instance = LCD_INSTANCE_FROM_GOP_THIS(This);
+  Instance = LCD_INSTANCE_FROM_GOP_THIS(This);
 
   if (ModeNumber >= Instance->Mode.MaxMode) {
     return EFI_UNSUPPORTED;
@@ -350,51 +350,51 @@ LcdGraphicsOutputDxeInitialize (
     goto EXIT;
   }
 
-	// Install the Graphics Output Protocol and the Device Path
-	Status = gBS->InstallMultipleProtocolInterfaces(
-			&Instance->Handle,
-			&gEfiGraphicsOutputProtocolGuid, &Instance->Gop,
-			&gEfiDevicePathProtocolGuid,     &Instance->DevicePath,
-			NULL
-	   );
+  // Install the Graphics Output Protocol and the Device Path
+  Status = gBS->InstallMultipleProtocolInterfaces(
+             &Instance->Handle,
+             &gEfiGraphicsOutputProtocolGuid, &Instance->Gop,
+             &gEfiDevicePathProtocolGuid,     &Instance->DevicePath,
+             NULL
+             );
 
-	if (EFI_ERROR(Status)) {
-	  DEBUG((DEBUG_ERROR, "GraphicsOutputDxeInitialize: Can not install the protocol. Exit Status=%r\n", Status));
-		goto EXIT;
-	}
+  if (EFI_ERROR(Status)) {
+    DEBUG((DEBUG_ERROR, "GraphicsOutputDxeInitialize: Can not install the protocol. Exit Status=%r\n", Status));
+    goto EXIT;
+  }
 
   // Register for an ExitBootServicesEvent
-	// When ExitBootServices starts, this function here will make sure that the graphics driver will shut down properly,
-	// i.e. it will free up all allocated memory and perform any necessary hardware re-configuration.
-	/*Status = gBS->CreateEvent (
-	    EVT_SIGNAL_EXIT_BOOT_SERVICES,
-	    TPL_NOTIFY,
-	    LcdGraphicsExitBootServicesEvent, NULL,
-			&Instance->ExitBootServicesEvent
-			);
+  // When ExitBootServices starts, this function here will make sure that the graphics driver will shut down properly,
+  // i.e. it will free up all allocated memory and perform any necessary hardware re-configuration.
+  /*Status = gBS->CreateEvent (
+               EVT_SIGNAL_EXIT_BOOT_SERVICES,
+               TPL_NOTIFY,
+               LcdGraphicsExitBootServicesEvent, NULL,
+               &Instance->ExitBootServicesEvent
+               );
 
-	if (EFI_ERROR(Status)) {
-	  DEBUG((DEBUG_ERROR, "GraphicsOutputDxeInitialize: Can not install the ExitBootServicesEvent handler. Exit Status=%r\n", Status));
-		goto EXIT_ERROR_UNINSTALL_PROTOCOL;
-	}*/
+  if (EFI_ERROR(Status)) {
+    DEBUG((DEBUG_ERROR, "GraphicsOutputDxeInitialize: Can not install the ExitBootServicesEvent handler. Exit Status=%r\n", Status));
+    goto EXIT_ERROR_UNINSTALL_PROTOCOL;
+  }*/
 
-	// To get here, everything must be fine, so just exit
-	goto EXIT;
+  // To get here, everything must be fine, so just exit
+  goto EXIT;
 
 //EXIT_ERROR_UNINSTALL_PROTOCOL:
-	/* The following function could return an error message,
-	 * however, to get here something must have gone wrong already,
-	 * so preserve the original error, i.e. don't change
-	 * the Status variable, even it fails to uninstall the protocol.
-	 */
-/*	gBS->UninstallMultipleProtocolInterfaces (
-	    Instance->Handle,
-	    &gEfiGraphicsOutputProtocolGuid, &Instance->Gop, // Uninstall Graphics Output protocol
-	    &gEfiDevicePathProtocolGuid,     &Instance->DevicePath,     // Uninstall device path
-	    NULL
-	    );*/
+  /* The following function could return an error message,
+   * however, to get here something must have gone wrong already,
+   * so preserve the original error, i.e. don't change
+   * the Status variable, even it fails to uninstall the protocol.
+   */
+  /*  gBS->UninstallMultipleProtocolInterfaces (
+        Instance->Handle,
+        &gEfiGraphicsOutputProtocolGuid, &Instance->Gop, // Uninstall Graphics Output protocol
+        &gEfiDevicePathProtocolGuid,     &Instance->DevicePath,     // Uninstall device path
+        NULL
+        );*/
 
 EXIT:
-	return Status;
+  return Status;
 
 }

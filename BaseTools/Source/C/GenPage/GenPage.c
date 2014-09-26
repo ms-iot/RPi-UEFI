@@ -1,18 +1,4 @@
 /** @file
-
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-  GenPage.c
-  
-Abstract:
   Pre-Create a 4G page table (2M pages).
   It's used in DUET x64 build needed to enter LongMode.
  
@@ -28,6 +14,16 @@ Abstract:
                         (
                           Directory-Ptr Directory {512}
                         ) {4}
+
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
 **/
 
 #include <stdio.h>
@@ -69,7 +65,7 @@ UINT32 gPageTableOffsetInFile = EFI_PAGE_BASE_OFFSET_IN_LDR;
 // Utility version information
 //
 #define UTILITY_MAJOR_VERSION 0
-#define UTILITY_MINOR_VERSION 1
+#define UTILITY_MINOR_VERSION 2
 
 void
 Version (
@@ -91,7 +87,7 @@ Returns:
 
 --*/
 {
-  printf ("%s Version %d.%d Build %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
+  printf ("%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 VOID
@@ -100,7 +96,7 @@ Usage (
   )
 {
   printf ("Usage: GenPage.exe [options] EfiLoaderImageName \n\n\
-Copyright (c) 2008 - 2013, Intel Corporation.  All rights reserved.\n\n\
+Copyright (c) 2008 - 2014, Intel Corporation.  All rights reserved.\n\n\
   Utility to generate the EfiLoader image containing a page table.\n\n\
 optional arguments:\n\
   -h, --help            Show this help message and exit\n\
@@ -243,13 +239,13 @@ return:
   //
   // Open files
   //
-  PageFile = fopen (PageFileName, "w+b");
+  PageFile = fopen (LongFilePath (PageFileName), "w+b");
   if (PageFile == NULL) {
     Error (NoPageFileName, 0, 0x4002, "Invalid parameter option", "Output File %s open failure", PageFileName);
     return -1;
   }
 
-  NoPageFile = fopen (NoPageFileName, "r+b");
+  NoPageFile = fopen (LongFilePath (NoPageFileName), "r+b");
   if (NoPageFile == NULL) {
     Error (NoPageFileName, 0, 0x4002, "Invalid parameter option", "Input File %s open failure", NoPageFileName);
     fclose (PageFile);

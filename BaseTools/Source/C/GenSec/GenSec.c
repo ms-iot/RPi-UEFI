@@ -1,6 +1,7 @@
 /** @file
+Creates output file that is a properly formed section per the PI spec.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -8,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  GenSection.c
-
-Abstract:
-
-  Creates output file that is a properly formed section per the PI spec.
 
 **/
 
@@ -153,7 +146,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -283,7 +276,7 @@ Returns:
   //
   // Open the input file
   //
-  InFile = fopen (InputFileName[0], "rb");
+  InFile = fopen (LongFilePath (InputFileName[0]), "rb");
   if (InFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", InputFileName[0]);
     return STATUS_ERROR;
@@ -473,7 +466,7 @@ Returns:
     // 
     // Open file and read contents
     //
-    InFile = fopen (InputFileName[Index], "rb");
+    InFile = fopen (LongFilePath (InputFileName[Index]), "rb");
     if (InFile == NULL) {
       Error (NULL, 0, 0001, "Error opening file", InputFileName[Index]);
       return EFI_ABORTED;
@@ -1553,7 +1546,7 @@ Returns:
   //
   // Write the output file
   //
-  OutFile = fopen (OutputFileName, "wb");
+  OutFile = fopen (LongFilePath (OutputFileName), "wb");
   if (OutFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file for writing", OutputFileName);
     goto Finish;

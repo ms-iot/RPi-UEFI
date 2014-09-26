@@ -12,12 +12,10 @@
 *
 **/
 
-#include <Uefi.h>
+#include "ArmJunoDxeInternal.h"
 
-EFI_STATUS
-PciEmulationEntryPoint (
-  VOID
-  );
+// This GUID must match the FILE_GUID in ArmPlatformPkg/ArmJunoPkg/AcpiTables/AcpiTables.inf
+STATIC CONST EFI_GUID mJunoAcpiTableFile = { 0xa1dd808e, 0x1e95, 0x4399, { 0xab, 0xc0, 0x65, 0x3c, 0x82, 0xe8, 0x53, 0x0c } };
 
 EFI_STATUS
 EFIAPI
@@ -29,6 +27,19 @@ ArmJunoEntryPoint (
   EFI_STATUS Status;
 
   Status = PciEmulationEntryPoint ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Try to install the ACPI Tables
+  Status = LocateAndInstallAcpiFromFv (&mJunoAcpiTableFile);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Try to install the Flat Device Tree (FDT). This function actually installs the
+  // UEFI Driver Binding Protocol.
+  Status = JunoFdtInstall (ImageHandle);
 
   return Status;
 }

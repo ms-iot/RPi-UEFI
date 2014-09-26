@@ -65,8 +65,9 @@
   # it has been configured by the CPU DXE
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|FALSE|BOOLEAN|0x00000032
 
-  # Define if the Power State Coordination Interface (PSCI) is supported by the Platform Trusted Firmware
-  gArmTokenSpaceGuid.PcdArmPsciSupport|FALSE|BOOLEAN|0x00000033
+  # Define if the spin-table mechanism is used by the secondary cores when booting
+  # Linux (instead of PSCI)
+  gArmTokenSpaceGuid.PcdArmLinuxSpinTable|FALSE|BOOLEAN|0x00000033
 
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
@@ -79,13 +80,6 @@
   gArmTokenSpaceGuid.PcdArmCacheOperationThreshold|1024|UINT32|0x00000003
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xffff0000|UINT32|0x00000004
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
-
-  #
-  # ARM Generic Interrupt Controller
-  #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
-  gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
 
   #
   # ARM Secure Firmware PCDs
@@ -111,12 +105,6 @@
   gArmTokenSpaceGuid.PcdHypFvBaseAddress|0|UINT32|0x0000003C
   gArmTokenSpaceGuid.PcdHypFvSize|0|UINT32|0x0000003D
 
-  # System Memory (DRAM): These PCDs define the region of in-built system memory
-  # Some platforms can get DRAM extensions, these additional regions will be declared
-  # to UEFI by ArmPlatformLib
-  gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
-
   # Use ClusterId + CoreId to identify the PrimaryCore
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
   # The Primary Core is ClusterId[0] & CoreId[0]
@@ -136,13 +124,6 @@
   # Maximum file size for TFTP servers that do not support 'tsize' extension
   gArmTokenSpaceGuid.PcdMaxTftpFileSize|0x01000000|UINT32|0x00000000
 
-  #
-  # ARM Architectural Timer
-  #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
-  # ARM Architectural Timer Interrupt(GIC PPI) number
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
-  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
 
 [PcdsFixedAtBuild.ARM]
   #
@@ -220,3 +201,41 @@
   gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x20000000|UINT32|0x00000023
   # The FDT blob must be loaded at a 2MB aligned address.
   gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment|0x00200000|UINT32|0x00000026
+
+
+#
+# These PCDs are also defined as 'PcdsDynamic' to be redefined when using UEFI in a
+# context of virtual machine.
+#
+[PcdsFixedAtBuild.common, PcdsDynamic.common]
+  # System Memory (DRAM): These PCDs define the region of in-built system memory
+  # Some platforms can get DRAM extensions, these additional regions will be declared
+  # to UEFI by ArmPlatformLib
+  gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
+
+  #
+  # ARM Architectural Timer
+  #
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
+
+  # ARM Architectural Timer Interrupt(GIC PPI) numbers
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26|UINT32|0x00000040
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27|UINT32|0x00000041
+
+  #
+  # ARM Generic Interrupt Controller
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
+  gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
+
+  #
+  # ARM PSCI function invocations can be done either through hypervisor
+  # calls (HVC) or secure monitor calls (SMC).
+  # PcdArmPsciMethod == 1 : use HVC
+  # PcdArmPsciMethod == 2 : use SMC
+  #
+  gArmTokenSpaceGuid.PcdArmPsciMethod|0|UINT32|0x00000042

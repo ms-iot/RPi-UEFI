@@ -13,7 +13,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ArmJunoResetSystemLib
-  FILE_GUID                      = b5b8e984-c8a2-4df4-b5ac-026204124aa0 
+  FILE_GUID                      = b5b8e984-c8a2-4df4-b5ac-026204124aa0
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = EfiResetSystemLib

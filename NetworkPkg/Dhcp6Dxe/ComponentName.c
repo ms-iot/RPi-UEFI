@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Dhcp6 driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -259,7 +259,7 @@ UpdateName (
 {
   EFI_STATUS                       Status;
   EFI_DHCP6_MODE_DATA              Dhcp6ModeData;
-  CHAR16                           HandleName[64];
+  CHAR16                           *HandleName;
 
   if (Dhcp6 == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -279,9 +279,12 @@ UpdateName (
   }
   
   if (Dhcp6ModeData.Ia == NULL) {
-    UnicodeSPrint (HandleName, sizeof (HandleName), L"DHCPv6 (No configured IA)");
+    HandleName = L"DHCPv6 (No configured IA)";
   } else {
-    StrCpy (HandleName, mDhcp6ControllerName[Dhcp6ModeData.Ia->State]);
+    if (Dhcp6ModeData.Ia->State > Dhcp6Rebinding) {
+      return EFI_DEVICE_ERROR;
+    }
+    HandleName = mDhcp6ControllerName[Dhcp6ModeData.Ia->State];
   }
   
   Status = AddUnicodeString2 (

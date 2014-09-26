@@ -35,7 +35,12 @@
 [Sources.common]
   ArmJuno.c
   ArmJunoMem.c
-  ArmJunoHelper.S   | GCC
+
+[Sources.AARCH64]
+  AArch64/ArmJunoHelper.S | GCC
+
+[Sources.ARM]
+  Arm/ArmJunoHelper.S     | GCC
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

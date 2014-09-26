@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -14,8 +14,6 @@
 
 #include <Guid/ArmGlobalVariableHob.h>
 #include "BdsInternal.h"
-
-extern EFI_HANDLE mImageHandle;
 
 EFI_STATUS
 BootOptionStart (
@@ -41,12 +39,12 @@ BootOptionStart (
     LoaderType = ReadUnaligned32 ((CONST UINT32*)&OptionalData->Header.LoaderType);
 
     if (LoaderType == BDS_LOADER_EFI_APPLICATION) {
-      if ((BootOption->Attributes & LOAD_OPTION_CATEGORY_BOOT) == 0) {
+      if ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_APP) {
         // Need to connect every drivers to ensure no dependencies are missing for the application
         BdsConnectAllDrivers ();
       }
 
-      Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList, 0, NULL);
+      Status = BdsStartEfiApplication (gImageHandle, BootOption->FilePathList, 0, NULL);
     } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) {
       LinuxArguments = &(OptionalData->Arguments.LinuxArguments);
       CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
@@ -93,7 +91,7 @@ BootOptionStart (
     }
   } else {
     // Connect all the drivers if the EFI Application is not a EFI OS Loader
-    if ((BootOption->Attributes & LOAD_OPTION_CATEGORY_BOOT) == 0) {
+    if ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_APP) {
       BdsConnectAllDrivers ();
     }
 
@@ -103,7 +101,7 @@ BootOptionStart (
               EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
               LoadOptionIndexSize, &(BootOption->LoadOptionIndex));
 
-    Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList, BootOption->OptionalDataSize, BootOption->OptionalData);
+    Status = BdsStartEfiApplication (gImageHandle, BootOption->FilePathList, BootOption->OptionalDataSize, BootOption->OptionalData);
 
     // Clear BootCurrent variable
     LoadOptionIndexSize = sizeof(UINT16);
@@ -369,6 +367,7 @@ BootOptionDelete (
   UINTN         BootOrderSize;
   UINT16*       BootOrder;
   UINTN         BootOrderCount;
+  CHAR16        BootVariableName[9];
   EFI_STATUS    Status;
 
   // Remove the entry from the BootOrder environment variable
@@ -401,7 +400,17 @@ BootOptionDelete (
         );
   }
 
+  // Delete Boot#### environment variable
+  UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", BootOption->LoadOptionIndex);
+  Status = gRT->SetVariable (
+      BootVariableName,
+      &gEfiGlobalVariableGuid,
+      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+      0,
+      NULL
+      );
+
   FreePool (BootOrder);
 
-  return EFI_SUCCESS;
+  return Status;
 }

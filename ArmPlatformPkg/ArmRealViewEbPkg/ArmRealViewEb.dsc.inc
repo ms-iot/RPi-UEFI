@@ -1,13 +1,13 @@
 #
 #  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http://opensource.org/licenses/bsd-license.php                                            
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
 
@@ -41,7 +41,7 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf  
+  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
 
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
@@ -62,27 +62,32 @@
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
 
   # RealView Emulation Board Specific Libraries
+  PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   EfiResetSystemLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ResetSystemLib/ResetSystemLib.inf
   RealTimeClockLib|ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
   SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
   SerialPortExtLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortExtLib.inf
-  TimerLib|ArmPlatformPkg/Library/SP804TimerLib/SP804TimerLib.inf  
+  TimerLib|ArmPlatformPkg/Library/SP804TimerLib/SP804TimerLib.inf
   # ARM PL011 UART Driver
   PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
   NorFlashPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/NorFlashArmRealViewEbLib/NorFlashArmRealViewEbLib.inf
-  LcdPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/PL111LcdArmRealViewEbLib/PL111LcdArmRealViewEbLib.inf  
-  ArmPlatformSysConfigLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/SysConfigArmRealViewEbLib/SysConfigArmRealViewEbLib.inf
+  LcdPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/PL111LcdArmRealViewEbLib/PL111LcdArmRealViewEbLib.inf
+  ArmPlatformSysConfigLib|ArmPlatformPkg/Library/ArmPlatformSysConfigLibNull/ArmPlatformSysConfigLibNull.inf
 
-  # EBL Related Libraries  
+  # Networking Requirements for ArmPlatformPkg/Bds
+  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+
+  # EBL Related Libraries
   EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   EblAddExternalCommandLib|EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
 
   #
-  # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window 
+  # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
   # in the debugger will show load and unload commands for symbols. You can cut and paste this
   # into the command window to load symbols. We should be able to use a script to do this, but
   # the version of RVD I have does not support scripts accessing system memory.
@@ -90,12 +95,12 @@
   #PeCoffExtraActionLib|ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf
   PeCoffExtraActionLib|ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
   #PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
-    
+
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   DebugAgentTimerLib|EmbeddedPkg/Library/DebugAgentTimerLibNull/DebugAgentTimerLibNull.inf
   #DebugAgentTimerLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
 
-  SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf  
+  SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
 
   GdbSerialLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/GdbSerialLib/GdbSerialLib.inf
 
@@ -110,9 +115,9 @@
 
   DebugAgentLib|ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLibBase.inf
-  # Uncomment to turn on GDB stub in SEC. 
+  # Uncomment to turn on GDB stub in SEC.
   #DebugAgentLib|EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
-  
+
 !ifdef $(EDK2_SKIP_PEICORE)
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
@@ -120,7 +125,6 @@
   MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
   PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
-  PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
 !endif
 
@@ -201,6 +205,9 @@
   #
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
+  # Add support for GCC stack protector
+  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
+
 [BuildOptions]
   RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
@@ -220,9 +227,9 @@
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|TRUE
-  
+
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|TRUE
-  
+
   # Use the Vector Table location in CpuDxe. We will not copy the Vector Table at PcdCpuVectorBaseAddress
   gArmTokenSpaceGuid.PcdRelocateVectorTable|FALSE
 
@@ -269,16 +276,16 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
-  
+
   gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand|""
   gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000
-  
+
   #
   # Optional feature to help prevent EFI memory map fragments
   # Turned on and off via: PcdPrePiProduceMemoryTypeInformationHob
-  # Values are in EFI Pages (4K). DXE Core will make sure that 
-  # at least this much of each type of memory can be allocated 
+  # Values are in EFI Pages (4K). DXE Core will make sure that
+  # at least this much of each type of memory can be allocated
   # from a single memory range. This way you only end up with
   # maximum of two fragements for each type in the memory map
   # (the memory used, and the free memory that was prereserved
@@ -297,7 +304,7 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"SemiHosting"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/zImage-RTSM"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
-  
+
   # Use the Serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"

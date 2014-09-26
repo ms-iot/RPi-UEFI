@@ -21,7 +21,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/ArmJuno
-  SUPPORTED_ARCHITECTURES        = AARCH64
+  SUPPORTED_ARCHITECTURES        = AARCH64|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmPlatformPkg/ArmJunoPkg/ArmJuno.fdf
@@ -30,7 +30,6 @@
 !include ArmPlatformPkg/ArmVExpressPkg/ArmVExpress.dsc.inc
 
 [LibraryClasses.common]
-  ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64Lib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmJunoPkg/Library/ArmJunoLib/ArmJunoLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
 
@@ -42,6 +41,12 @@
 
   # USB Requirements
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+
+[LibraryClasses.ARM]
+  ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
+
+[LibraryClasses.AARCH64]
+  ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64Lib.inf
 
 [LibraryClasses.common.SEC]
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
@@ -55,7 +60,7 @@
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
 
 [BuildOptions]
-  GCC:*_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmJunoPkg/Include
+  GCC:*_*_*_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmJunoPkg/Include
 
 ################################################################################
 #
@@ -70,13 +75,11 @@
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
 
-  gArmTokenSpaceGuid.PcdArmPsciSupport|TRUE
-
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Juno"
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"0.2"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"1.1"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmJuno"
 
   #
@@ -131,7 +134,7 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from NOR Flash"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/Image"
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,115200 earlyprintk=pl011,0x7ff80000 rootwait verbose debug root=/dev/sda2"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,115200 earlyprintk=pl011,0x7ff80000 root=/dev/sda1 rootwait verbose debug"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
@@ -193,6 +196,12 @@
 
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+
+  #
+  # ACPI Support
+  #
+  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  ArmPlatformPkg/ArmJunoPkg/AcpiTables/AcpiTables.inf
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 

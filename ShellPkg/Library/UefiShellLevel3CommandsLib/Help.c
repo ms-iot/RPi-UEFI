@@ -1,7 +1,8 @@
 /** @file
   Main file for Help shell level 3 function.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2014, ARM Limited. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +16,88 @@
 #include "UefiShellLevel3CommandsLib.h"
 
 #include <Library/ShellLib.h>
+#include <Library/HandleParsingLib.h>
+
+#include <Protocol/EfiShellDynamicCommand.h>
+
+/**
+  Attempt to print help from a dynamically added command.
+
+  @param[in]  CommandToGetHelpOn  The unicode name of the command that help is
+                                  requested on.
+  @param[in]  SectionToGetHelpOn  Pointer to the section specifier(s).
+  @param[in]  PrintCommandText    Print the command followed by the help content
+                                  or just help.
+
+  @retval EFI_SUCCESS             The help was displayed
+  @retval EFI_NOT_FOUND           The command name could not be found
+  @retval EFI_DEVICE_ERROR        The help data format was incorrect.
+**/
+EFI_STATUS
+EFIAPI
+PrintDynamicCommandHelp(
+  IN CHAR16  *CommandToGetHelpOn,
+  IN CHAR16  *SectionToGetHelpOn,
+  IN BOOLEAN  PrintCommandText
+ )
+{
+  EFI_STATUS                          Status;
+  BOOLEAN                             Found;
+  EFI_HANDLE                          *CommandHandleList;
+  EFI_HANDLE                          *NextCommand;
+  EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *DynamicCommand;
+
+  Status = EFI_NOT_FOUND;
+  Found = FALSE;
+  CommandHandleList = NULL;
+
+  CommandHandleList = GetHandleListByProtocol(&gEfiShellDynamicCommandProtocolGuid);
+
+  if (CommandHandleList == NULL) {
+    //
+    // not found or out of resources
+    //
+    return Status;
+  }
+
+  for (NextCommand = CommandHandleList; *NextCommand != NULL; NextCommand++) {
+    Status = gBS->HandleProtocol(
+      *NextCommand,
+      &gEfiShellDynamicCommandProtocolGuid,
+      (VOID **)&DynamicCommand
+      );
+
+    if (EFI_ERROR(Status)) {
+      continue;
+    }
+
+    //
+    // Check execution break flag when printing multiple command help information.
+    //
+    if (ShellGetExecutionBreakFlag ()) {
+      break;
+    }
+
+    if ((gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)DynamicCommand->CommandName, CommandToGetHelpOn)) ||
+      (gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL) != NULL && (gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)DynamicCommand->CommandName, (CHAR16*)(gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL)))))) {
+      // Print as Shell Help if in ManPage format.
+      Status = ShellPrintHelp (DynamicCommand->CommandName, SectionToGetHelpOn,
+                              PrintCommandText);
+      if (Status == EFI_DEVICE_ERROR) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_INV),
+                        gShellLevel3HiiHandle, DynamicCommand->CommandName);
+      } else if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_NF),
+                        gShellLevel3HiiHandle, DynamicCommand->CommandName);
+      } else {
+        Found = TRUE;
+      }
+    }
+  }
+
+  return (Found ? EFI_SUCCESS : Status);
+
+}
 
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-usage", TypeFlag},
@@ -164,18 +247,28 @@ ShellCommandRunHelp (
             }
           }
         }
+
+        //
+        // now try to match against the dynamic command list and print help
+        //
+        Status = PrintDynamicCommandHelp (CommandToGetHelpOn, SectionToGetHelpOn,
+                                          PrintCommandText);
+        if (!EFI_ERROR(Status)) {
+          Found = TRUE;
+        }
+
         //
         // Search the .man file for Shell applications (Shell external commands).
         //
         if (!Found) {
-            Status = ShellPrintHelp(CommandToGetHelpOn, SectionToGetHelpOn, FALSE);
-            if (Status == EFI_DEVICE_ERROR) {
-               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
-            } else if (EFI_ERROR(Status)) {
-               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
-            } else {
-              Found = TRUE;
-            }
+          Status = ShellPrintHelp(CommandToGetHelpOn, SectionToGetHelpOn, FALSE);
+          if (Status == EFI_DEVICE_ERROR) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
+          } else if (EFI_ERROR(Status)) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
+          } else {
+            Found = TRUE;
+          }
         }
       }
 
@@ -206,4 +299,3 @@ ShellCommandRunHelp (
 
   return (ShellStatus);
 }
-

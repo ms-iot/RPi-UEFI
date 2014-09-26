@@ -66,7 +66,7 @@ else
 	if [ $$? -ne 0 ]; then \
 		$(ECHO) "Warning: 'fip_create' tool is not in the PATH. The UEFI binary will not be added in the Firmware Image Package (FIP)."; \
 	else \
-		fip_create --bl33 $(WORKSPACE)/Build/ArmJuno/$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)/FV/BL32_AP_UEFI.fd --dump $(JUNO_FIP); \
+		fip_create --bl33 $(WORKSPACE)/Build/ArmJuno/$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)/FV/BL33_AP_UEFI.fd --dump $(JUNO_FIP); \
 	fi
 endif
 

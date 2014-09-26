@@ -30,6 +30,7 @@
   ArmPlatformPkg/ArmJunoPkg/ArmJuno.dec
 
 [LibraryClasses]
+  ArmGenericTimerCounterLib
   BaseLib
   BaseMemoryLib
   DebugLib

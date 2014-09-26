@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,6 +38,7 @@ ShellCommandRunCd (
   SHELL_FILE_HANDLE Handle;
   CONST CHAR16      *Param1;
   CHAR16            *Param1Copy;
+  CHAR16*           Walker;
 
   ProblemParam = NULL;
   ShellStatus = SHELL_SUCCESS;
@@ -96,6 +97,12 @@ ShellCommandRunCd (
       }
     } else {
       Param1Copy = CatSPrint(NULL, L"%s", Param1, NULL);
+      for (Walker = Param1Copy; Walker != NULL && *Walker != CHAR_NULL ; Walker++) {
+        if (*Walker == L'\"') {
+          CopyMem(Walker, Walker+1, StrSize(Walker) - sizeof(Walker[0]));
+        }
+      }
+      
       if (Param1Copy != NULL) {
         Param1Copy = PathCleanUpDirectories(Param1Copy);
       }
@@ -194,12 +201,11 @@ ShellCommandRunCd (
           //
           // change directory with a drive letter
           //
-          Drive = AllocateZeroPool(StrSize(Param1Copy));
+          Drive = AllocateCopyPool(StrSize(Param1Copy), Param1Copy);
           if (Drive == NULL) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
             ShellStatus = SHELL_OUT_OF_RESOURCES;
           } else {
-            Drive = StrCpy(Drive, Param1Copy);
             Path = StrStr(Drive, L":");
             ASSERT(Path != NULL);
             if (EFI_ERROR(ShellIsDirectory(Param1Copy))) {

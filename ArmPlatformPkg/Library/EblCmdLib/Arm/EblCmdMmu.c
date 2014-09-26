@@ -1,14 +1,14 @@
 /** @file
 *
 *  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -26,41 +26,41 @@
 #define GET_TT_LARGEPAGE_ATTRIBUTES(TTEntry)  ((TTEntry) & 0xFFFF)
 
 // Section
-#define TT_DESCRIPTOR_SECTION_STRONGLY_ORDER	   (TT_DESCRIPTOR_SECTION_TYPE_SECTION 													  | \
-													TT_DESCRIPTOR_SECTION_NG_GLOBAL 													  | \
-													TT_DESCRIPTOR_SECTION_S_NOT_SHARED 													  | \
-													TT_DESCRIPTOR_SECTION_DOMAIN(0) 													  | \
-													TT_DESCRIPTOR_SECTION_AP_RW_RW 														  | \
-													TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED)
+#define TT_DESCRIPTOR_SECTION_STRONGLY_ORDER   (TT_DESCRIPTOR_SECTION_TYPE_SECTION    | \
+                                                TT_DESCRIPTOR_SECTION_NG_GLOBAL       | \
+                                                TT_DESCRIPTOR_SECTION_S_NOT_SHARED    | \
+                                                TT_DESCRIPTOR_SECTION_DOMAIN(0)       | \
+                                                TT_DESCRIPTOR_SECTION_AP_RW_RW        | \
+                                                TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED)
 
 // Small Page
-#define TT_DESCRIPTOR_PAGE_STRONGLY_ORDER			(TT_DESCRIPTOR_PAGE_TYPE_PAGE 														   | \
-														TT_DESCRIPTOR_PAGE_NG_GLOBAL 													  | \
-														TT_DESCRIPTOR_PAGE_S_NOT_SHARED 												  | \
-														TT_DESCRIPTOR_PAGE_AP_RW_RW  													  | \
-														TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED)
+#define TT_DESCRIPTOR_PAGE_STRONGLY_ORDER      (TT_DESCRIPTOR_PAGE_TYPE_PAGE          | \
+                                                TT_DESCRIPTOR_PAGE_NG_GLOBAL          | \
+                                                TT_DESCRIPTOR_PAGE_S_NOT_SHARED       | \
+                                                TT_DESCRIPTOR_PAGE_AP_RW_RW           | \
+                                                TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED)
 
 // Large Page
-#define TT_DESCRIPTOR_LARGEPAGE_WRITE_BACK              (TT_DESCRIPTOR_PAGE_TYPE_LARGEPAGE                                                           | \
-                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
-                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
-                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
-                                                        TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC)
-#define TT_DESCRIPTOR_LARGEPAGE_WRITE_THROUGH           (TT_DESCRIPTOR_PAGE_TYPE_LARGEPAGE                                                           | \
-                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
-                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
-                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
-                                                        TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC)
-#define TT_DESCRIPTOR_LARGEPAGE_DEVICE                  (TT_DESCRIPTOR_PAGE_TYPE_LARGEPAGE                                                           | \
-                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
-                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
-                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
-                                                        TT_DESCRIPTOR_SECTION_CACHE_POLICY_SHAREABLE_DEVICE)
-#define TT_DESCRIPTOR_LARGEPAGE_UNCACHED                (TT_DESCRIPTOR_PAGE_TYPE_LARGEPAGE                                                           | \
-                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
-                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
-                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
-                                                        TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE)
+#define TT_DESCRIPTOR_LARGEPAGE_WRITE_BACK     (TT_DESCRIPTOR_PAGE_TYPE_LARGEPAGE     | \
+                                                TT_DESCRIPTOR_PAGE_NG_GLOBAL          | \
+                                                TT_DESCRIPTOR_PAGE_S_NOT_SHARED       | \
+                                                TT_DESCRIPTOR_PAGE_AP_RW_RW           | \
+                                                TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC)
+#define TT_DESCRIPTOR_LARGEPAGE_WRITE_THROUGH  (TT_DESCRIPTOR_PAGE_TYPE_LARGEPAGE     | \
+                                                TT_DESCRIPTOR_PAGE_NG_GLOBAL          | \
+                                                TT_DESCRIPTOR_PAGE_S_NOT_SHARED       | \
+                                                TT_DESCRIPTOR_PAGE_AP_RW_RW           | \
+                                                TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC)
+#define TT_DESCRIPTOR_LARGEPAGE_DEVICE         (TT_DESCRIPTOR_PAGE_TYPE_LARGEPAGE     | \
+                                                TT_DESCRIPTOR_PAGE_NG_GLOBAL          | \
+                                                TT_DESCRIPTOR_PAGE_S_NOT_SHARED       | \
+                                                TT_DESCRIPTOR_PAGE_AP_RW_RW           | \
+                                                TT_DESCRIPTOR_SECTION_CACHE_POLICY_SHAREABLE_DEVICE)
+#define TT_DESCRIPTOR_LARGEPAGE_UNCACHED       (TT_DESCRIPTOR_PAGE_TYPE_LARGEPAGE     | \
+                                                TT_DESCRIPTOR_PAGE_NG_GLOBAL          | \
+                                                TT_DESCRIPTOR_PAGE_S_NOT_SHARED       | \
+                                                TT_DESCRIPTOR_PAGE_AP_RW_RW           | \
+                                                TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE)
 
 
 typedef enum { Level0, Level1,Level2 } MMU_LEVEL;
@@ -296,7 +296,7 @@ DumpMmuLevel (
   UINT32      Index = 0, Count;
   MMU_ENTRY   LastEntry, Entry;
 
-	ASSERT((Level == Level1) || (Level == Level2));
+  ASSERT((Level == Level1) || (Level == Level2));
 
   if (Level == Level1)    Count = 4096;
   else                    Count = 256;

@@ -23,29 +23,10 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
-  facp.asl
-  dsdt.asl
-  ssdt0.asl
-  bert.asl
-  ecdt.asl
-  facs.asl
-  gtdt.asl
-  hest.asl
   apic.asl
-  mcfg.asl
-  mpst.asl
-  oem0.asl
-  slit.asl
-  spmi.asl
-  srat.asl
-  uefi.asl
-  cpep.asl
-  einj.asl
-  erst.asl
-  fpdt.asl
-  mchi.asl
-  msct.asl
-  pmtt.asl
+  dsdt.asl
+  facp.asl
+  gtdt.asl
 
 [Packages]
   MdePkg/MdePkg.dec

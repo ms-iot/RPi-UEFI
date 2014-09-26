@@ -2,6 +2,7 @@
   Member functions of EFI_SHELL_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
+  (C) Copyright 2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -444,8 +445,6 @@ EfiShellEnablePageBreak (
                                 environment variable name and y is the value. If this
                                 is NULL, then the current shell environment is used.
   @param[out] StartImageStatus  Returned status from gBS->StartImage.
-  @param[out] ExitDataSize      ExitDataSize as returned from gBS->StartImage
-  @param[out] ExitData          ExitData as returned from gBS->StartImage
 
   @retval EFI_SUCCESS       The command executed successfully. The  status code
                             returned by the command is pointed to by StatusCode.
@@ -460,9 +459,7 @@ InternalShellExecuteDevicePath(
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
   IN CONST CHAR16                   *CommandLine OPTIONAL,
   IN CONST CHAR16                   **Environment OPTIONAL,
-  OUT EFI_STATUS                    *StartImageStatus OPTIONAL,
-  OUT UINTN                         *ExitDataSize OPTIONAL,
-  OUT CHAR16                        **ExitData OPTIONAL
+  OUT EFI_STATUS                    *StartImageStatus OPTIONAL
   );
 
 /**
@@ -657,7 +654,7 @@ EfiShellOpenFileList(
 
   @param Name                   A pointer to the environment variable name
 
-  @return !=NULL                The environment variable's value. The returned
+  @retval !=NULL                The environment variable's value. The returned
                                 pointer does not need to be freed by the caller.
   @retval NULL                  The environment variable doesn't exist.
 **/

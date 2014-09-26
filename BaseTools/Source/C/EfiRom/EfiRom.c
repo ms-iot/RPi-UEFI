@@ -1,6 +1,7 @@
 /** @file
+Utility program to create an EFI option ROM image from binary and EFI PE32 files.
 
-Copyright (c) 1999 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
 distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  EfiRom.c
-  
-Abstract:
-
-  Utility program to create an EFI option ROM image from binary and 
-  EFI PE32 files.
 
 **/
 
@@ -135,7 +127,7 @@ Returns:
   //
   // Now open our output file
   //
-  if ((FptrOut = fopen (mOptions.OutFileName, "wb")) == NULL) {
+  if ((FptrOut = fopen (LongFilePath (mOptions.OutFileName), "wb")) == NULL) {
     Error (NULL, 0, 0001, "Error opening file", "Error opening file %s", mOptions.OutFileName);
     goto BailOut;
   }
@@ -246,7 +238,7 @@ Returns:
   //
   // Try to open the input file
   //
-  if ((InFptr = fopen (InFile->FileName, "rb")) == NULL) {
+  if ((InFptr = fopen (LongFilePath (InFile->FileName), "rb")) == NULL) {
     Error (NULL, 0, 0001, "Error opening file", InFile->FileName);
     return STATUS_ERROR;
   }
@@ -460,7 +452,7 @@ Returns:
   //
   // Try to open the input file
   //
-  if ((InFptr = fopen (InFile->FileName, "rb")) == NULL) {
+  if ((InFptr = fopen (LongFilePath (InFile->FileName), "rb")) == NULL) {
     Error (NULL, 0, 0001, "Open file error", "Error opening file: %s", InFile->FileName);
     return STATUS_ERROR;
   }
@@ -1230,7 +1222,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -1300,7 +1292,7 @@ Returns:
   //
   // Open the input file
   //
-  if ((InFptr = fopen (InFile->FileName, "rb")) == NULL) {
+  if ((InFptr = fopen (LongFilePath (InFile->FileName), "rb")) == NULL) {
     Error (NULL, 0, 0001, "Error opening file", InFile->FileName);
     return ;
   }

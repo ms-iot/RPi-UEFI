@@ -1,7 +1,7 @@
 /** @file
   The platform device manager reference implementation
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1260,10 +1260,13 @@ CallDriverHealth (
   LIST_ENTRY                  *Link;
   EFI_DEVICE_PATH_PROTOCOL    *DriverDevicePath;
   BOOLEAN                     RebootRequired;
+  BOOLEAN                     IsControllerNameEmpty;
+  UINTN                       StringSize;
 
   Index               = 0;
   DriverHealthInfo    = NULL;  
   DriverDevicePath    = NULL;
+  IsControllerNameEmpty = FALSE;
   InitializeListHead (&DriverHealthList);
 
   HiiHandle = gDeviceManagerPrivate.DriverHealthHiiHandle;
@@ -1336,13 +1339,7 @@ CallDriverHealth (
   Link = GetFirstNode (&DriverHealthList);
 
   while (!IsNull (&DriverHealthList, Link)) {   
-    DriverHealthInfo = DEVICE_MANAGER_HEALTH_INFO_FROM_LINK (Link);
-    
-    //
-    // Assume no line strings is longer than 512 bytes.
-    //
-    String = (EFI_STRING) AllocateZeroPool (0x200);
-    ASSERT (String != NULL);
+    DriverHealthInfo = DEVICE_MANAGER_HEALTH_INFO_FROM_LINK (Link);    
 
     Status = DriverHealthGetDriverName (DriverHealthInfo->DriverHandle, &DriverName);
     if (EFI_ERROR (Status)) {
@@ -1352,11 +1349,7 @@ CallDriverHealth (
       DriverDevicePath = DevicePathFromHandle (DriverHealthInfo->DriverHandle);
       DriverName       = DevicePathToStr (DriverDevicePath);
     }
-    //
-    // Add the Driver name & Controller name into FormSetTitle string
-    // 
-    StrnCat (String, DriverName, StrLen (DriverName));
-
+    StringSize = StrSize (DriverName);
 
     Status = DriverHealthGetControllerName (
                DriverHealthInfo->DriverHandle, 
@@ -1366,23 +1359,39 @@ CallDriverHealth (
                );
 
     if (!EFI_ERROR (Status)) {
-      //
-      // Can not get the Controller name, just let it empty.
-      //
-      StrnCat (String, L"    ", StrLen (L"    "));
-      StrnCat (String, ControllerName, StrLen (ControllerName));   
+      IsControllerNameEmpty = FALSE;
+      StringSize += StrLen (L"    ") * sizeof(CHAR16);
+      StringSize += StrLen (ControllerName) * sizeof(CHAR16);
+    } else {
+      IsControllerNameEmpty = TRUE;
     }
    
     //
     // Add the message of the Module itself provided after the string item.
     //
     if ((DriverHealthInfo->MessageList != NULL) && (DriverHealthInfo->MessageList->StringId != 0)) {
-       StrnCat (String, L"    ", StrLen (L"    "));
        TmpString = HiiGetString (
                      DriverHealthInfo->MessageList->HiiHandle, 
                      DriverHealthInfo->MessageList->StringId, 
                      NULL
                      );
+       ASSERT (TmpString != NULL);
+       
+       StringSize += StrLen (L"    ") * sizeof(CHAR16);
+       StringSize += StrLen (TmpString) * sizeof(CHAR16);
+
+       String = (EFI_STRING) AllocateZeroPool (StringSize);
+       ASSERT (String != NULL);
+       
+       StrnCpy (String, DriverName, StringSize / sizeof(CHAR16));
+       if (!IsControllerNameEmpty) {
+        StrnCat (String, L"    ", StringSize / sizeof(CHAR16) - StrLen(String) - 1);
+        StrnCat (String, ControllerName, StringSize / sizeof(CHAR16) - StrLen(String) - 1);
+       }
+
+       StrnCat (String, L"    ", StringSize / sizeof(CHAR16) - StrLen(String) - 1);
+       StrnCat (String, TmpString, StringSize / sizeof(CHAR16) - StrLen(String) - 1);
+       
     } else {
       //
       // Update the string will be displayed base on the driver's health status
@@ -1407,10 +1416,22 @@ CallDriverHealth (
         TmpString = GetStringById (STRING_TOKEN (STR_DRIVER_HEALTH_HEALTHY));
         break;
       }
+      ASSERT (TmpString != NULL);
+
+      StringSize += StrLen (TmpString) * sizeof(CHAR16);
+
+      String = (EFI_STRING) AllocateZeroPool (StringSize);
+      ASSERT (String != NULL);
+      
+      StrnCpy (String, DriverName, StringSize / sizeof(CHAR16));
+      if (!IsControllerNameEmpty) {
+        StrnCat (String, L"    ", StringSize / sizeof(CHAR16) - StrLen(String) - 1);
+        StrnCat (String, ControllerName, StringSize / sizeof(CHAR16) - StrLen(String) - 1);
+      }
+
+      StrnCat (String, TmpString, StringSize / sizeof(CHAR16) - StrLen(String) - 1);
     }
 
-    ASSERT (TmpString != NULL);
-    StrCat (String, TmpString);
     FreePool (TmpString);
 
     Token = HiiSetString (HiiHandle, 0, String, NULL);

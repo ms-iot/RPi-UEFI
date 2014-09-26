@@ -1,7 +1,7 @@
 /** @file
   Main file for Pci shell Debug1 function.
 
-  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
+  (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.
   Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -20,7 +20,6 @@
 #include <IndustryStandard/Acpi.h>
 #include "Pci.h"
 
-#define PCI_CLASS_STRING_LIMIT  54
 //
 // Printable strings for Pci class code
 //
@@ -63,9 +62,19 @@ PCI_CLASS_ENTRY PCISubClass_0e[];
 PCI_CLASS_ENTRY PCISubClass_0f[];
 PCI_CLASS_ENTRY PCISubClass_10[];
 PCI_CLASS_ENTRY PCISubClass_11[];
+PCI_CLASS_ENTRY PCISubClass_12[];
+PCI_CLASS_ENTRY PCISubClass_13[];
+PCI_CLASS_ENTRY PCIPIFClass_0100[];
 PCI_CLASS_ENTRY PCIPIFClass_0101[];
+PCI_CLASS_ENTRY PCIPIFClass_0105[];
+PCI_CLASS_ENTRY PCIPIFClass_0106[];
+PCI_CLASS_ENTRY PCIPIFClass_0107[];
+PCI_CLASS_ENTRY PCIPIFClass_0108[];
+PCI_CLASS_ENTRY PCIPIFClass_0109[];
 PCI_CLASS_ENTRY PCIPIFClass_0300[];
 PCI_CLASS_ENTRY PCIPIFClass_0604[];
+PCI_CLASS_ENTRY PCIPIFClass_0609[];
+PCI_CLASS_ENTRY PCIPIFClass_060b[];
 PCI_CLASS_ENTRY PCIPIFClass_0700[];
 PCI_CLASS_ENTRY PCIPIFClass_0701[];
 PCI_CLASS_ENTRY PCIPIFClass_0703[];
@@ -76,6 +85,8 @@ PCI_CLASS_ENTRY PCIPIFClass_0803[];
 PCI_CLASS_ENTRY PCIPIFClass_0904[];
 PCI_CLASS_ENTRY PCIPIFClass_0c00[];
 PCI_CLASS_ENTRY PCIPIFClass_0c03[];
+PCI_CLASS_ENTRY PCIPIFClass_0c07[];
+PCI_CLASS_ENTRY PCIPIFClass_0d01[];
 PCI_CLASS_ENTRY PCIPIFClass_0e00[];
 
 //
@@ -173,6 +184,16 @@ PCI_CLASS_ENTRY gClassStringList[] = {
     PCISubClass_11
   },
   {
+    0x12,
+    L"Processing Accelerators",
+    PCISubClass_12
+  },
+  {
+    0x13,
+    L"Non-Essential Instrumentation",
+    PCISubClass_13
+  },
+  {
     0xff,
     L"Device does not fit in any defined classes",
     PCIBlankEntry
@@ -221,8 +242,8 @@ PCI_CLASS_ENTRY PCISubClass_00[] = {
 PCI_CLASS_ENTRY PCISubClass_01[] = {
   {
     0x00,
-    L"SCSI controller",
-    PCIBlankEntry
+    L"SCSI",
+    PCIPIFClass_0100
   },
   {
     0x01,
@@ -243,6 +264,31 @@ PCI_CLASS_ENTRY PCISubClass_01[] = {
     0x04,
     L"RAID controller",
     PCIBlankEntry
+  },
+  {
+    0x05,
+    L"ATA controller with ADMA interface",
+    PCIPIFClass_0105
+  },
+  {
+    0x06,
+    L"Serial ATA controller",
+    PCIPIFClass_0106
+  },
+  {
+    0x07,
+    L"Serial Attached SCSI (SAS) controller ",
+    PCIPIFClass_0107
+  },
+  {
+    0x08,
+    L"Non-volatile memory subsystem",
+    PCIPIFClass_0108
+  },
+  {
+    0x09,
+    L"Universal Flash Storage (UFS) controller ",
+    PCIPIFClass_0109
   },
   {
     0x80,
@@ -280,6 +326,21 @@ PCI_CLASS_ENTRY PCISubClass_02[] = {
   {
     0x04,
     L"ISDN controller",
+    PCIBlankEntry
+  },
+  {
+    0x05,
+    L"WorldFip controller",
+    PCIBlankEntry
+  },
+  {
+    0x06,
+    L"PICMG 2.14 Multi Computing",
+    PCIBlankEntry
+  },
+  {
+    0x07,
+    L"InfiniBand controller",
     PCIBlankEntry
   },
   {
@@ -336,6 +397,11 @@ PCI_CLASS_ENTRY PCISubClass_04[] = {
   {
     0x02,
     L"Computer Telephony device",
+    PCIBlankEntry
+  },
+  {
+    0x03,
+    L"Mixed mode device",
     PCIBlankEntry
   },
   {
@@ -420,6 +486,21 @@ PCI_CLASS_ENTRY PCISubClass_06[] = {
     PCIBlankEntry
   },
   {
+    0x09,
+    L"Semi-transparent PCI-to-PCI bridge",
+    PCIPIFClass_0609
+  },
+  {
+    0x0A,
+    L"InfiniBand-to-PCI host bridge",
+    PCIBlankEntry
+  },
+  {
+    0x0B,
+    L"Advanced Switching to PCI host bridge",
+    PCIPIFClass_060b
+  },
+  {
     0x80,
     L"Other bridge type",
     PCIBlankEntry
@@ -451,6 +532,16 @@ PCI_CLASS_ENTRY PCISubClass_07[] = {
     0x03,
     L"Modem",
     PCIPIFClass_0703
+  },
+  {
+    0x04,
+    L"GPIB (IEEE 488.1/2) controller",
+    PCIBlankEntry
+  },
+  {
+    0x05,
+    L"Smart Card",
+    PCIBlankEntry
   },
   {
     0x80,
@@ -488,6 +579,21 @@ PCI_CLASS_ENTRY PCISubClass_08[] = {
   {
     0x04,
     L"Generic PCI Hot-Plug controller",
+    PCIBlankEntry
+  },
+  {
+    0x05,
+    L"SD Host controller",
+    PCIBlankEntry
+  },
+  {
+    0x06,
+    L"IOMMU",
+    PCIBlankEntry
+  },
+  {
+    0x07,
+    L"Root Complex Event Collector",
     PCIBlankEntry
   },
   {
@@ -609,8 +715,8 @@ PCI_CLASS_ENTRY PCISubClass_0b[] = {
 PCI_CLASS_ENTRY PCISubClass_0c[] = {
   {
     0x00,
-    L"Firewire(IEEE 1394)",
-    PCIPIFClass_0c03
+    L"IEEE 1394",
+    PCIPIFClass_0c00
   },
   {
     0x01,
@@ -625,7 +731,7 @@ PCI_CLASS_ENTRY PCISubClass_0c[] = {
   {
     0x03,
     L"USB",
-    PCIPIFClass_0c00
+    PCIPIFClass_0c03
   },
   {
     0x04,
@@ -635,6 +741,26 @@ PCI_CLASS_ENTRY PCISubClass_0c[] = {
   {
     0x05,
     L"System Management Bus",
+    PCIBlankEntry
+  },
+  {
+    0x06,
+    L"InfiniBand",
+    PCIBlankEntry
+  },
+  {
+    0x07,
+    L"IPMI",
+    PCIPIFClass_0c07
+  },
+  {
+    0x08,
+    L"SERCOS Interface Standard (IEC 61491)",
+    PCIBlankEntry
+  },
+  {
+    0x09,
+    L"CANbus",
     PCIBlankEntry
   },
   {
@@ -657,12 +783,32 @@ PCI_CLASS_ENTRY PCISubClass_0d[] = {
   },
   {
     0x01,
-    L"Consumer IR controller",
-    PCIBlankEntry
+    L"",
+    PCIPIFClass_0d01
   },
   {
     0x10,
     L"RF controller",
+    PCIBlankEntry
+  },
+  {
+    0x11,
+    L"Bluetooth",
+    PCIBlankEntry
+  },
+  {
+    0x12,
+    L"Broadband",
+    PCIBlankEntry
+  },
+  {
+    0x20,
+    L"Ethernet (802.11a - 5 GHz)",
+    PCIBlankEntry
+  },
+  {
+    0x21,
+    L"Ethernet (802.11b - 2.4 GHz)",
     PCIBlankEntry
   },
   {
@@ -692,23 +838,28 @@ PCI_CLASS_ENTRY PCISubClass_0e[] = {
 
 PCI_CLASS_ENTRY PCISubClass_0f[] = {
   {
-    0x00,
+    0x01,
     L"TV",
     PCIBlankEntry
   },
   {
-    0x01,
+    0x02,
     L"Audio",
     PCIBlankEntry
   },
   {
-    0x02,
+    0x03,
     L"Voice",
     PCIBlankEntry
   },
   {
-    0x03,
+    0x04,
     L"Data",
+    PCIBlankEntry
+  },
+  {
+    0x80,
+    L"Other satellite communication controller",
     PCIBlankEntry
   },
   {
@@ -748,8 +899,49 @@ PCI_CLASS_ENTRY PCISubClass_11[] = {
     PCIBlankEntry
   },
   {
+    0x01,
+    L"Performance Counters",
+    PCIBlankEntry
+  },
+  {
+    0x10,
+    L"Communications synchronization plus time and frequency test/measurement ",
+    PCIBlankEntry
+  },
+  {
+    0x20,
+    L"Management card",
+    PCIBlankEntry
+  },
+  {
     0x80,
     L"Other DAQ & SP controllers",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCISubClass_12[] = {
+  {
+    0x00,
+    L"Processing Accelerator",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCISubClass_13[] = {
+  {
+    0x00,
+    L"Non-Essential Instrumentation Function",
     PCIBlankEntry
   },
   {
@@ -762,6 +954,39 @@ PCI_CLASS_ENTRY PCISubClass_11[] = {
 //
 // Programming Interface entries
 //
+PCI_CLASS_ENTRY PCIPIFClass_0100[] = {
+  {
+    0x00,
+    L"SCSI controller",
+    PCIBlankEntry
+  },
+  {
+    0x11,
+    L"SCSI storage device SOP using PQI",
+    PCIBlankEntry
+  },
+  {
+    0x12,
+    L"SCSI controller SOP using PQI",
+    PCIBlankEntry
+  },
+  {
+    0x13,
+    L"SCSI storage device and controller SOP using PQI",
+    PCIBlankEntry
+  },
+  {
+    0x21,
+    L"SCSI storage device SOP using NVMe",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
 PCI_CLASS_ENTRY PCIPIFClass_0101[] = {
   {
     0x00,
@@ -930,6 +1155,106 @@ PCI_CLASS_ENTRY PCIPIFClass_0101[] = {
   }
 };
 
+PCI_CLASS_ENTRY PCIPIFClass_0105[] = {
+  {
+    0x20,
+    L"Single stepping",
+    PCIBlankEntry
+  },
+  {
+    0x30,
+    L"Continuous operation",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCIPIFClass_0106[] = {
+  {
+    0x00,
+    L"",
+    PCIBlankEntry
+  },
+  {
+    0x01,
+    L"AHCI",
+    PCIBlankEntry
+  },
+  {
+    0x02,
+    L"Serial Storage Bus",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCIPIFClass_0107[] = {
+  {
+    0x00,
+    L"",
+    PCIBlankEntry
+  },
+  {
+    0x01,
+    L"Obsolete",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCIPIFClass_0108[] = {
+  {
+    0x00,
+    L"",
+    PCIBlankEntry
+  },
+  {
+    0x01,
+    L"NVMHCI",
+    PCIBlankEntry
+  },
+  {
+    0x02,
+    L"NVM Express",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCIPIFClass_0109[] = {
+  {
+    0x00,
+    L"",
+    PCIBlankEntry
+  },
+  {
+    0x01,
+    L"UFSHCI",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
 PCI_CLASS_ENTRY PCIPIFClass_0300[] = {
   {
     0x00,
@@ -957,6 +1282,42 @@ PCI_CLASS_ENTRY PCIPIFClass_0604[] = {
   {
     0x01,
     L"Subtractive decode",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCIPIFClass_0609[] = {
+  {
+    0x40,
+    L"Primary PCI bus side facing the system host processor",
+    PCIBlankEntry
+  },
+  {
+    0x80,
+    L"Secondary PCI bus side facing the system host processor",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCIPIFClass_060b[] = {
+  {
+    0x00,
+    L"Custom",
+    PCIBlankEntry
+  },
+  {
+    0x01,
+    L"ASI-SIG Defined Portal",
     PCIBlankEntry
   },
   {
@@ -1198,12 +1559,40 @@ PCI_CLASS_ENTRY PCIPIFClass_0904[] = {
 PCI_CLASS_ENTRY PCIPIFClass_0c00[] = {
   {
     0x00,
-    L"Universal Host Controller spec",
+    L"",
     PCIBlankEntry
   },
   {
     0x10,
-    L"Open Host Controller spec",
+    L"Using 1394 OpenHCI spec",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCIPIFClass_0c03[] = {
+  {
+    0x00,
+    L"UHCI",
+    PCIBlankEntry
+  },
+  {
+    0x10,
+    L"OHCI",
+    PCIBlankEntry
+  },
+  {
+    0x20,
+    L"EHCI",
+    PCIBlankEntry
+  },
+  {
+    0x30,
+    L"xHCI",
     PCIBlankEntry
   },
   {
@@ -1223,15 +1612,38 @@ PCI_CLASS_ENTRY PCIPIFClass_0c00[] = {
   }
 };
 
-PCI_CLASS_ENTRY PCIPIFClass_0c03[] = {
+PCI_CLASS_ENTRY PCIPIFClass_0c07[] = {
   {
     0x00,
-    L"",
+    L"SMIC",
+    PCIBlankEntry
+  },
+  {
+    0x01,
+    L"Keyboard Controller Style",
+    PCIBlankEntry
+  },
+  {
+    0x02,
+    L"Block Transfer",
+    PCIBlankEntry
+  },
+  {
+    0x00,
+    NULL,
+    /* null string ends the list */NULL
+  }
+};
+
+PCI_CLASS_ENTRY PCIPIFClass_0d01[] = {
+  {
+    0x00,
+    L"Consumer IR controller",
     PCIBlankEntry
   },
   {
     0x10,
-    L"Using 1394 OpenHCI spec",
+    L"UWB Radio controller",
     PCIBlankEntry
   },
   {
@@ -1378,7 +1790,7 @@ PciGetClassStrings (
   Print strings that represent PCI device class, subclass and programmed I/F.
 
   @param[in] ClassCodePtr   Points to the memory which stores register Class Code in PCI
-                 configuation space.
+                            configuration space.
   @param[in] IncludePIF     If the printed string should include the programming I/F part
 **/
 VOID
@@ -1391,9 +1803,9 @@ PciPrintClassCode (
   PCI_CLASS_STRINGS ClassStrings;
 
   ClassCode = 0;
-  ClassCode |= ClassCodePtr[0];
-  ClassCode |= (ClassCodePtr[1] << 8);
-  ClassCode |= (ClassCodePtr[2] << 16);
+  ClassCode |= (UINT32)ClassCodePtr[0];
+  ClassCode |= (UINT32)(ClassCodePtr[1] << 8);
+  ClassCode |= (UINT32)(ClassCodePtr[2] << 16);
 
   //
   // Get name from class code
@@ -1662,7 +2074,7 @@ PciExplainPciExpress (
 **/
 EFI_STATUS
 ExplainPcieCapReg (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1674,7 +2086,7 @@ ExplainPcieCapReg (
 **/
 EFI_STATUS
 ExplainPcieDeviceCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1686,7 +2098,7 @@ ExplainPcieDeviceCap (
 **/
 EFI_STATUS
 ExplainPcieDeviceControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1698,7 +2110,7 @@ ExplainPcieDeviceControl (
 **/
 EFI_STATUS
 ExplainPcieDeviceStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1710,7 +2122,7 @@ ExplainPcieDeviceStatus (
 **/
 EFI_STATUS
 ExplainPcieLinkCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1722,7 +2134,7 @@ ExplainPcieLinkCap (
 **/
 EFI_STATUS
 ExplainPcieLinkControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1734,7 +2146,7 @@ ExplainPcieLinkControl (
 **/
 EFI_STATUS
 ExplainPcieLinkStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1746,7 +2158,7 @@ ExplainPcieLinkStatus (
 **/
 EFI_STATUS
 ExplainPcieSlotCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1758,7 +2170,7 @@ ExplainPcieSlotCap (
 **/
 EFI_STATUS
 ExplainPcieSlotControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1770,7 +2182,7 @@ ExplainPcieSlotControl (
 **/
 EFI_STATUS
 ExplainPcieSlotStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1782,7 +2194,7 @@ ExplainPcieSlotStatus (
 **/
 EFI_STATUS
 ExplainPcieRootControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1794,7 +2206,7 @@ ExplainPcieRootControl (
 **/
 EFI_STATUS
 ExplainPcieRootCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1806,10 +2218,10 @@ ExplainPcieRootCap (
 **/
 EFI_STATUS
 ExplainPcieRootStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
-typedef EFI_STATUS (*PCIE_EXPLAIN_FUNCTION) (IN PCIE_CAP_STURCTURE *PciExpressCap);
+typedef EFI_STATUS (*PCIE_EXPLAIN_FUNCTION) (IN PCIE_CAP_STRUCTURE *PciExpressCap);
 
 typedef enum {
   FieldWidthUINT8,
@@ -3853,7 +4265,7 @@ PciExplainCapabilityStruct (
 **/
 EFI_STATUS
 ExplainPcieCapReg (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieCapReg;
@@ -3901,7 +4313,7 @@ ExplainPcieCapReg (
 **/
 EFI_STATUS
 ExplainPcieDeviceCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieCapReg;
@@ -3990,7 +4402,7 @@ ExplainPcieDeviceCap (
 **/
 EFI_STATUS
 ExplainPcieDeviceControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieCapReg;
@@ -4067,7 +4479,7 @@ ExplainPcieDeviceControl (
 **/
 EFI_STATUS
 ExplainPcieDeviceStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieDeviceStatus;
@@ -4109,7 +4521,7 @@ ExplainPcieDeviceStatus (
 **/
 EFI_STATUS
 ExplainPcieLinkCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT32 PcieLinkCap;
@@ -4200,7 +4612,7 @@ ExplainPcieLinkCap (
 **/
 EFI_STATUS
 ExplainPcieLinkControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieLinkControl;
@@ -4271,7 +4683,7 @@ ExplainPcieLinkControl (
 **/
 EFI_STATUS
 ExplainPcieLinkStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieLinkStatus;
@@ -4332,7 +4744,7 @@ ExplainPcieLinkStatus (
 **/
 EFI_STATUS
 ExplainPcieSlotCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT32 PcieSlotCap;
@@ -4400,7 +4812,7 @@ ExplainPcieSlotCap (
 **/
 EFI_STATUS
 ExplainPcieSlotControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieSlotControl;
@@ -4464,7 +4876,7 @@ ExplainPcieSlotControl (
 **/
 EFI_STATUS
 ExplainPcieSlotStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieSlotStatus;
@@ -4525,7 +4937,7 @@ ExplainPcieSlotStatus (
 **/
 EFI_STATUS
 ExplainPcieRootControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieRootControl;
@@ -4565,7 +4977,7 @@ ExplainPcieRootControl (
 **/
 EFI_STATUS
 ExplainPcieRootCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieRootCap;
@@ -4589,7 +5001,7 @@ ExplainPcieRootCap (
 **/
 EFI_STATUS
 ExplainPcieRootStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT32 PcieRootStatus;
@@ -5062,7 +5474,7 @@ EFIAPI
 PrintInterpretedExtendedCompatibilityMulticast (
   IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
   IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress,
-  IN CONST PCIE_CAP_STURCTURE *PciExpressCapPtr
+  IN CONST PCIE_CAP_STRUCTURE *PciExpressCapPtr
   )
 {
   CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_MULTICAST *Header;
@@ -5234,7 +5646,7 @@ EFIAPI
 PrintInterpretedExtendedCompatibilitySecondary (
   IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
   IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress,
-  IN CONST PCIE_CAP_STURCTURE *PciExpressCapPtr
+  IN CONST PCIE_CAP_STRUCTURE *PciExpressCapPtr
   )
 {
   CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_SECONDARY_PCIE *Header;
@@ -5276,7 +5688,7 @@ EFIAPI
 PrintPciExtendedCapabilityDetails(
   IN CONST PCI_EXP_EXT_HDR    *HeadersBaseAddress, 
   IN CONST PCI_EXP_EXT_HDR    *HeaderAddress,
-  IN CONST PCIE_CAP_STURCTURE *PciExpressCapPtr
+  IN CONST PCIE_CAP_STRUCTURE *PciExpressCapPtr
   )
 {
   switch (HeaderAddress->CapabilityId){
@@ -5346,7 +5758,7 @@ PciExplainPciExpress (
   )
 {
 
-  PCIE_CAP_STURCTURE  PciExpressCap;
+  PCIE_CAP_STRUCTURE  PciExpressCap;
   EFI_STATUS          Status;
   UINT64              CapRegAddress;
   UINT8               Bus;

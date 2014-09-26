@@ -1,4 +1,5 @@
 /** @file
+The tool dumps the contents of a firmware volume
 
 Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -8,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  VolInfo.c
-
-Abstract:
-
-  The tool dumps the contents of a firmware volume
 
 **/
 
@@ -51,7 +44,7 @@ Abstract:
 EFI_GUID  gEfiCrc32GuidedSectionExtractionProtocolGuid = EFI_CRC32_GUIDED_SECTION_EXTRACTION_PROTOCOL_GUID;
 
 #define UTILITY_MAJOR_VERSION      0
-#define UTILITY_MINOR_VERSION      82
+#define UTILITY_MINOR_VERSION      83
 
 #define UTILITY_NAME         "VolInfo"
 
@@ -172,7 +165,7 @@ Returns:
   //
   // Print utility header
   //
-  printf ("%s Tiano Firmware Volume FFS image info.  Version %d.%d %s, %s\n",
+  printf ("%s Version %d.%d %s, %s\n",
     UTILITY_NAME,
     UTILITY_MAJOR_VERSION,
     UTILITY_MINOR_VERSION,
@@ -249,7 +242,7 @@ Returns:
   //
   // Open the file containing the FV
   //
-  InputFile = fopen (argv[0], "rb");
+  InputFile = fopen (LongFilePath (argv[0]), "rb");
   if (InputFile == NULL) {
     Error (NULL, 0, 0001, "Error opening the input file", argv[0]);
     return GetUtilityStatus ();
@@ -1716,7 +1709,7 @@ Returns:
   CHAR8             Line[MAX_LINE_LEN];
   GUID_TO_BASENAME  *GPtr;
 
-  if ((Fptr = fopen (FileName, "r")) == NULL) {
+  if ((Fptr = fopen (LongFilePath (FileName), "r")) == NULL) {
     printf ("ERROR: Failed to open input cross-reference file '%s'\n", FileName);
     return EFI_DEVICE_ERROR;
   }
@@ -1839,6 +1832,7 @@ Returns:
   // Copyright declaration
   // 
   fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "  Display Tiano Firmware Volume FFS image information\n\n");
 
   //
   // Details Option

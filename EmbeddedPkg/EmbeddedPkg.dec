@@ -49,6 +49,10 @@
 [Guids.common]
   gEmbeddedTokenSpaceGuid       = { 0xe0d8ca17, 0x4276, 0x4386, { 0xbb, 0x79, 0x48, 0xcb, 0x81, 0x3d, 0x3c, 0x4f }}
 
+  ## FDT Configuration Table
+  # Include/Guid/Fdt.h
+  gFdtTableGuid = { 0xb1b621d5, 0xf19c, 0x41a5, { 0x83, 0x0b, 0xd9, 0x15, 0x2c, 0x69, 0xaa, 0xe0 } }
+
 [Protocols.common]
   gHardwareInterruptProtocolGuid =  { 0x2890B3EA, 0x053D, 0x1643, { 0xAD, 0x0C, 0xD6, 0x48, 0x08, 0xDA, 0x3F, 0xF1 } }
   gEfiDebugSupportPeriodicCallbackProtocolGuid = { 0x9546e07c, 0x2cbb, 0x4c88, { 0x98, 0x6c, 0xcd, 0x34, 0x10, 0x86, 0xf0, 0x44 } }
@@ -71,7 +75,7 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE|BOOLEAN|0x00000006
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|FALSE|BOOLEAN|0x00000041
   gEmbeddedTokenSpaceGuid.PcdEmbeddedProbeRemovable|TRUE|BOOLEAN|0x00000052
-  
+
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
@@ -86,14 +90,14 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|131072|UINT32|0x00000040
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|131072|UINT32|0x0000000c
-  
+
   gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x0|UINT32|0x0000004e
   gEmbeddedTokenSpaceGuid.PcdMemorySize|0x0|UINT32|0x0000004f
 
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0x0|UINT32|0x00000043
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainOffset|0x0|UINT32|0x00000044
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0x0|UINT32|0x00000045
-  
+
 # Used to help reduce fragmentation in the EFI memory map
 # EFI Pages (4K) are the units used
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0|UINT32|0x00000012
@@ -112,7 +116,7 @@
   gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress|0x38e00000|UINT32|0x0000001f
 
   gEmbeddedTokenSpaceGuid.PcdMetronomeTickPeriod|100|UINT32|0x00000020
-  
+
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress|0xffff0000|UINT32|0x00000030
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize|0x0000000|UINT32|0x00000031
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|0x0000000|UINT64|0x00000032

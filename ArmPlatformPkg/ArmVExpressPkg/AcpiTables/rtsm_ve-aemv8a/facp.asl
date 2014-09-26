@@ -118,7 +118,10 @@
 [0008]                            Address : 0000000000000001
 
 [0001]               Value to cause reset : 00
-[0003]                           Reserved : 000000
+[0002]      ARM_BOOT_ARCH (decoded below) : 0001
+                            Use PSCI 0.2+ : 1
+                             PSCI Use HVC : 0
+[0001]                FADT Minor Revision : 01
 [0008]                       FACS Address : 0000000000000000
 [0008]                       DSDT Address : 0000000000000010
 [0012]                   PM1A Event Block : [Generic Address Structure]

@@ -1847,7 +1847,7 @@ ON_ERROR:
   One notified function to stop the Host Controller when gBS->ExitBootServices() called.
 
   @param  Event                   Pointer to this event
-  @param  Context                 Event hanlder private data
+  @param  Context                 Event handler private data
 
 **/
 VOID
@@ -1969,7 +1969,7 @@ XhcDriverBindingStart (
                     &Supports
                     );
   if (!EFI_ERROR (Status)) {
-    Supports &= EFI_PCI_DEVICE_ENABLE;
+    Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
     Status = PciIo->Attributes (
                       PciIo,
                       EfiPciIoAttributeOperationEnable,

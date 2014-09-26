@@ -19,9 +19,9 @@
 
 #include <Protocol/Bds.h>
 
-#define EFI_SET_TIMER_TO_SECOND   10000000
+#include <Guid/EventGroup.h>
 
-EFI_HANDLE mImageHandle;
+#define EFI_SET_TIMER_TO_SECOND   10000000
 
 STATIC
 EFI_STATUS
@@ -345,7 +345,7 @@ DefineDefaultBootEntries (
     }
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 EFI_STATUS
@@ -393,7 +393,7 @@ StartDefaultBootOnTimeout (
       }
       // Discard key in the buffer
       do {
-      	Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+        Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
       } while(!EFI_ERROR(Status));
       gBS->CloseEvent (WaitList[0]);
       Print(L"\n\r");
@@ -408,8 +408,8 @@ StartDefaultBootOnTimeout (
         UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", BootOrder[Index]);
         Status = BdsStartBootOption (BootVariableName);
         if(!EFI_ERROR(Status)){
-        	// Boot option returned successfully, hence don't need to start next boot option
-        	break;
+          // Boot option returned successfully, hence don't need to start next boot option
+          break;
         }
         // In case of success, we should not return from this call.
       }
@@ -417,6 +417,25 @@ StartDefaultBootOnTimeout (
     }
   }
   return EFI_SUCCESS;
+}
+
+/**
+  An empty function to pass error checking of CreateEventEx ().
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+STATIC
+VOID
+EFIAPI
+EmptyCallbackFunction (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  return;
 }
 
 /**
@@ -451,6 +470,22 @@ BdsEntry (
   UINT16             *BootNext;
   UINTN               BootNextSize;
   CHAR16              BootVariableName[9];
+  EFI_EVENT           EndOfDxeEvent;
+
+  //
+  // Signal EndOfDxe PI Event
+  //
+  Status = gBS->CreateEventEx (
+      EVT_NOTIFY_SIGNAL,
+      TPL_NOTIFY,
+      EmptyCallbackFunction,
+      NULL,
+      &gEfiEndOfDxeEventGroupGuid,
+      &EndOfDxeEvent
+      );
+  if (!EFI_ERROR (Status)) {
+    gBS->SignalEvent (EndOfDxeEvent);
+  }
 
   PERF_END   (NULL, "DXE", NULL, 0);
 
@@ -541,8 +576,6 @@ BdsInitialize (
   )
 {
   EFI_STATUS  Status;
-
-  mImageHandle = ImageHandle;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,

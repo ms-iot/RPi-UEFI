@@ -1,14 +1,14 @@
 /** @file
 *
 *  Copyright (c) 2011, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -31,22 +31,22 @@ typedef struct {
 } ARM_CORE_INFO;
 
 typedef struct{
-	UINT64   Signature;
-	UINT32   Length;
-	UINT32   Revision;
-	UINT64   OemId;
-	UINT64   OemTableId;
-	UINTN    OemRevision;
-	UINTN    CreatorId;
-	UINTN    CreatorRevision;
-	EFI_GUID Identifier;
-	UINTN    DataLen;
+        UINT64   Signature;
+        UINT32   Length;
+        UINT32   Revision;
+        UINT64   OemId;
+        UINT64   OemTableId;
+        UINTN    OemRevision;
+        UINTN    CreatorId;
+        UINTN    CreatorRevision;
+        EFI_GUID Identifier;
+        UINTN    DataLen;
 } ARM_PROCESSOR_TABLE_HEADER;
 
 typedef struct {
-	ARM_PROCESSOR_TABLE_HEADER   Header;
-	UINTN                        NumberOfEntries;
-	ARM_CORE_INFO                *ArmCpus;
+        ARM_PROCESSOR_TABLE_HEADER   Header;
+        UINTN                        NumberOfEntries;
+        ARM_CORE_INFO                *ArmCpus;
 } ARM_PROCESSOR_TABLE;
 
 

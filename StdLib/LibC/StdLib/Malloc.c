@@ -84,8 +84,8 @@ void *
 malloc(size_t Size)
 {
   CPOOL_HEAD   *Head;
-  void       *RetVal;
-  EFI_STATUS  Status;
+  void         *RetVal;
+  EFI_STATUS    Status;
   UINTN         NodeSize;
 
   if( Size == 0) {
@@ -98,7 +98,7 @@ malloc(size_t Size)
 
   DEBUG((DEBUG_POOL, "malloc(%d): NodeSz: %d", Size, NodeSize));
 
-  Status = gBS->AllocatePool( EfiLoaderData, NodeSize, (void **)&Head);
+  Status = gBS->AllocatePool( EfiLoaderData, NodeSize, (void**)&Head);
   if( Status != EFI_SUCCESS) {
     RetVal  = NULL;
     errno   = ENOMEM;
@@ -183,7 +183,7 @@ free(void *Ptr)
       errno = EFAULT;
       DEBUG((DEBUG_ERROR, "ERROR free(0x%p): Signature is 0x%8X, expected 0x%8X\n",
              Ptr, Head->Signature, CPOOL_HEAD_SIGNATURE));
-  }
+    }
   }
   DEBUG((DEBUG_POOL, "free Done\n"));
 }
@@ -272,8 +272,8 @@ realloc(void *Ptr, size_t ReqSize)
     }
   }
   else {
-      free( Ptr);                           // Reclaim the old region.
-    }
+    free( Ptr);                           // Reclaim the old region.
+  }
   DEBUG((DEBUG_POOL, "0x%p = realloc(%p, %d): Head: %p NewSz: %d\n",
          RetVal, Ptr, ReqSize, Head, NewSize));
 

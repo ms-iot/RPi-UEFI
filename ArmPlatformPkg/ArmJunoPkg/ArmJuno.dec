@@ -13,7 +13,7 @@
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = ArmJunoPkg
-  PACKAGE_GUID                   = a1147a20-3144-4f8d-8295-b48311c8e4a4 
+  PACKAGE_GUID                   = a1147a20-3144-4f8d-8295-b48311c8e4a4
   PACKAGE_VERSION                = 0.1
 
 ################################################################################

@@ -270,18 +270,30 @@ ValidateAndMoveFiles(
   UINTN                     Length;
   VOID                      *Response;
   SHELL_FILE_HANDLE         DestHandle;
+  CHAR16                    *CleanFilePathStr;
 
   ASSERT(FileList != NULL);
   ASSERT(DestDir  != NULL);
 
-  DestPath = NULL;
-  Cwd      = ShellGetCurrentDir(NULL);
-  Response = *Resp;
+  DestPath         = NULL;
+  Cwd              = ShellGetCurrentDir(NULL);
+  Response         = *Resp;
+  CleanFilePathStr = NULL;
+
+  Status = ShellLevel2StripQuotes (DestDir, &CleanFilePathStr);
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_OUT_OF_RESOURCES) {
+      return SHELL_OUT_OF_RESOURCES;
+    } else {
+      return SHELL_INVALID_PARAMETER;
+    }
+  }  
 
   //
   // Get and validate the destination location
   //
-  ShellStatus = GetDestinationLocation(DestDir, &DestPath, Cwd);
+  ShellStatus = GetDestinationLocation(CleanFilePathStr, &DestPath, Cwd);
+  FreePool (CleanFilePathStr);
   if (ShellStatus != SHELL_SUCCESS) {
     return (ShellStatus);
   }

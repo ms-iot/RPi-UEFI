@@ -133,7 +133,7 @@
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
         "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
 
-    <Command.ARMGCC, Command.ARMLINUXGCC>
+    <Command.ARMGCC, Command.ARMLINUXGCC, command.XCODE>
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
 
 
@@ -169,6 +169,21 @@
         Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
         # For RVCTCYGWIN ASM_FLAGS must be first to work around pathing issues
         "$(ASM)" $(ASM_FLAGS) -o ${dst} $(INC) ${d_path}(+)${s_base}.iii
+
+[Nasm-Assembly-Code-File.COMMON.COMMON]
+    <InputFile>
+        ?.nasm, ?.Nasm, ?.NASM
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command>
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        "$(NASM)" -I${s_path}(+) $(NASM_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
 
 [Assembly-Code-File.COMMON.IPF]
     <InputFile>
@@ -299,7 +314,7 @@
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
-
+        -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
     <Command.GCC>
         $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
         $(OBJCOPY) --strip-unneeded -R .eh_frame ${src}
@@ -411,7 +426,7 @@
       
 [Masm16-Code-File]
     <InputFile>
-        ?.asm16, ?.Asm16, ?.ASM16
+        ?.asm16, ?.Asm16, ?.ASM16, ?.s16, ?.S16
 
     <ExtraDependency>
         $(MAKE_FILE)
@@ -439,6 +454,22 @@
       "$(SLINK)" $(SLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
       otool -t $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib | hex2bin.py ${dst}
       
+
+[Nasm-to-Binary-Code-File]
+    <InputFile>
+        ?.nasmb, ?.NASMB
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_base}.bin
+
+    <Command>
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        "$(NASM)" -I${s_path}(+) -l ${d_path}(+)${s_base}.lst $(NASMB_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
+
 
 [Microcode-File.USER_DEFINED, Microcode-File.Microcode]
     <InputFile>

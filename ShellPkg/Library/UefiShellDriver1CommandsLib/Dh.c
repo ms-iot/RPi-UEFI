@@ -1,7 +1,8 @@
 /** @file
   Main file for Dh shell Driver1 function.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -282,6 +283,8 @@ DisplayDriverModelHandle (
   EFI_HANDLE                  *ControllerHandleBuffer;
   UINTN                       ChildIndex;
   BOOLEAN                     Image;
+
+  DriverName = NULL;
 
   //
   // See if Handle is a device handle and display its details.
@@ -749,6 +752,10 @@ DoDhForHandleList(
           DriverInfo,
           TRUE
          );
+    if (ShellGetExecutionBreakFlag ()) {
+      ShellStatus = SHELL_ABORTED;
+      break;
+    }
   }
   return (ShellStatus);
 }

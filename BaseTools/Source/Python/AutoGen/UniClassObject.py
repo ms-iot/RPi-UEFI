@@ -1,4 +1,7 @@
-# Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+## @file
+# This file is used to collect all defined strings in multiple uni files
+#
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -7,20 +10,16 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-#
-#This file is used to collect all defined strings in multiple uni files
-#
-
 ##
 # Import Modules
 #
-import os, codecs, re
+import Common.LongFilePathOs as os, codecs, re
 import distutils.util
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *
 from Common.String import GetLineNo
 from Common.Misc import PathClass
-
+from Common.LongFilePathSupport import LongFilePath
 ##
 # Static definitions
 #
@@ -210,7 +209,7 @@ class UniFileClassObject(object):
         Lang = distutils.util.split_quoted((Line.split(u"//")[0]))
         if len(Lang) != 3:
             try:
-                FileIn = codecs.open(File.Path, mode='rb', encoding='utf-16').read()
+                FileIn = codecs.open(LongFilePath(File.Path), mode='rb', encoding='utf-16').read()
             except UnicodeError, X:
                 EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File);
             except:
@@ -292,7 +291,7 @@ class UniFileClassObject(object):
             EdkLogger.error("Unicode File Parser", FILE_NOT_FOUND, ExtraData=File.Path)
 
         try:
-            FileIn = codecs.open(File.Path, mode='rb', encoding='utf-16').readlines()
+            FileIn = codecs.open(LongFilePath(File.Path), mode='rb', encoding='utf-16').readlines()
         except UnicodeError, X:
             EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File.Path);
         except:

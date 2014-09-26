@@ -48,7 +48,7 @@ Arguments:
   Offset      - starting register number
   Length      - number of bytes to read
   Buffer      - destination buffer
-  
+
 Returns:
 
   EFI_SUCCESS - registers read successfully
@@ -76,7 +76,7 @@ Arguments:
   Offset      - starting register number
   Length      - number of bytes to write
   Buffer      - source buffer
-  
+
 Returns:
 
   EFI_SUCCESS - registers written successfully
@@ -91,4 +91,4 @@ struct _EMBEDDED_EXTERNAL_DEVICE {
 
 extern EFI_GUID gEmbeddedExternalDeviceProtocolGuid;
 
-#endif	// __EMBEDDED_EXTERNAL_DEVICE_H__
+#endif  // __EMBEDDED_EXTERNAL_DEVICE_H__

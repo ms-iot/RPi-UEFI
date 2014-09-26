@@ -206,19 +206,56 @@ UiFindMenuList (
   Find parent menu for current menu.
 
   @param  CurrentMenu    Current Menu
+  @param  SettingLevel   Whether find parent menu in Form Level or Formset level.
+                         In form level, just find the parent menu; 
+                         In formset level, find the parent menu which has different
+                         formset guid value.
 
   @retval   The parent menu for current menu.
 **/
 FORM_ENTRY_INFO *
 UiFindParentMenu (
-  IN FORM_ENTRY_INFO  *CurrentMenu
+  IN FORM_ENTRY_INFO          *CurrentMenu,
+  IN BROWSER_SETTING_SCOPE    SettingLevel
   )
 {
   FORM_ENTRY_INFO    *ParentMenu;
+  LIST_ENTRY         *Link;
 
+  ASSERT (SettingLevel == FormLevel || SettingLevel == FormSetLevel);
+
+  if (CurrentMenu == NULL) {
+    return NULL;
+  }
+  
   ParentMenu = NULL;
-  if (CurrentMenu->Link.BackLink != &mPrivateData.FormBrowserEx2.FormViewHistoryHead) {
-    ParentMenu = FORM_ENTRY_INFO_FROM_LINK (CurrentMenu->Link.BackLink);
+  Link       = &CurrentMenu->Link;
+
+  while (Link->BackLink != &mPrivateData.FormBrowserEx2.FormViewHistoryHead) {
+    ParentMenu = FORM_ENTRY_INFO_FROM_LINK (Link->BackLink);
+
+    if (SettingLevel == FormLevel) {
+      //
+      // For FormLevel, just find the parent menu, return.
+      //
+      break;
+    }
+
+    if (!CompareGuid (&CurrentMenu->FormSetGuid, &ParentMenu->FormSetGuid)) {
+      //
+      // For SystemLevel, must find the menu which has different formset.
+      //
+      break;
+    }
+
+    Link = Link->BackLink;
+  }
+
+  //
+  // Not find the parent menu, just return NULL.
+  //
+  if (Link->BackLink == &mPrivateData.FormBrowserEx2.FormViewHistoryHead) {
+    return NULL;
   }
 
   return ParentMenu;
@@ -480,6 +517,14 @@ SendForm (
     do {
       FormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
       ASSERT (FormSet != NULL);
+
+      //
+      // Validate the HiiHandle
+      // if validate failed, find the first validate parent HiiHandle.
+      //
+      if (!ValidateHiiHandle(Selection->Handle)) {
+        FindNextMenu (Selection, FormSetLevel);
+      }
 
       //
       // Initialize internal data structures of FormSet
@@ -2347,6 +2392,45 @@ SendDiscardInfoToDriver (
 }
 
 /**
+  Validate the HiiHandle.
+
+  @param  HiiHandle              The input HiiHandle which need to validate.
+
+  @retval TRUE                   The handle is validate.
+  @retval FALSE                  The handle is invalidate.
+
+**/
+BOOLEAN
+ValidateHiiHandle (
+  EFI_HII_HANDLE          HiiHandle
+  )
+{
+  EFI_HII_HANDLE          *HiiHandles;
+  UINTN                   Index;
+  BOOLEAN                 Find;
+
+  if (HiiHandle == NULL) {
+    return FALSE;
+  }
+
+  Find = FALSE;
+
+  HiiHandles = HiiGetHiiHandles (NULL);
+  ASSERT (HiiHandles != NULL);
+
+  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
+    if (HiiHandles[Index] == HiiHandle) {
+      Find = TRUE;
+      break;
+    }
+  }
+
+  FreePool (HiiHandles);
+
+  return Find;
+}
+
+/**
   Validate the FormSet. If the formset is not validate, remove it from the list.
 
   @param  FormSet                The input FormSet which need to validate.
@@ -2360,35 +2444,19 @@ ValidateFormSet (
   FORM_BROWSER_FORMSET    *FormSet
   )
 {
-  EFI_HII_HANDLE          *HiiHandles;
-  UINTN                   Index;
-  BOOLEAN                 Find;
+  BOOLEAN  Find;
 
   ASSERT (FormSet != NULL);
-  Find = FALSE;
-  //
-  // Get all the Hii handles
-  //
-  HiiHandles = HiiGetHiiHandles (NULL);
-  ASSERT (HiiHandles != NULL);
 
+  Find = ValidateHiiHandle(FormSet->HiiHandle);
   //
-  // Search for formset of each class type
+  // Should not remove the formset which is being used.
   //
-  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-    if (HiiHandles[Index] == FormSet->HiiHandle) {
-      Find = TRUE;
-      break;
-    }
-  }
-
-  if (!Find) {
+  if (!Find && (FormSet != gCurrentSelection->FormSet)) {
     CleanBrowserStorage(FormSet);
     RemoveEntryList (&FormSet->Link);
     DestroyFormSet (FormSet);
   }
-
-  FreePool (HiiHandles);
 
   return Find;
 }
@@ -2525,6 +2593,7 @@ FindQuestionFromProgress (
       // For Name/Value type, Skip the ConfigHdr part.
       //
       EndStr = StrStr (Progress, L"PATH=");
+      ASSERT (EndStr != NULL);
       while (*EndStr != '&') {
         EndStr++;
       }
@@ -2535,6 +2604,7 @@ FindQuestionFromProgress (
       // For Buffer type, Skip the ConfigHdr part.
       //
       EndStr = StrStr (Progress, L"&OFFSET=");
+      ASSERT (EndStr != NULL);
       *EndStr = '\0';
     }
 
@@ -2550,6 +2620,7 @@ FindQuestionFromProgress (
     // here, just keep the "Fred" string.
     //
     EndStr = StrStr (Progress, L"=");
+    ASSERT (EndStr != NULL);
     *EndStr = '\0';
   } else {
     //
@@ -2557,6 +2628,7 @@ FindQuestionFromProgress (
     // here, just keep the "OFFSET=0x####&WIDTH=0x####" string.
     //
     EndStr = StrStr (Progress, L"&VALUE=");
+    ASSERT (EndStr != NULL);
     *EndStr = '\0';
   }
 
@@ -2616,7 +2688,7 @@ FindQuestionFromProgress (
     *EndStr = '&';
   }
 
-  return *RetForm != NULL;
+  return (BOOLEAN) (*RetForm != NULL);
 }
 
 /**
@@ -4181,9 +4253,8 @@ IsQuestionValueChanged (
   }
 
   CopyMem (&Question->HiiValue, &BackUpValue, sizeof (EFI_HII_VALUE));
-  CopyMem (Question->BufferValue, BackUpBuffer, BufferWidth);
-
   if (BackUpBuffer != NULL) {
+    CopyMem (Question->BufferValue, BackUpBuffer, BufferWidth);
     FreePool (BackUpBuffer);
   }
 

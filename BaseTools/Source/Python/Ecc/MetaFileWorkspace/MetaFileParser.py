@@ -14,7 +14,7 @@
 ##
 # Import Modules
 #
-import os
+import Common.LongFilePathOs as os
 import re
 import time
 import copy
@@ -31,7 +31,8 @@ from Common.Expression import *
 from CommonDataClass.Exceptions import *
 
 from MetaFileTable import MetaFileStorage
-from GenFds.FdfParser import FdfParser  
+from GenFds.FdfParser import FdfParser
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## A decorator used to parse macro definition
 def ParseMacro(Parser):
@@ -432,6 +433,7 @@ class InfParser(MetaFileParser):
     def Start(self):
         NmakeLine = ''
         Content = ''
+        Usage = ''
         try:
             Content = open(str(self.MetaFile), 'r').readlines()
         except:
@@ -450,8 +452,26 @@ class InfParser(MetaFileParser):
         IsFindBlockComment = False
 
         for Index in range(0, len(Content)):
+            if self._SectionType in [MODEL_EFI_GUID,
+                                     MODEL_EFI_PROTOCOL,
+                                     MODEL_EFI_PPI,
+                                     MODEL_PCD_FIXED_AT_BUILD,
+                                     MODEL_PCD_PATCHABLE_IN_MODULE,
+                                     MODEL_PCD_FEATURE_FLAG,
+                                     MODEL_PCD_DYNAMIC_EX,
+                                     MODEL_PCD_DYNAMIC]:
+                Line = Content[Index].strip()
+                if Line.startswith(TAB_COMMENT_SPLIT):
+                    continue
+                elif Line.find(TAB_COMMENT_SPLIT) > 0:
+                    Usage = Line[Line.find(TAB_COMMENT_SPLIT):]
+                    Line = Line[:Line.find(TAB_COMMENT_SPLIT)]
+                else:
+                    Usage = ''
+            else:
             # skip empty, commented, block commented lines
-            Line = CleanString(Content[Index], AllowCppStyleComment=True)
+                Line = CleanString(Content[Index], AllowCppStyleComment=True)
+                Usage = ''
             NextLine = ''
             if Index + 1 < len(Content):
                 NextLine = CleanString(Content[Index + 1])
@@ -538,7 +558,8 @@ class InfParser(MetaFileParser):
                             -1,
                             self._LineIndex+1,
                             -1,
-                            0
+                            0,
+                            Usage
                             )
         if IsFindBlockComment:
             EdkLogger.error("Parser", FORMAT_INVALID, "Open block comments (starting with /*) are expected to end with */", 

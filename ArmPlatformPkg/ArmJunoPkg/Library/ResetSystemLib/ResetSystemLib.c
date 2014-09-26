@@ -39,27 +39,26 @@ LibResetSystem (
   IN CHAR16           *ResetData OPTIONAL
   )
 {
-  UINTN   Rx;
-  UINTN   SystemState;
+  ARM_SMC_ARGS SmcArgs;
 
   switch (ResetType) {
   case EfiResetWarm:
   case EfiResetCold:
     // Map a warm reset into a cold reset
-    Rx          = ARM_JUNO_ARM_FAST_SMC_SET_SYSTEM_POWER_STATE;
-    SystemState = ARM_JUNO_ARM_FAST_SMC_SYSTEM_POWER_STATE_REBOOT;
+    SmcArgs.Arg0 = ARM_JUNO_ARM_FAST_SMC_SET_SYSTEM_POWER_STATE;
+    SmcArgs.Arg1 = ARM_JUNO_ARM_FAST_SMC_SYSTEM_POWER_STATE_REBOOT;
     break;
   case EfiResetShutdown:
-    Rx          = ARM_JUNO_ARM_FAST_SMC_SET_SYSTEM_POWER_STATE;
-    SystemState = ARM_JUNO_ARM_FAST_SMC_SYSTEM_POWER_STATE_SHUTDOWN;
+    SmcArgs.Arg0 = ARM_JUNO_ARM_FAST_SMC_SET_SYSTEM_POWER_STATE;
+    SmcArgs.Arg1 = ARM_JUNO_ARM_FAST_SMC_SYSTEM_POWER_STATE_SHUTDOWN;
     break;
   default:
-    Rx = 0;
+    SmcArgs.Arg0 = 0;
     ASSERT(FALSE);
   }
 
-  if (Rx != 0) {
-    ArmCallSmcArg1 (&Rx, &SystemState);
+  if (SmcArgs.Arg0 != 0) {
+    ArmCallSmc (&SmcArgs);
     // We should never be here
     while(1);
   }
@@ -72,7 +71,7 @@ LibResetSystem (
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/

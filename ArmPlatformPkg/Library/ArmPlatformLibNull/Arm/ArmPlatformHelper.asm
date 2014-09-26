@@ -23,7 +23,7 @@
 
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
-  
+
   PRESERVE8
   AREA    ArmPlatformNullHelper, CODE, READONLY
 
@@ -36,10 +36,10 @@ ArmPlatformPeiBootAction FUNCTION
 //  IN UINTN MpId
 //  );
 ArmPlatformGetCorePosition FUNCTION
-  and	r1, r0, #ARM_CORE_MASK
-  and	r0, r0, #ARM_CLUSTER_MASK
-  add	r0, r1, r0, LSR #7
-  bx 	lr
+  and   r1, r0, #ARM_CORE_MASK
+  and   r0, r0, #ARM_CLUSTER_MASK
+  add   r0, r1, r0, LSR #7
+  bx    lr
   ENDFUNC
 
 //UINTN

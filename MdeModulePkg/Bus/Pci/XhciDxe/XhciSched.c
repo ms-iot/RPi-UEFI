@@ -2606,7 +2606,12 @@ XhcInitializeEndpointContext (
           InputContext->EP[Dci-1].CErr   = 0;
           InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
         }
-        break;
+        //
+        // Do not support isochronous transfer now.
+        //
+        DEBUG ((EFI_D_INFO, "XhcInitializeEndpointContext: Unsupport ISO EP found, Transfer ring is not allocated.\n"));
+        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+        continue;
       case USB_ENDPOINT_INTERRUPT:
         if (Direction == EfiUsbDataIn) {
           InputContext->EP[Dci-1].CErr   = 3;
@@ -2648,9 +2653,14 @@ XhcInitializeEndpointContext (
         break;
 
       case USB_ENDPOINT_CONTROL:
+        //
+        // Do not support control transfer now.
+        //
+        DEBUG ((EFI_D_INFO, "XhcInitializeEndpointContext: Unsupport Control EP found, Transfer ring is not allocated.\n"));
       default:
-        ASSERT (0);
-        break;
+        DEBUG ((EFI_D_INFO, "XhcInitializeEndpointContext: Unknown EP found, Transfer ring is not allocated.\n"));
+        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+        continue;
     }
 
     PhyAddr = UsbHcGetPciAddrForHostAddr (
@@ -2658,8 +2668,8 @@ XhcInitializeEndpointContext (
                 ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingSeg0,
                 sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER
                 );
-    PhyAddr &= ~(0x0F);
-    PhyAddr |= ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
+    PhyAddr &= ~((EFI_PHYSICAL_ADDRESS)0x0F);
+    PhyAddr |= (EFI_PHYSICAL_ADDRESS)((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
     InputContext->EP[Dci-1].PtrLo = XHC_LOW_32BIT (PhyAddr);
     InputContext->EP[Dci-1].PtrHi = XHC_HIGH_32BIT (PhyAddr);
 
@@ -2759,7 +2769,12 @@ XhcInitializeEndpointContext64 (
           InputContext->EP[Dci-1].CErr   = 0;
           InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
         }
-        break;
+        //
+        // Do not support isochronous transfer now.
+        //
+        DEBUG ((EFI_D_INFO, "XhcInitializeEndpointContext64: Unsupport ISO EP found, Transfer ring is not allocated.\n"));
+        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+        continue;
       case USB_ENDPOINT_INTERRUPT:
         if (Direction == EfiUsbDataIn) {
           InputContext->EP[Dci-1].CErr   = 3;
@@ -2801,9 +2816,14 @@ XhcInitializeEndpointContext64 (
         break;
 
       case USB_ENDPOINT_CONTROL:
+        //
+        // Do not support control transfer now.
+        //
+        DEBUG ((EFI_D_INFO, "XhcInitializeEndpointContext64: Unsupport Control EP found, Transfer ring is not allocated.\n"));
       default:
-        ASSERT (0);
-        break;
+        DEBUG ((EFI_D_INFO, "XhcInitializeEndpointContext64: Unknown EP found, Transfer ring is not allocated.\n"));
+        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+        continue;
     }
 
     PhyAddr = UsbHcGetPciAddrForHostAddr (
@@ -2811,8 +2831,8 @@ XhcInitializeEndpointContext64 (
                 ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingSeg0,
                 sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER
                 );
-    PhyAddr &= ~(0x0F);
-    PhyAddr |= ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
+    PhyAddr &= ~((EFI_PHYSICAL_ADDRESS)0x0F);
+    PhyAddr |= (EFI_PHYSICAL_ADDRESS)((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
     InputContext->EP[Dci-1].PtrLo = XHC_LOW_32BIT (PhyAddr);
     InputContext->EP[Dci-1].PtrHi = XHC_HIGH_32BIT (PhyAddr);
 

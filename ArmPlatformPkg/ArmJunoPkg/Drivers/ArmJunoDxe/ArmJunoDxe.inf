@@ -20,28 +20,44 @@
 
 [Sources.common]
   ArmJunoDxe.c
+  InstallFdt.c
   PciEmulation.c
   PciRootBridgeIo.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
   ArmPlatformPkg/ArmJunoPkg/ArmJuno.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  AcpiLib
   BaseMemoryLib
+  BdsLib
   DebugLib
   DmaLib
+  FdtLib
   IoLib
   PcdLib
+  PrintLib
+  SerialPortLib
   UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
   UefiLib
   UefiDriverEntryPoint
 
+[Guids]
+  gArmGlobalVariableGuid
+  gEfiEndOfDxeEventGroupGuid
+  gEfiFileInfoGuid
+  gFdtTableGuid
+
 [Protocols]
   gEfiBlockIoProtocolGuid
+  gEfiDevicePathFromTextProtocolGuid
   gEfiPciIoProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
@@ -49,6 +65,8 @@
 
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbEhciBaseAddress
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbOhciBaseAddress
+
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath
 
 [Depex]
   TRUE

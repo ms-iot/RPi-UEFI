@@ -406,7 +406,7 @@ CascadeProcessVariables (
     FoundVarName = AllocateZeroPool (NameSize);
     if (FoundVarName != NULL) {
       if (PrevName != NULL) {
-        StrCpy(FoundVarName, PrevName);
+        StrnCpy(FoundVarName, PrevName, NameSize/sizeof(CHAR16)-1);
       }
 
       Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
@@ -641,6 +641,9 @@ ShellCommandRunDmpStore (
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellDebug1HiiHandle, L"-l or -s", L"-d");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
+      //
+      // Determine the GUID to search for based on -all and -guid parameters
+      //
       if (!ShellCommandLineGetFlag(Package, L"-all")) {
         GuidStr = ShellCommandLineGetValue(Package, L"-guid");
         if (GuidStr != NULL) {
@@ -653,11 +656,15 @@ ShellCommandRunDmpStore (
         } else  {
           Guid = &gEfiGlobalVariableGuid;
         }
-        Name = ShellCommandLineGetRawValue(Package, 1);
       } else {
-        Name  = NULL;
         Guid  = NULL;
       }
+
+      //
+      // Get the Name of the variable to find
+      //
+      Name = ShellCommandLineGetRawValue(Package, 1);
+
       if (ShellStatus == SHELL_SUCCESS) {
         if (ShellCommandLineGetFlag(Package, L"-s")) {
           Type = DmpStoreSave;

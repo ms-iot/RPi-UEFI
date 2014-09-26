@@ -50,7 +50,7 @@
 #  DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
-  
+
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
@@ -58,17 +58,17 @@
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
-  
+
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-  
+
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-  
+
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
-  
+
   SerialPortLib|EmbeddedPkg/Library/TemplateSerialPortLib/TemplateSerialPortLib.inf
   SerialPortExtLib|EmbeddedPkg/Library/TemplateSerialPortExtLib/TemplateSerialPortExtLib.inf
   RealTimeClockLib|EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
@@ -80,7 +80,7 @@
  # Need to change this for IPF
  #
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  
+
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -95,15 +95,16 @@
 
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   EblCmdLib|EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
-  
+
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
 
+  AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
   # Networking Requirements
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf  
+  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -117,7 +118,7 @@
 [LibraryClasses.common.UEFI_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  
+
 [LibraryClasses.common.SEC]
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
 
@@ -127,6 +128,9 @@
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+
+  # Add support for GCC stack protector
+  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 [LibraryClasses.ARM]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
@@ -146,11 +150,11 @@
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
-  
+
   #
   # Control what commands are supported from the UI
   # Turn these on and off to add features or save size
-  #  
+  #
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMacBoot|TRUE
   gEmbeddedTokenSpaceGuid.PcdEmbeddedDirCmd|TRUE
   gEmbeddedTokenSpaceGuid.PcdEmbeddedHobCmd|TRUE
@@ -158,7 +162,7 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedIoEnable|FALSE
   gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|TRUE
-  
+
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE
 
 
@@ -182,7 +186,7 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand|L""
   gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000
-  
+
   gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0
@@ -190,8 +194,8 @@
 #
 # Optinal feature to help prevent EFI memory map fragments
 # Turned on and off via: PcdPrePiProduceMemoryTypeInformationHob
-# Values are in EFI Pages (4K). DXE Core will make sure that 
-# at least this much of each type of memory can be allocated 
+# Values are in EFI Pages (4K). DXE Core will make sure that
+# at least this much of each type of memory can be allocated
 # from a single memory range. This way you only end up with
 # maximum of two fragements for each type in the memory map
 # (the memory used, and the free memory that was prereserved
@@ -235,14 +239,15 @@
 #
 ################################################################################
 [Components.common]
-  EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf 
+  EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
   EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
   EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
-  EmbeddedPkg/Library/GdbSerialDebugPortLib/GdbSerialDebugPortLib.inf  
-  EmbeddedPkg/Library/GdbSerialLib/GdbSerialLib.inf                    
+  EmbeddedPkg/Library/GdbSerialDebugPortLib/GdbSerialDebugPortLib.inf
+  EmbeddedPkg/Library/GdbSerialLib/GdbSerialLib.inf
   EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   EmbeddedPkg/Library/TemplateSerialPortLib/TemplateSerialPortLib.inf
+  EmbeddedPkg/Library/SerialPortExtLibNull/SerialPortExtLibNull.inf
   EmbeddedPkg/Library/TemplateResetSystemLib/TemplateResetSystemLib.inf
   EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
   EmbeddedPkg/Library/LzmaHobCustomDecompressLib/LzmaHobCustomDecompressLib.inf
@@ -258,6 +263,9 @@
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+
+  # FDT Support
+  EmbeddedPkg/Library/FdtLoadLib/FdtLoadLib.inf
 
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf

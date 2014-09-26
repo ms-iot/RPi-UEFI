@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011, 2013, ARM Limited. All rights reserved.
+#  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -160,6 +160,12 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmFvpDxe.inf
   INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 
+  #
+  # Platform Driver
+  #
+  INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmFvpDxe.inf
+  INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+
 !ifdef EDK2_ENABLE_SMSC_91X
 !include ArmPlatformPkg/ArmVExpressPkg/ArmVExpress-networking.fdf.inc
   INF EmbeddedPkg/Drivers/LAN91xDxe/LAN91xDxe.inf
@@ -247,7 +253,7 @@ READ_LOCK_STATUS   = TRUE
 
 [Rule.Common.SEC]
   FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
-    TE  TE Align = 128                  $(INF_OUTPUT)/$(MODULE_NAME).efi
+    TE  TE Align = 4K                  $(INF_OUTPUT)/$(MODULE_NAME).efi
   }
 
 [Rule.Common.PEI_CORE]

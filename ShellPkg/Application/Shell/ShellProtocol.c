@@ -2,6 +2,7 @@
   Member functions of EFI_SHELL_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
+  (C) Copyright 2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -529,18 +530,17 @@ EfiShellGetDevicePathFromFilePath(
     if (Cwd == NULL) {
       return (NULL);
     }
-    Size = StrSize(Cwd);
-    Size += StrSize(Path);
+    Size = StrSize(Cwd) + StrSize(Path) - sizeof(CHAR16);
     NewPath = AllocateZeroPool(Size);
     if (NewPath == NULL) {
       return (NULL);
     }
-    StrCpy(NewPath, Cwd);
+    StrnCpy(NewPath, Cwd, Size/sizeof(CHAR16)-1);
     if (*Path == L'\\') {
       Path++;
       while (PathRemoveLastItem(NewPath)) ;
     }
-    StrCat(NewPath, Path);
+    StrnCat(NewPath, Path, Size/sizeof(CHAR16) - 1 - StrLen(NewPath));
     DevicePathForReturn = EfiShellGetDevicePathFromFilePath(NewPath);
     FreePool(NewPath);
     return (DevicePathForReturn);
@@ -1145,10 +1145,37 @@ EfiShellCreateFile(
     return (EFI_NOT_FOUND);
   }
 
-  Status = InternalOpenFileDevicePath(DevicePath, FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, FileAttribs); // 0 = no specific file attributes
+  Status = InternalOpenFileDevicePath(DevicePath, FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, FileAttribs);
   FreePool(DevicePath);
 
   return(Status);
+}
+
+/**
+  Register a GUID and a localized human readable name for it.
+
+  If Guid is not assigned a name, then assign GuidName to Guid.  This list of GUID
+  names must be used whenever a shell command outputs GUID information.
+
+  This function is only available when the major and minor versions in the
+  EfiShellProtocol are greater than or equal to 2 and 1, respectively.
+
+  @param[in] Guid       A pointer to the GUID being registered.
+  @param[in] GuidName   A pointer to the localized name for the GUID being registered.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_INVALID_PARAMETER   Guid was NULL.
+  @retval EFI_INVALID_PARAMETER   GuidName was NULL.
+  @retval EFI_ACCESS_DENIED       Guid already is assigned a name.
+**/
+EFI_STATUS
+EFIAPI 
+EfiShellRegisterGuidName(
+  IN CONST EFI_GUID *Guid,
+  IN CONST CHAR16   *GuidName
+  )
+{
+  return (AddNewGuidNameMapping(Guid, GuidName, NULL));
 }
 
 /**
@@ -1318,6 +1345,8 @@ EfiShellDeleteFileByName(
   SHELL_FILE_HANDLE FileHandle;
   EFI_STATUS        Status;
 
+  FileHandle = NULL;
+
   //
   // get a handle to the file
   //
@@ -1372,8 +1401,6 @@ EfiShellEnablePageBreak (
                                 is NULL, then the current shell environment is used.
                             
   @param[out] StartImageStatus  Returned status from gBS->StartImage.
-  @param[out] ExitDataSize      ExitDataSize as returned from gBS->StartImage
-  @param[out] ExitData          ExitData as returned from gBS->StartImage
 
   @retval EFI_SUCCESS       The command executed successfully. The  status code
                             returned by the command is pointed to by StatusCode.
@@ -1388,9 +1415,7 @@ InternalShellExecuteDevicePath(
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
   IN CONST CHAR16                   *CommandLine OPTIONAL,
   IN CONST CHAR16                   **Environment OPTIONAL,
-  OUT EFI_STATUS                    *StartImageStatus OPTIONAL,
-  OUT UINTN                         *ExitDataSize OPTIONAL,
-  OUT CHAR16                        **ExitData OPTIONAL
+  OUT EFI_STATUS                    *StartImageStatus OPTIONAL
   )
 {
   EFI_STATUS                    Status;
@@ -1400,18 +1425,10 @@ InternalShellExecuteDevicePath(
   EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
   LIST_ENTRY                    OrigEnvs;
   EFI_SHELL_PARAMETERS_PROTOCOL ShellParamsProtocol;
-  UINTN                         InternalExitDataSize;
-  UINTN                         *ExitDataSizePtr;
   CHAR16                        *ImagePath;
   UINTN                         Index;
-
-  // ExitDataSize is not OPTIONAL for gBS->BootServices, provide somewhere for
-  // it to be dumped if the caller doesn't want it.
-  if (ExitData == NULL) {
-    ExitDataSizePtr = &InternalExitDataSize;
-  } else {
-    ExitDataSizePtr = ExitDataSize;
-  }
+  CHAR16                        *Walker;
+  CHAR16                        *NewCmdLine;
 
   if (ParentImageHandle == NULL) {
     return (EFI_INVALID_PARAMETER);
@@ -1420,6 +1437,17 @@ InternalShellExecuteDevicePath(
   InitializeListHead(&OrigEnvs);
 
   NewHandle = NULL;
+  
+  NewCmdLine = AllocateCopyPool (StrSize (CommandLine), CommandLine);
+  if (NewCmdLine == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (Walker = NewCmdLine; Walker != NULL && *Walker != CHAR_NULL ; Walker++) {
+    if (*Walker == L'^' && *(Walker+1) == L'#') {
+      CopyMem(Walker, Walker+1, StrSize(Walker) - sizeof(Walker[0]));
+    }
+  }
 
   //
   // Load the image with:
@@ -1449,9 +1477,9 @@ InternalShellExecuteDevicePath(
 
   if (!EFI_ERROR(Status)) {
     ASSERT(LoadedImage->LoadOptionsSize == 0);
-    if (CommandLine != NULL) {
-      LoadedImage->LoadOptionsSize  = (UINT32)StrSize(CommandLine);
-      LoadedImage->LoadOptions      = (VOID*)CommandLine;
+    if (NewCmdLine != NULL) {
+      LoadedImage->LoadOptionsSize  = (UINT32)StrSize(NewCmdLine);
+      LoadedImage->LoadOptions      = (VOID*)NewCmdLine;
     }
 
     //
@@ -1470,7 +1498,7 @@ InternalShellExecuteDevicePath(
     ShellParamsProtocol.StdIn   = ShellInfoObject.NewShellParametersProtocol->StdIn;
     ShellParamsProtocol.StdOut  = ShellInfoObject.NewShellParametersProtocol->StdOut;
     ShellParamsProtocol.StdErr  = ShellInfoObject.NewShellParametersProtocol->StdErr;
-    Status = UpdateArgcArgv(&ShellParamsProtocol, CommandLine, NULL, NULL);
+    Status = UpdateArgcArgv(&ShellParamsProtocol, NewCmdLine, NULL, NULL);
     ASSERT_EFI_ERROR(Status);
     //
     // Replace Argv[0] with the full path of the binary we're executing:
@@ -1505,13 +1533,13 @@ InternalShellExecuteDevicePath(
     ///@todo initialize and install ShellInterface protocol on the new image for compatibility if - PcdGetBool(PcdShellSupportOldProtocols)
 
     //
-    // now start the image, passing up exit data if the caller requested it
+    // now start the image and if the caller wanted the return code pass it to them...
     //
     if (!EFI_ERROR(Status)) {
       StartStatus      = gBS->StartImage(
                           NewHandle,
-                          ExitDataSizePtr,
-                          ExitData
+                          0,
+                          NULL
                           );
       if (StartImageStatus != NULL) {
         *StartImageStatus = StartStatus;
@@ -1548,6 +1576,8 @@ FreeAlloc:
     CleanupStatus = SetEnvironmentVariableList(&OrigEnvs);
     ASSERT_EFI_ERROR (CleanupStatus);
   }
+
+  FreePool (NewCmdLine);
 
   return(Status);
 }
@@ -1598,8 +1628,6 @@ EfiShellExecute(
   CHAR16                    *Temp;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   UINTN                     Size;
-  UINTN                     ExitDataSize;
-  CHAR16                    *ExitData;
 
   if ((PcdGet8(PcdShellSupportLevel) < 1)) {
     return (EFI_UNSUPPORTED);
@@ -1627,32 +1655,7 @@ EfiShellExecute(
     DevPath,
     Temp,
     (CONST CHAR16**)Environment,
-    StatusCode,
-    &ExitDataSize,
-    &ExitData);
-
-    if (Status == EFI_ABORTED) {
-      // If the command exited with an error, the shell should put the exit
-      // status in ExitData, preceded by a null-terminated string.
-      ASSERT (ExitDataSize == StrSize (ExitData) + sizeof (SHELL_STATUS));
-
-      if (StatusCode != NULL) {
-        // Skip the null-terminated string
-        ExitData += StrLen (ExitData) + 1;
-
-        // Use CopyMem to avoid alignment faults
-        CopyMem (StatusCode, ExitData, sizeof (SHELL_STATUS));
-
-        // Convert from SHELL_STATUS to EFI_STATUS
-        // EFI_STATUSes have top bit set when they are errors.
-        // (See UEFI Spec Appendix D)
-        if (*StatusCode != SHELL_SUCCESS) {
-          *StatusCode = (EFI_STATUS) *StatusCode | MAX_BIT;
-        }
-      }
-      FreePool (ExitData);
-      Status = EFI_SUCCESS;
-    }
+    StatusCode);
 
   //
   // de-allocate and return
@@ -1816,10 +1819,9 @@ InternalDuplicateShellFileInfo(
   if (NewNode == NULL) {
     return (NULL);
   }
-  NewNode->FullName = AllocateZeroPool(StrSize(Node->FullName));
-
-  NewNode->FileName = AllocateZeroPool(StrSize(Node->FileName));
-  NewNode->Info     = AllocateZeroPool((UINTN)Node->Info->Size);
+  NewNode->FullName = AllocateCopyPool(StrSize(Node->FullName), Node->FullName);
+  NewNode->FileName = AllocateCopyPool(StrSize(Node->FileName), Node->FileName);
+  NewNode->Info     = AllocateCopyPool((UINTN)Node->Info->Size, Node->Info);
   if ( NewNode->FullName == NULL
     || NewNode->FileName == NULL
     || NewNode->Info == NULL
@@ -1835,9 +1837,6 @@ InternalDuplicateShellFileInfo(
   if (!Save) {
     Node->Handle = NULL;
   }
-  StrCpy((CHAR16*)NewNode->FullName, Node->FullName);
-  StrCpy((CHAR16*)NewNode->FileName, Node->FileName);
-  CopyMem(NewNode->Info, Node->Info, (UINTN)Node->Info->Size);
 
   return((EFI_SHELL_FILE_INFO*)NewNode);
 }
@@ -1960,6 +1959,7 @@ EfiShellFindFilesInDir(
   UINTN                     Size;
   CHAR16                    *TempSpot;
 
+  BasePath = NULL;
   Status = FileHandleGetFileName(FileDirHandle, &BasePath);
   if (EFI_ERROR(Status)) {
     return (Status);
@@ -2024,6 +2024,87 @@ EfiShellFindFilesInDir(
   }
   SHELL_FREE_NON_NULL(BasePath);
   return(Status);
+}
+
+/**
+  Get the GUID value from a human readable name.
+
+  If GuidName is a known GUID name, then update Guid to have the correct value for
+  that GUID.
+
+  This function is only available when the major and minor versions in the
+  EfiShellProtocol are greater than or equal to 2 and 1, respectively.
+
+  @param[in]  GuidName   A pointer to the localized name for the GUID being queried.
+  @param[out] Guid       A pointer to the GUID structure to be filled in.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_INVALID_PARAMETER   Guid was NULL.
+  @retval EFI_INVALID_PARAMETER   GuidName was NULL.
+  @retval EFI_NOT_FOUND           GuidName is not a known GUID Name.
+**/
+EFI_STATUS
+EFIAPI 
+EfiShellGetGuidFromName(
+  IN  CONST CHAR16   *GuidName,
+  OUT       EFI_GUID *Guid
+  )
+{
+  EFI_GUID    *NewGuid;
+  EFI_STATUS  Status;
+
+  if (Guid == NULL || GuidName == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+ 
+  Status = GetGuidFromStringName(GuidName, NULL, &NewGuid);
+
+  if (!EFI_ERROR(Status)) {
+    CopyGuid(NewGuid, Guid);
+  }
+
+  return (Status);
+}
+
+/**
+  Get the human readable name for a GUID from the value.
+
+  If Guid is assigned a name, then update *GuidName to point to the name. The callee
+  should not modify the value.
+
+  This function is only available when the major and minor versions in the
+  EfiShellProtocol are greater than or equal to 2 and 1, respectively.
+
+  @param[in]  Guid       A pointer to the GUID being queried.
+  @param[out] GuidName   A pointer to a pointer the localized to name for the GUID being requested
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_INVALID_PARAMETER   Guid was NULL.
+  @retval EFI_INVALID_PARAMETER   GuidName was NULL.
+  @retval EFI_NOT_FOUND           Guid is not assigned a name.
+**/
+EFI_STATUS
+EFIAPI 
+EfiShellGetGuidName(
+  IN  CONST EFI_GUID *Guid,
+  OUT CONST CHAR16   **GuidName
+  )
+{
+  CHAR16   *Name;
+
+  if (Guid == NULL || GuidName == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
+  Name = GetStringNameFromGuid(Guid, NULL);
+  if (Name == NULL || StrLen(Name) == 0) {
+    SHELL_FREE_NON_NULL(Name);
+    return (EFI_NOT_FOUND);
+  }
+
+  *GuidName = AddBufferToFreeList(Name);
+
+  return (EFI_SUCCESS);
 }
 
 /**
@@ -2201,8 +2282,8 @@ ShellSearchHandle(
             if (NewFullName == NULL) {
               Status = EFI_OUT_OF_RESOURCES;
             } else {
-              StrCpy(NewFullName, MapName);
-              StrCat(NewFullName, ShellInfoNode->FullName+1);
+              StrnCpy(NewFullName, MapName, Size/sizeof(CHAR16)-1);
+              StrnCat(NewFullName, ShellInfoNode->FullName+1, (Size/sizeof(CHAR16))-StrLen(NewFullName)-1);
               FreePool((VOID*)ShellInfoNode->FullName);
               ShellInfoNode->FullName = NewFullName;
             }
@@ -2325,11 +2406,10 @@ EfiShellFindFiles(
   RootDevicePath = NULL;
   RootFileHandle = NULL;
   MapName        = NULL;
-  PatternCopy = AllocateZeroPool(StrSize(FilePattern));
+  PatternCopy = AllocateCopyPool(StrSize(FilePattern), FilePattern);
   if (PatternCopy == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
-  StrCpy(PatternCopy, FilePattern);
 
   PatternCopy = PathCleanUpDirectories(PatternCopy);
 
@@ -2458,34 +2538,32 @@ EfiShellOpenFileList(
 }
 
 /**
-  This function updated with errata.
+  Gets the environment variable and Attributes, or list of environment variables.  Can be
+  used instead of GetEnv().
 
-  Gets either a single or list of environment variables.
+  This function returns the current value of the specified environment variable and
+  the Attributes. If no variable name was specified, then all of the known
+  variables will be returned.
 
-  If name is not NULL then this function returns the current value of the specified
-  environment variable.
+  @param[in] Name               A pointer to the environment variable name. If Name is NULL,
+                                then the function will return all of the defined shell
+                                environment variables. In the case where multiple environment
+                                variables are being returned, each variable will be terminated
+                                by a NULL, and the list will be terminated by a double NULL.
+  @param[out] Attributes        If not NULL, a pointer to the returned attributes bitmask for
+                                the environment variable. In the case where Name is NULL, and
+                                multiple environment variables are being returned, Attributes
+                                is undefined.
 
-  If Name is NULL, then a list of all environment variable names is returned.  Each is a
-  NULL terminated string with a double NULL terminating the list.
-
-  @param Name                   A pointer to the environment variable name.  If
-                                Name is NULL, then the function will return all
-                                of the defined shell environment variables.  In
-                                the case where multiple environment variables are
-                                being returned, each variable will be terminated by
-                                a NULL, and the list will be terminated by a double
-                                NULL.
-
-  @return !=NULL                A pointer to the returned string.
-                                The returned pointer does not need to be freed by the caller.
-
-  @retval NULL                  The environment variable doesn't exist or there are
-                                no environment variables.
+  @retval NULL                  The environment variable doesn't exist.
+  @return                       A non-NULL value points to the variable's value. The returned
+                                pointer does not need to be freed by the caller.
 **/
 CONST CHAR16 *
-EFIAPI
-EfiShellGetEnv(
-  IN CONST CHAR16 *Name
+EFIAPI 
+EfiShellGetEnvEx(
+  IN  CONST CHAR16 *Name,
+  OUT       UINT32 *Attributes OPTIONAL
   )
 {
   EFI_STATUS  Status;
@@ -2535,7 +2613,7 @@ EfiShellGetEnv(
       ; Node = (ENV_VAR_LIST*)GetNextNode(&List, &Node->Link)
      ){
       ASSERT(Node->Key != NULL);
-      StrCpy(CurrentWriteLocation, Node->Key);
+      StrnCpy(CurrentWriteLocation, Node->Key,  (Size)/sizeof(CHAR16) - (CurrentWriteLocation - ((CHAR16*)Buffer)) - 1);
       CurrentWriteLocation += StrLen(CurrentWriteLocation) + 1;
     }
 
@@ -2553,14 +2631,13 @@ EfiShellGetEnv(
     //
     // get the size we need for this EnvVariable
     //
-    Status = SHELL_GET_ENVIRONMENT_VARIABLE(Name, &Size, Buffer);
+    Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(Name, Attributes, &Size, Buffer);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       //
       // Allocate the space and recall the get function
       //
       Buffer = AllocateZeroPool(Size);
-      ASSERT(Buffer != NULL);
-      Status = SHELL_GET_ENVIRONMENT_VARIABLE(Name, &Size, Buffer);
+      Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(Name, Attributes, &Size, Buffer);
     }
     //
     // we didnt get it (might not exist)
@@ -2578,6 +2655,38 @@ EfiShellGetEnv(
   // return the buffer
   //
   return (AddBufferToFreeList(Buffer));
+}
+
+/**
+  Gets either a single or list of environment variables.
+
+  If name is not NULL then this function returns the current value of the specified
+  environment variable.
+
+  If Name is NULL, then a list of all environment variable names is returned.  Each is a
+  NULL terminated string with a double NULL terminating the list.
+
+  @param Name                   A pointer to the environment variable name.  If
+                                Name is NULL, then the function will return all
+                                of the defined shell environment variables.  In
+                                the case where multiple environment variables are
+                                being returned, each variable will be terminated by
+                                a NULL, and the list will be terminated by a double
+                                NULL.
+
+  @retval !=NULL                A pointer to the returned string.
+                                The returned pointer does not need to be freed by the caller.
+
+  @retval NULL                  The environment variable doesn't exist or there are
+                                no environment variables.
+**/
+CONST CHAR16 *
+EFIAPI
+EfiShellGetEnv(
+  IN CONST CHAR16 *Name
+  )
+{
+  return (EfiShellGetEnvEx(Name, NULL));
 }
 
 /**
@@ -3045,7 +3154,7 @@ InternalEfiShellGetListAlias(
   
   @return        The null-terminated string converted into all lowercase.  
 **/
-STATIC CHAR16 *
+CHAR16 *
 ToLower (
   CHAR16 *Str
   )
@@ -3280,7 +3389,13 @@ EFI_SHELL_PROTOCOL         mShellProtocol = {
   EfiShellOpenRootByHandle,
   NULL,
   SHELL_MAJOR_VERSION,
-  SHELL_MINOR_VERSION
+  SHELL_MINOR_VERSION,
+
+  // New for UEFI Shell 2.1
+  EfiShellRegisterGuidName,
+  EfiShellGetGuidName,
+  EfiShellGetGuidFromName,
+  EfiShellGetEnvEx
 };
 
 /**

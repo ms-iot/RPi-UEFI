@@ -578,7 +578,7 @@ DoReturn:
     pushl   -8(%esp)      # save EIP in new location
     pushl   -8(%esp)      # save EFLAGS in new location
     popfl                 # restore EFLAGS
-    retf                  # far return
+    lret                  # far return
 
 DoIret:
     iretl
@@ -632,7 +632,7 @@ ASM_PFX(AsmGetTemplateAddressMap):
         popl        %ebp
         ret
 #-------------------------------------------------------------------------------------
-#  AsmVectorNumFixup (*VectorBase, VectorNum);
+#  AsmVectorNumFixup (*NewVectorAddr, VectorNum, *OldVectorAddr);
 #-------------------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(AsmVectorNumFixup)
 ASM_PFX(AsmVectorNumFixup):

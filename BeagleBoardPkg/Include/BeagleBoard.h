@@ -2,14 +2,14 @@
 *  Header defining the BeagleBoard constants (Base addresses, sizes, flags)
 *
 *  Copyright (c) 2011, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -94,7 +94,7 @@
 #define SP810_CTRL_BASE                       (ARM_EB_BOARD_PERIPH_BASE + 0x01000)
 
 // SYSTRCL Register
-#define ARM_EB_SYSCTRL											  0x10001000
+#define ARM_EB_SYSCTRL                        0x10001000
 
 // Uart0
 #define PL011_CONSOLE_UART_BASE               (ARM_EB_BOARD_PERIPH_BASE + 0x09000)
@@ -176,4 +176,4 @@ typedef enum {
   REVISION_AB,
 } BEAGLEBOARD_REVISION;
 
-#endif 
+#endif

@@ -16,7 +16,7 @@
 [Defines]
   PLATFORM_NAME                  = MdeModule
   PLATFORM_GUID                  = 587CE499-6CBE-43cd-94E2-186218569478
-  PLATFORM_VERSION               = 0.93
+  PLATFORM_VERSION               = 0.94
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/MdeModule
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM|AARCH64
@@ -114,6 +114,7 @@
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+  ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -237,6 +238,7 @@
   MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   MdeModulePkg/Library/DxePrintLibPrint2Protocol/DxePrintLibPrint2Protocol.inf
+  MdeModulePkg/Library/PeiCrc32GuidedSectionExtractLib/PeiCrc32GuidedSectionExtractLib.inf
   MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
   MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
@@ -253,6 +255,7 @@
   MdeModulePkg/Library/PiDxeS3BootScriptLib/DxeS3BootScriptLib.inf
   MdeModulePkg/Library/PeiDebugPrintHobLib/PeiDebugPrintHobLib.inf
   MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
+  MdeModulePkg/Library/PlatformHookLibSerialPortPpi/PlatformHookLibSerialPortPpi.inf
 
   MdeModulePkg/Universal/CapsulePei/CapsulePei.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -322,7 +325,15 @@
   }
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
-
+  MdeModulePkg/Universal/SectionExtractionDxe/SectionExtractionDxe.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
+  }
+  MdeModulePkg/Universal/SectionExtractionPei/SectionExtractionPei.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/PeiCrc32GuidedSectionExtractLib/PeiCrc32GuidedSectionExtractLib.inf
+  }
+  
   MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
   MdeModulePkg/Universal/Fdt/FdtTableDxe/FdtTableDxe.inf
 

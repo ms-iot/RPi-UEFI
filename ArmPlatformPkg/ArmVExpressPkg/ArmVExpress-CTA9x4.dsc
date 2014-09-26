@@ -1,13 +1,13 @@
 #
 #  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http://opensource.org/licenses/bsd-license.php                                            
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
 
@@ -18,7 +18,7 @@
 ################################################################################
 [Defines]
   PLATFORM_NAME                  = ArmVExpressPkg-CTA9x4
-  PLATFORM_GUID                  = eb2bd5ff-2379-4a06-9c12-db905cdee9ea 
+  PLATFORM_GUID                  = eb2bd5ff-2379-4a06-9c12-db905cdee9ea
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   SUPPORTED_ARCHITECTURES        = ARM
@@ -32,11 +32,8 @@
 !ifndef EDK2_ARMVE_STANDALONE
   DEFINE EDK2_ARMVE_STANDALONE=1
 !endif
-!ifndef $(EDK2_ARMVE_SINGLE_BINARY)
-  DEFINE EDK2_ARMVE_SINGLE_BINARY=1
-!endif
-!ifdef $(EDK2_OUT_DIR)
-  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)
+!if $(EDK2_ARMVE_STANDALONE) == 1
+  OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4-Standalone
 !else
   OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4
 !endif
@@ -57,7 +54,7 @@
   PL341DmcLib|ArmPlatformPkg/Drivers/PL34xDmc/PL341Dmc.inf
   # ARM PL301 Axi Driver
   PL301AxiLib|ArmPlatformPkg/Drivers/PL301Axi/PL301Axi.inf
-  
+
   ArmPlatformSysConfigLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSysConfigLib/ArmVExpressSysConfigLib.inf
   NorFlashPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/NorFlashArmVExpressLib/NorFlashArmVExpressLib.inf
   LcdPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/PL111LcdArmVExpressLib/PL111LcdArmVExpressLib.inf
@@ -67,14 +64,14 @@
   ArmPlatformSecLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSecLibCTA9x4/ArmVExpressSecLib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressLibSec.inf
 
-  # Uncomment to turn on GDB stub in SEC. 
+  # Uncomment to turn on GDB stub in SEC.
   #DebugAgentLib|EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
 
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A9 -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
 
   GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
-  
+
   XCODE:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
 
 ################################################################################
@@ -96,13 +93,13 @@
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
-  
+
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
 
 [PcdsFixedAtBuild.common]
-  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"  
+  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress"
 
   gArmPlatformTokenSpaceGuid.PcdCoreCount|4
@@ -118,7 +115,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x00010000
 
   gArmTokenSpaceGuid.PcdVFPEnabled|1
-  
+
   # Stacks for MPCores in Secure World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x49E00000
   # Stacks for MPCores in Monitor Mode
@@ -126,15 +123,15 @@
   # Stacks for MPCores in Normal World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x48000000
 
-  # System Memory (1GB) 
+  # System Memory (1GB)
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x60000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x40000000
-    
+
   #
   # ARM Pcds
   #
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
-  
+
   #
   # ARM PrimeCell
   #
@@ -151,7 +148,7 @@
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase|0x1000F000
   ## SP805 Watchdog - CoreTile Watchdog
   #gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase|0x100E5000
-  
+
   ## PL011 - Serial Terminal
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x10009000
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|38400
@@ -168,7 +165,7 @@
   ## PL180 MMC/SD card controller
   gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x10000048
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x10005000
-  
+
   #
   # ARM General Interrupt Controller
   #
@@ -178,14 +175,11 @@
   #
   # ARM OS Loader
   #
-  # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux: 
+  # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux:
   gArmTokenSpaceGuid.PcdArmMachineType|2272
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linaro image on SD card"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/uImage"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/uInitrd"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,38400n8 rootwait root=/dev/mmcblk0p2"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/v2p-ca9.dtb"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"NorFlash"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0x46000000,0x46400000)"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
@@ -208,7 +202,7 @@
 #
 ################################################################################
 [Components.common]
-  
+
   #
   # SEC
   #
@@ -217,7 +211,7 @@
       # Use the implementation which set the Secure bits
       ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
   }
-  
+
   #
   # PEI Phase modules
   #
@@ -262,13 +256,13 @@
   #
   # Architectural Protocols
   #
-  ArmPkg/Drivers/CpuDxe/CpuDxe.inf  
+  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf 
+  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
@@ -278,7 +272,7 @@
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   EmbeddedPkg/SerialDxe/SerialDxe.inf
-  
+
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
@@ -296,7 +290,7 @@
   # Filesystems
   #
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
-  
+
   #
   # Multimedia Card Interface
   #

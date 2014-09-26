@@ -15,7 +15,7 @@
 [Defines]
   PLATFORM_NAME                  = SecurityPkg
   PLATFORM_GUID                  = B2C4614D-AE76-47ba-B876-5988BFED064F
-  PLATFORM_VERSION               = 0.93
+  PLATFORM_VERSION               = 0.94
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/SecurityPkg
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
@@ -162,6 +162,9 @@
 
   SecurityPkg/Library/HashLibTpm2/HashLibTpm2.inf
 
+  SecurityPkg/Library/DxeRsa2048Sha256GuidedSectionExtractLib/DxeRsa2048Sha256GuidedSectionExtractLib.inf
+  SecurityPkg/Library/PeiRsa2048Sha256GuidedSectionExtractLib/PeiRsa2048Sha256GuidedSectionExtractLib.inf
+  
 [Components.IA32, Components.X64, Components.IPF]
 #  SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
 #  SecurityPkg/UserIdentification/UsbCredentialProviderDxe/UsbCredentialProviderDxe.inf

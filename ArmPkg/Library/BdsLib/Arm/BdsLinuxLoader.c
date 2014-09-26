@@ -1,14 +1,14 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -16,6 +16,9 @@
 #include "BdsLinuxLoader.h"
 
 #define ALIGN32_BELOW(addr)   ALIGN_POINTER(addr - 32,32)
+
+#define IS_ADDRESS_IN_REGION(RegionStart, RegionSize, Address) \
+    (((UINTN)(RegionStart) <= (UINTN)(Address)) && ((UINTN)(Address) <= ((UINTN)(RegionStart) + (UINTN)(RegionSize))))
 
 STATIC
 EFI_STATUS
@@ -25,9 +28,11 @@ PreparePlatformHardware (
 {
   //Note: Interrupts will be disabled by the GIC driver when ExitBootServices() will be called.
 
-  // Clean, invalidate, disable data cache
-  ArmCleanInvalidateDataCache();
-  ArmDisableDataCache();
+  // Clean before Disable else the Stack gets corrupted with old data.
+  ArmCleanDataCache ();
+  ArmDisableDataCache ();
+  // Invalidate all the entries that might have snuck in.
+  ArmInvalidateDataCache ();
 
   // Invalidate and disable the Instruction cache
   ArmDisableInstructionCache ();
@@ -89,7 +94,10 @@ StartLinux (
     LinuxImageSize -= 64;
   }
 
-  //TODO: Check there is no overlapping between kernel and Atag
+  // Check there is no overlapping between kernel and its parameters
+  // We can only assert because it is too late to fallback to UEFI (ExitBootServices has been called).
+  ASSERT (!IS_ADDRESS_IN_REGION(LinuxKernel, LinuxImageSize, KernelParamsAddress) &&
+          !IS_ADDRESS_IN_REGION(LinuxKernel, LinuxImageSize, KernelParamsAddress + KernelParamsSize));
 
   //
   // Switch off interrupts, caches, mmu, etc
@@ -175,7 +183,7 @@ BdsBootLinuxAtag (
       Print (L"ERROR: Did not find initrd image.\n");
       goto EXIT_FREE_LINUX;
     }
-    
+
     // Check if the initrd is a uInitrd
     if (*(UINT32*)((UINTN)InitrdImageBase) == LINUX_UIMAGE_SIGNATURE) {
       // Skip the 64-byte image header
@@ -190,7 +198,7 @@ BdsBootLinuxAtag (
   //
   // Setup the Linux Kernel Parameters
   //
- 
+
   // By setting address=0 we leave the memory allocation to the function
   Status = PrepareAtagList (CommandLineArguments, InitrdImage, InitrdImageSize, &AtagBase, &AtagSize);
   if (EFI_ERROR(Status)) {

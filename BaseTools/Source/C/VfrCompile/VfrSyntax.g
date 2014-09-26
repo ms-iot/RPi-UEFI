@@ -1,4 +1,6 @@
-/*++
+/*++ @file
+Vfr Syntax
+
 Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -7,11 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-  VfrSyntax.g
-
-Abstract:
 
 --*/
 
@@ -505,10 +502,10 @@ vfrFormSetDefinition :
   {
     ClassGuid "=" guidDefinition[ClassGuid1]        << ++ClassGuidNum; >>
                   {
-                   "\|" guidDefinition[ClassGuid2]  << ++ClassGuidNum; >>
-                  }
-                  {
-                   "\|" guidDefinition[ClassGuid3]  << ++ClassGuidNum; >>
+                     "\|" guidDefinition[ClassGuid2]  << ++ClassGuidNum; >>
+                     {
+                      "\|" guidDefinition[ClassGuid3]  << ++ClassGuidNum; >>
+                     }
                   }
                   ","
   }
@@ -1184,9 +1181,35 @@ questionheaderFlagsField[UINT8 & Flags] :
     ReadOnlyFlag                                    << $Flags |= 0x01; >>
   | InteractiveFlag                                 << $Flags |= 0x04; >>
   | ResetRequiredFlag                               << $Flags |= 0x10; >>
-  | OptionOnlyFlag                                  << $Flags |= 0x80; >>
-  | NVAccessFlag
-  | LateCheckFlag
+  | O:OptionOnlyFlag                                << 
+                                                       if (mCompatibleMode) {
+                                                         $Flags |= 0x80;
+                                                       } else {
+                                                         gCVfrErrorHandle.HandleWarning (
+                                                            VFR_WARNING_OBSOLETED_FRAMEWORK_OPCODE,
+                                                            O->getLine(),
+                                                            O->getText()
+                                                            );
+                                                       }
+                                                    >>
+  | N:NVAccessFlag                                  << 
+                                                       if (!mCompatibleMode) {
+                                                          gCVfrErrorHandle.HandleWarning (
+                                                            VFR_WARNING_OBSOLETED_FRAMEWORK_OPCODE,
+                                                            N->getLine(),
+                                                            N->getText()
+                                                            );
+                                                       }
+                                                    >>
+  | L:LateCheckFlag                                 << 
+                                                       if (!mCompatibleMode) {
+                                                          gCVfrErrorHandle.HandleWarning (
+                                                            VFR_WARNING_OBSOLETED_FRAMEWORK_OPCODE,
+                                                            L->getLine(),
+                                                            L->getText()
+                                                            );
+                                                       }
+                                                    >>
   ;
 
 vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFlag = TRUE] :
@@ -1617,8 +1640,29 @@ vfrStatementInvalid :
   ;
 
 flagsField :
-  Number | InteractiveFlag | ManufacturingFlag | DefaultFlag |
-  NVAccessFlag | ResetRequiredFlag | LateCheckFlag
+  Number 
+  | InteractiveFlag 
+  | ManufacturingFlag 
+  | DefaultFlag 
+  | ResetRequiredFlag 
+  | N:NVAccessFlag                                     << 
+                                                          if (!mCompatibleMode) {
+                                                            gCVfrErrorHandle.HandleWarning (
+                                                              VFR_WARNING_OBSOLETED_FRAMEWORK_OPCODE,
+                                                              N->getLine(),
+                                                              N->getText()
+                                                              );
+                                                          }
+                                                       >>
+  | L:LateCheckFlag                                    << 
+                                                          if (!mCompatibleMode) {
+                                                            gCVfrErrorHandle.HandleWarning (
+                                                              VFR_WARNING_OBSOLETED_FRAMEWORK_OPCODE,
+                                                              L->getLine(),
+                                                              L->getText()
+                                                              );
+                                                          }
+                                                       >> 
   ;
 
 vfrStatementValue :
@@ -1652,7 +1696,7 @@ vfrStatementSubTitle :
   |
     { "," vfrStatementStatTagList}
     { "," (vfrStatementStat | vfrStatementQuestions)*}
-    E: EndSubtitle ";"                                  << CRT_END_OP (E); >>
+    D: EndSubtitle ";"                                  << CRT_END_OP (D); >>
   )
   ;
 
@@ -1685,6 +1729,13 @@ vfrStatementStaticText :
   }
                                                        <<
                                                           if (Flags & EFI_IFR_FLAG_CALLBACK) {
+                                                            if (TxtTwo != EFI_STRING_ID_INVALID) {
+                                                              gCVfrErrorHandle.HandleWarning (
+                                                                                VFR_WARNING_ACTION_WITH_TEXT_TWO,
+                                                                                S3->getLine(),
+                                                                                S3->getText()
+                                                                                );
+                                                            }
                                                             CIfrAction AObj;
                                                             mCVfrQuestionDB.RegisterQuestion (NULL, NULL, QId);
                                                             AObj.SetLineNo (F->getLine());
@@ -2523,7 +2574,7 @@ vfrStatementOrderedList :
                                                           OLObj.SetMaxContainers (_STOU8(M->getText(), M->getLine()));
                                                        >>
   }
-  { F:FLAGS "=" vfrOrderedListFlags[OLObj, F->getLine()] }
+  { F:FLAGS "=" vfrOrderedListFlags[OLObj, F->getLine()] {","}}
   vfrStatementQuestionOptionList
   E:EndList                                            << CRT_END_OP (E); >>
   ";"
@@ -3035,11 +3086,31 @@ oneofoptionFlagsField [UINT8 & HFlags, UINT8 & LFlags] :
   | "OPTION_DEFAULT"                                   << $LFlags |= 0x10; >>
   | "OPTION_DEFAULT_MFG"                               << $LFlags |= 0x20; >>
   | InteractiveFlag                                    << $HFlags |= 0x04; >>
-  | NVAccessFlag                                       << $HFlags |= 0x08; >>
   | ResetRequiredFlag                                  << $HFlags |= 0x10; >>
-  | LateCheckFlag                                      << $HFlags |= 0x20; >>
   | ManufacturingFlag                                  << $LFlags |= 0x20; >>
   | DefaultFlag                                        << $LFlags |= 0x10; >>
+  | A:NVAccessFlag                                     << 
+                                                          if (mCompatibleMode) {
+                                                            $HFlags |= 0x08;
+                                                          } else {
+                                                            gCVfrErrorHandle.HandleWarning (
+                                                              VFR_WARNING_OBSOLETED_FRAMEWORK_OPCODE,
+                                                              A->getLine(),
+                                                              A->getText()
+                                                              );
+                                                          }
+                                                       >>
+  | L:LateCheckFlag                                    << 
+                                                          if (mCompatibleMode) {
+                                                            $HFlags |= 0x20;
+                                                          } else {
+                                                            gCVfrErrorHandle.HandleWarning (
+                                                              VFR_WARNING_OBSOLETED_FRAMEWORK_OPCODE,
+                                                              L->getLine(),
+                                                              L->getText()
+                                                              );
+                                                          }
+                                                       >>
   ;
 
 vfrStatementLabel :

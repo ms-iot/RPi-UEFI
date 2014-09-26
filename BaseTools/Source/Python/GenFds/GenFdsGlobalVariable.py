@@ -1,7 +1,7 @@
 ## @file
 # Global variables for GenFds
 #
-#  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +15,7 @@
 ##
 # Import Modules
 #
-import os
+import Common.LongFilePathOs as os
 import sys
 import subprocess
 import struct
@@ -30,6 +30,7 @@ from Common.ToolDefClassObject import ToolDefClassObject
 from AutoGen.BuildEngine import BuildRule
 import Common.DataType as DataType
 from Common.Misc import PathClass
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## Global variables
 #
@@ -44,6 +45,7 @@ class GenFdsGlobalVariable:
     LibDir = ''
     WorkSpace = None
     WorkSpaceDir = ''
+    ConfDir = ''
     EdkSourceDir = ''
     OutputDirFromDscDict = {}
     TargetName = ''
@@ -87,7 +89,7 @@ class GenFdsGlobalVariable:
     def __LoadBuildRule():
         if GenFdsGlobalVariable.__BuildRuleDatabase:
             return GenFdsGlobalVariable.__BuildRuleDatabase
-        BuildConfigurationFile = os.path.normpath(os.path.join(GenFdsGlobalVariable.WorkSpaceDir, "Conf/target.txt"))
+        BuildConfigurationFile = os.path.normpath(os.path.join(GenFdsGlobalVariable.ConfDir, "target.txt"))
         TargetTxt = TargetTxtClassObject()
         if os.path.isfile(BuildConfigurationFile) == True:
             TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
@@ -200,11 +202,13 @@ class GenFdsGlobalVariable:
 
         TargetList = set()
         FileList = []
-        for File in Inf.Sources:
-            if File.TagName in ("", "*", GenFdsGlobalVariable.ToolChainTag) and \
-                File.ToolChainFamily in ("", "*", GenFdsGlobalVariable.ToolChainFamily):
-                FileList.append((File, DataType.TAB_UNKNOWN_FILE))
-        
+
+        if not Inf.IsBinaryModule:
+            for File in Inf.Sources:
+                if File.TagName in ("", "*", GenFdsGlobalVariable.ToolChainTag) and \
+                    File.ToolChainFamily in ("", "*", GenFdsGlobalVariable.ToolChainFamily):
+                    FileList.append((File, DataType.TAB_UNKNOWN_FILE))
+
         for File in Inf.Binaries:
             if File.Target in ['COMMON', '*', GenFdsGlobalVariable.TargetName]:
                 FileList.append((File, File.Type))
@@ -644,7 +648,8 @@ class GenFdsGlobalVariable:
                 '$(EDK_SOURCE)'  : GenFdsGlobalVariable.EdkSourceDir,
 #                '$(OUTPUT_DIRECTORY)': GenFdsGlobalVariable.OutputDirFromDsc,
                 '$(TARGET)' : GenFdsGlobalVariable.TargetName,
-                '$(TOOL_CHAIN_TAG)' : GenFdsGlobalVariable.ToolChainTag
+                '$(TOOL_CHAIN_TAG)' : GenFdsGlobalVariable.ToolChainTag,
+                '$(SPACE)' : ' '
                }
         OutputDir = GenFdsGlobalVariable.OutputDirFromDscDict[GenFdsGlobalVariable.ArchList[0]]
         if Arch != 'COMMON' and Arch in GenFdsGlobalVariable.ArchList:

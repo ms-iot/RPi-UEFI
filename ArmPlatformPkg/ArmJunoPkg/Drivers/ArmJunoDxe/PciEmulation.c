@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.<BR>
-  
+ 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -35,19 +35,19 @@ typedef struct {
 #define EFI_PCI_IO_PRIVATE_DATA_SIGNATURE     SIGNATURE_32('p', 'c', 'i', 'o')
 #define EFI_PCI_IO_PRIVATE_DATA_FROM_THIS(a)  CR (a, EFI_PCI_IO_PRIVATE_DATA, PciIoProtocol, EFI_PCI_IO_PRIVATE_DATA_SIGNATURE)
 
-EFI_PCI_IO_DEVICE_PATH PciIoDevicePathTemplate = 
+EFI_PCI_IO_DEVICE_PATH PciIoDevicePathTemplate =
 {
   {
-    { ACPI_DEVICE_PATH, ACPI_DP, {sizeof (ACPI_HID_DEVICE_PATH), 0} },
+    { ACPI_DEVICE_PATH, ACPI_DP, { sizeof (ACPI_HID_DEVICE_PATH), 0 } },
     EISA_PNP_ID(0x0A03),  // HID
     0                     // UID
   },
   {
-    { HARDWARE_DEVICE_PATH, HW_PCI_DP, {sizeof (PCI_DEVICE_PATH), 0}},
+    { HARDWARE_DEVICE_PATH, HW_PCI_DP, { sizeof (PCI_DEVICE_PATH), 0 } },
     0,
     0
   },
-  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, {sizeof (EFI_DEVICE_PATH_PROTOCOL), 0}}
+  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0} }
 };
 
 STATIC
@@ -103,7 +103,7 @@ PciIoMemRead (
 {
   EFI_PCI_IO_PRIVATE_DATA *Private = EFI_PCI_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  return PciRootBridgeIoMemRead (&Private->RootBridge.Io, 
+  return PciRootBridgeIoMemRead (&Private->RootBridge.Io,
                                 (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
                                 Private->ConfigSpace->Device.Bar[BarIndex] + Offset, //Fix me ConfigSpace
                                 Count,
@@ -123,7 +123,7 @@ PciIoMemWrite (
 {
   EFI_PCI_IO_PRIVATE_DATA *Private = EFI_PCI_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  return PciRootBridgeIoMemWrite (&Private->RootBridge.Io, 
+  return PciRootBridgeIoMemWrite (&Private->RootBridge.Io,
                                  (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
                                  Private->ConfigSpace->Device.Bar[BarIndex] + Offset,  //Fix me ConfigSpace
                                  Count,
@@ -172,10 +172,10 @@ PciIoPciRead (
   EFI_STATUS Status;
 
   Status = PciRootBridgeIoMemRW ((EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH)Width,
-                               Count, 
-                               TRUE, 
-                               (PTR)(UINTN)Buffer, 
-                               TRUE, 
+                               Count,
+                               TRUE,
+                               (PTR)(UINTN)Buffer,
+                               TRUE,
                                (PTR)(UINTN)(((UINT8 *)Private->ConfigSpace) + Offset)  //Fix me ConfigSpace
                               );
   return Status;
@@ -192,11 +192,11 @@ PciIoPciWrite (
 {
   EFI_PCI_IO_PRIVATE_DATA *Private = EFI_PCI_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  return PciRootBridgeIoMemRW ((EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, 
-                               Count, 
-                               TRUE, 
+  return PciRootBridgeIoMemRW ((EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
+                               Count,
+                               TRUE,
                                (PTR)(UINTN)(((UINT8 *)Private->ConfigSpace) + Offset),  //Fix me ConfigSpace
-                               TRUE, 
+                               TRUE,
                                (PTR)(UINTN)Buffer
                                );
 }
@@ -340,7 +340,7 @@ PciIoAttributes (
   case EfiPciIoAttributeOperationDisable:
     // Since we are not a real PCI device no enable/set or disable operations exist.
     return EFI_SUCCESS;
-    
+   
   default:
   ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;
@@ -373,13 +373,13 @@ PciIoSetBarAttributes (
   return EFI_UNSUPPORTED;
 }
 
-EFI_PCI_IO_PROTOCOL PciIoTemplate = 
+EFI_PCI_IO_PROTOCOL PciIoTemplate =
 {
   PciIoPollMem,
   PciIoPollIo,
-  { PciIoMemRead, PciIoMemWrite},
+  { PciIoMemRead, PciIoMemWrite },
   { PciIoIoRead,  PciIoIoWrite },
-  { PciIoPciRead, PciIoPciWrite},
+  { PciIoPciRead, PciIoPciWrite },
   PciIoCopyMem,
   PciIoMap,
   PciIoUnmap,

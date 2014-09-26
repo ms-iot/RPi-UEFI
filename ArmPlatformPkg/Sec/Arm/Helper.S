@@ -1,18 +1,18 @@
 #========================================================================================
 #  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #=======================================================================================
 
 #start of the code section
-.text 
+.text
 .align 3
 
 GCC_ASM_EXPORT(return_from_exception)
@@ -36,7 +36,7 @@ ASM_PFX(enter_monitor_mode):
     mov     sp, r3                      @ Set the stack of the Monitor Mode
 
     mov     lr, r0                      @ Use the pass entrypoint as lr
-    
+
     msr     spsr_cxsf, r4               @ Use saved mode for the MOVS jump to the kernel
 
     mov     r4, r0                      @ Swap EntryPoint and MpId registers
@@ -72,13 +72,13 @@ ASM_PFX(copy_cpsr_into_spsr):
 # Set the Non Secure Mode
 ASM_PFX(set_non_secure_mode):
     push    { r1 }
-    and	    r0, r0, #0x1f     @ Keep only the mode bits
+    and     r0, r0, #0x1f     @ Keep only the mode bits
     mrs     r1, spsr          @ Read the spsr
     bic     r1, r1, #0x1f     @ Clear all mode bits
-    orr	    r1, r1, r0
+    orr     r1, r1, r0
     msr     spsr_cxsf, r1     @ write back spsr (may have caused a mode switch)
     isb
     pop     { r1 }
     bx      lr                @ return (hopefully thumb-safe!)
-    
+
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

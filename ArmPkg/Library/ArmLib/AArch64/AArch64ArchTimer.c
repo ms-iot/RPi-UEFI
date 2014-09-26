@@ -21,7 +21,7 @@
 #include <Library/DebugLib.h>
 #include "AArch64Lib.h"
 #include "ArmLibPrivate.h"
-#include <Library/ArmArchTimerLib.h>
+#include <Library/ArmArchTimer.h>
 
 VOID
 EFIAPI
@@ -165,111 +165,4 @@ ArmArchTimerWriteReg (
     DEBUG ((EFI_D_ERROR, "Attempt to write to ARM Generic Timer registers. But ARM Generic Timer extension is not implemented \n "));
     ASSERT (0);
   }
-}
-
-VOID
-EFIAPI
-ArmArchTimerEnableTimer (
-    VOID
-    )
-{
-  UINTN TimerCtrlReg;
-
-  ArmArchTimerReadReg (CntpCtl, (VOID *)&TimerCtrlReg);
-  TimerCtrlReg |= ARM_ARCH_TIMER_ENABLE;
-  ArmArchTimerWriteReg (CntpCtl, (VOID *)&TimerCtrlReg);
-}
-
-VOID
-EFIAPI
-ArmArchTimerDisableTimer (
-    VOID
-    )
-{
-  UINTN TimerCtrlReg;
-
-  ArmArchTimerReadReg (CntpCtl, (VOID *)&TimerCtrlReg);
-  TimerCtrlReg &= ~ARM_ARCH_TIMER_ENABLE;
-  ArmArchTimerWriteReg (CntpCtl, (VOID *)&TimerCtrlReg);
-}
-
-VOID
-EFIAPI
-ArmArchTimerSetTimerFreq (
-    IN   UINTN  FreqInHz
-    )
-{
-  ArmArchTimerWriteReg (CntFrq, (VOID *)&FreqInHz);
-}
-
-UINTN
-EFIAPI
-ArmArchTimerGetTimerFreq (
-    VOID
-    )
-{
-  UINTN ArchTimerFreq = 0;
-  ArmArchTimerReadReg (CntFrq, (VOID *)&ArchTimerFreq);
-  return ArchTimerFreq;
-}
-
-UINTN
-EFIAPI
-ArmArchTimerGetTimerVal (
-    VOID
-    )
-{
-  UINTN ArchTimerVal;
-  ArmArchTimerReadReg (CntpTval, (VOID *)&ArchTimerVal);
-  return ArchTimerVal;
-}
-
-
-VOID
-EFIAPI
-ArmArchTimerSetTimerVal (
-    IN   UINTN   Val
-    )
-{
-  ArmArchTimerWriteReg (CntpTval, (VOID *)&Val);
-}
-
-UINT64
-EFIAPI
-ArmArchTimerGetSystemCount (
-    VOID
-    )
-{
-  UINT64 SystemCount;
-  ArmArchTimerReadReg (CntPct, (VOID *)&SystemCount);
-  return SystemCount;
-}
-
-UINTN
-EFIAPI
-ArmArchTimerGetTimerCtrlReg (
-    VOID
-    )
-{
-  UINTN  Val;
-  ArmArchTimerReadReg (CntpCtl, (VOID *)&Val);
-  return Val;
-}
-
-VOID
-EFIAPI
-ArmArchTimerSetTimerCtrlReg (
-    UINTN Val
-    )
-{
-  ArmArchTimerWriteReg (CntpCtl, (VOID *)&Val);
-}
-
-VOID
-EFIAPI
-ArmArchTimerSetCompareVal (
-    IN   UINT64   Val
-    )
-{
-  ArmArchTimerWriteReg (CntpCval, (VOID *)&Val);
 }

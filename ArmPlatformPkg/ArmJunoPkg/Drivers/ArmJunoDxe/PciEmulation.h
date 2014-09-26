@@ -20,13 +20,11 @@
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PciLib.h>
 #include <Library/UefiLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/DmaLib.h>
 
 #include <Protocol/EmbeddedExternalDevice.h>
@@ -36,7 +34,8 @@
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 
 #include <IndustryStandard/Pci23.h>
-#include <IndustryStandard/Acpi.h>
+
+#include "ArmJunoDxeInternal.h"
 
 #define EFI_RESOURCE_NONEXISTENT  0xFFFFFFFFFFFFFFFFULL
 #define EFI_RESOURCE_LESS         0xFFFFFFFFFFFFFFFEULL
@@ -66,7 +65,7 @@ typedef struct {
   EFI_HANDLE                                        Handle;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL                   Io;
   EFI_PCI_ROOT_BRIDGE_DEVICE_PATH                   DevicePath;
-  
+ 
   UINT8   StartBus;
   UINT8   EndBus;
   UINT16  Type;
@@ -75,7 +74,7 @@ typedef struct {
   UINTN   IoOffset;
   UINT32  IoStart;
   UINT32  IoSize;
-  UINT64  PciAttributes;  
+  UINT64  PciAttributes; 
 
   ACPI_CONFIG_INFO  *Config;
 
@@ -98,7 +97,7 @@ typedef union {
 
 EFI_STATUS
 EFIAPI
-PciRootBridgeIoPollMem ( 
+PciRootBridgeIoPollMem (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN  UINT64                                 Address,
@@ -107,10 +106,10 @@ PciRootBridgeIoPollMem (
   IN  UINT64                                 Delay,
   OUT UINT64                                 *Result
   );
-  
+ 
 EFI_STATUS
 EFIAPI
-PciRootBridgeIoPollIo ( 
+PciRootBridgeIoPollIo (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN  UINT64                                 Address,
@@ -119,7 +118,7 @@ PciRootBridgeIoPollIo (
   IN  UINT64                                 Delay,
   OUT UINT64                                 *Result
   );
-  
+ 
 EFI_STATUS
 EFIAPI
 PciRootBridgeIoMemRead (
@@ -247,8 +246,8 @@ PciRootBridgeIoSetAttributes (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *This,
   IN     UINT64                           Attributes,
   IN OUT UINT64                           *ResourceBase,
-  IN OUT UINT64                           *ResourceLength 
-  ); 
+  IN OUT UINT64                           *ResourceLength
+  );
 
 EFI_STATUS
 EFIAPI
