@@ -232,7 +232,8 @@ struct _URB {
   // Transaction result
   //
   UINT32                          Result;
-  UINTN                           Completed;    // completed data length
+  BOOLEAN                         InProgress;   // defined when the URB is being processed
+  UINTN                           Completed;    // Length of the data being processed
   UINT8                           DataToggle;
 };
 
