@@ -600,6 +600,7 @@ EhcCreateUrb (
   Urb->DataLen    = DataLen;
   Urb->Callback   = Callback;
   Urb->Context    = Context;
+  Urb->InProgress = FALSE;
 
   PciIo           = Ehc->PciIo;
   Urb->Qh         = EhcCreateQh (Ehc, &Urb->Ep);
