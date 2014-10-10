@@ -709,16 +709,9 @@ WriteSections64 (
             }
             break;
 
+	  // These relative relocations do not require fixups 
           case R_AARCH64_CALL26:
-            if  (Rel->r_addend != 0 ) { /* TODO */
-              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_CALL26 Need to fixup with addend!.");
-            }
-            break;
-
           case R_AARCH64_JUMP26:
-            if  (Rel->r_addend != 0 ) { /* TODO : AArch64 '-O2' optimisation. */
-              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_JUMP26 Need to fixup with addend!.");
-            }
             break;
 
           case R_AARCH64_ADR_PREL_PG_HI21:
