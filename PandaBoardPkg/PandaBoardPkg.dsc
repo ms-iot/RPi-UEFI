@@ -92,6 +92,9 @@
 
   RealTimeClockLib|Omap44xxPkg/Library/RealTimeClockLib/RealTimeClockLib.inf
 
+  # Networking Requirements for ArmPlatformPkg/Bds
+  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
@@ -212,6 +215,9 @@
   # [LibraryClasses.ARM] and NULL mean link this library into all ARM images.
   #
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+
+  # Add support for GCC stack protector
+  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 
 [BuildOptions]

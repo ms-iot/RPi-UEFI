@@ -31,7 +31,7 @@
 #include <Protocol/RealTimeClock.h>
 #include <Guid/GlobalVariable.h>
 #include <Drivers/PL031RealTimeClock.h>
-#include <Library/ArmArchTimerLib.h>
+#include <Library/ArmArchTimer.h>
 #include <ArmPlatform.h>
 
 STATIC CONST CHAR16  mTimeZoneVariableName[] = L"PL031RtcTimeZone";

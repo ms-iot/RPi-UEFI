@@ -18,5 +18,3 @@ Conf/BuildEnv.sh
 Conf/build_rule.txt
 Conf/target.txt
 Conf/tools_def.txt
-PandaBoardPkg/Tools/chtool
-tmp.bin

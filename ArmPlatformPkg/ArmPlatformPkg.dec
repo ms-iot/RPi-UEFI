@@ -160,3 +160,4 @@
   # and PcdCPUCoreSecSecondaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x0|UINT32|0x00000008
+
