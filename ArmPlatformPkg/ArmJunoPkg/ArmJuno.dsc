@@ -79,7 +79,7 @@
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Juno"
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"Beta"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"v2.1"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmJuno"
 
   #
