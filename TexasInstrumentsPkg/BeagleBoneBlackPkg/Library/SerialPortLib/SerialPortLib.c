@@ -223,8 +223,11 @@ SerialPortPoll (
   VOID
   )
 {
-  //
-  // Read the serial port status
-  //
- return TRUE;
+  UINT32  LSR = UART0_BASE + UART_LSR_REG;
+
+  if ((MmioRead8(LSR) & UART_LSR_RX_FIFO_E_MASK) == UART_LSR_RX_FIFO_E_NOT_EMPTY) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
 }
