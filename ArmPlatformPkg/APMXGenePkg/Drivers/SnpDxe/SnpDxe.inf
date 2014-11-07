@@ -1,0 +1,94 @@
+##
+# Component name for module SnpDxe
+#
+#  Copyright (c) 2013, AppliedMicro Corp. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SnpDxe
+  FILE_GUID                      = EB950780-31E4-4AFB-BCA4-25F55FAC7C83
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeSnpDxeDriver
+  UNLOAD_IMAGE                   = SnpDxeUnload
+
+[Sources]
+  SnpDxe.h
+  SnpDxe.c
+  ComponentName.c
+  xgene_enet.c
+  mustang.h
+  qm/xgene_qmtm_core.h
+  qm/xgene_qmtm_csr.h
+  qm/xgene_qmtm.h
+  qm/xgene_qmtm.c
+  qm/xgene_qmtm_msg.c
+  qm/xgene_qmtm_shadowcat_csr.h
+  qm/xgene_qmtm_storm.c
+  qm/xgene_qmtm_util.h
+  qm/xgene_qmtm_util.c
+  qm/xgene_qmtm_main.h
+  qm/xgene_qmtm_main.c
+
+  classifier/apm_preclass_base.h
+  classifier/apm_preclass_data.h
+  classifier/apm_cle_access.h
+  classifier/apm_cle_mgr.h
+  classifier/apm_preclass_base.c
+  classifier/apm_preclass_api.c
+  classifier/apm_cle_mgr.c
+  classifier/apm_cle_access.c
+
+  ethernet/apm_enet_common.h
+  ethernet/apm_enet_common.c
+  ethernet/apm_enet_mac.h
+  ethernet/apm_enet_mac.c
+  ethernet/apm_xgenet_mac.h
+  ethernet/apm_xgenet_mac.c
+  ethernet/apm_enet_misc.h
+  ethernet/apm_enet_misc.c
+  ethernet/apm_enet_access.h
+  ethernet/apm_cle_cfg.c
+  ethernet/apm_enet.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/APMXGenePkg/APMXGene.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DevicePathLib
+  DebugLib
+  NetLib
+  DevicePathLib
+  TimerLib
+  XGenePHYLib
+
+[Guids]
+  gShellVariableGuid
+
+[Protocols]
+  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED

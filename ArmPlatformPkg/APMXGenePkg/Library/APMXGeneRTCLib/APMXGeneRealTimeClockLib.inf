@@ -1,0 +1,46 @@
+##
+# APM X-Gene RTC Library
+#
+#  Copyright (c) 2013, AppliedMicro Corp. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = APMXGeneRealTimeClockLib
+  FILE_GUID                      = 4CA931E1-6B71-4A9A-A333-FE401A167E93
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib
+
+[Sources.common]
+  APMXGeneRealTimeClockLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/APMXGenePkg/APMXGene.dec
+
+[LibraryClasses]
+  UefiRuntimeLib
+  DxeServicesTableLib
+  IoLib
+  UefiLib
+  DebugLib
+  TimerLib
+  PcdLib
+
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdApmRtcBase
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid               ## CONSUMES ## Event
