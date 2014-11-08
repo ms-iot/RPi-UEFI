@@ -67,5 +67,5 @@ ArmPlatformSecExtraAction (
   OUT UINTN*        JumpAddress
   )
 {
-  *JumpAddress = PcdGet32(PcdFvBaseAddress);
+  *JumpAddress = PcdGet64(PcdFvBaseAddress);
 }
