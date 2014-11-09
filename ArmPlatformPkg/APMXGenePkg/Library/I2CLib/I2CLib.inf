@@ -1,0 +1,45 @@
+##
+#  Copyright (c) 2013, AppliedMicro Corp. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = I2C
+  FILE_GUID                      = beb88122-ad59-44b8-a067-e9cd9b84e6d1
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = I2CLib
+  
+[Sources.common]
+
+
+[Sources.AARCH64]
+  I2CLib.c
+  
+[FeaturePcd]
+
+[Pcd]
+  
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdSysClkInHz
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/APMXGenePkg/APMXGene.dec
+  
+[LibraryClasses]
+  PcdLib
+  BaseLib
+  DebugLib
+  IoLib
+  TimerLib

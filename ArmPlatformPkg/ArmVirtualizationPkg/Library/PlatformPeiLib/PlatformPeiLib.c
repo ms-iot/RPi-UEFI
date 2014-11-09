@@ -41,7 +41,7 @@ PlatformPeim (
   CopyMem (NewBase, Base, FdtSize);
   PcdSet64 (PcdDeviceTreeBaseAddress, (UINT64)(UINTN)NewBase);
 
-  BuildFvHob (PcdGet32(PcdFvBaseAddress), PcdGet32(PcdFvSize));
+  BuildFvHob (PcdGet64(PcdFvBaseAddress), PcdGet32(PcdFvSize));
 
   return EFI_SUCCESS;
 }
