@@ -41,7 +41,7 @@ CEntryPoint (
   ArmInvalidateInstructionCache();
 
   // Invalidate I & D TLBs
-  ArmInvalidateInstructionAndDataTlb();
+  ArmInvalidateTlb();
 
   // CPU specific settings
   ArmCpuSetup (MpId);
