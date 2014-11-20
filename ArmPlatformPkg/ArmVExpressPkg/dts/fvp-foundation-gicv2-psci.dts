@@ -9,6 +9,7 @@
 	#size-cells = <0x2>;
 
 	chosen {
+		stdout-path = "serial0";
 	};
 
 	aliases {
