@@ -1,22 +1,19 @@
 /** @file
   Implement the IP4 driver support for the socket layer.
 
-  Copyright (c) 2011, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
-
 #include "Socket.h"
 
 
-/**
-  Get the local socket address
+/** Get the local socket address.
 
   This routine returns the IPv4 address associated with the local
   socket.
@@ -25,9 +22,7 @@
   network address for the SOCK_RAW socket.
 
   @param [in] pPort       Address of an ::ESL_PORT structure.
-
   @param [out] pAddress   Network address to receive the local system address
-
 **/
 VOID
 EslIp4LocalAddressGet (
@@ -40,9 +35,7 @@ EslIp4LocalAddressGet (
 
   DBG_ENTER ( );
 
-  //
   //  Return the local address
-  //
   pIp4 = &pPort->Context.Ip4;
   pLocalAddress = (struct sockaddr_in *)pAddress;
   pLocalAddress->sin_family = AF_INET;
@@ -54,8 +47,7 @@ EslIp4LocalAddressGet (
 }
 
 
-/**
-  Set the local port address.
+/** Set the local port address.
 
   This routine sets the local port address.
 
@@ -75,7 +67,6 @@ EslIp4LocalAddressGet (
   @param [in] bBindTest   TRUE = run bind testing
 
   @retval EFI_SUCCESS     The operation was successful
-
  **/
 EFI_STATUS
 EslIp4LocalAddressSet (
@@ -91,23 +82,17 @@ EslIp4LocalAddressSet (
 
   DBG_ENTER ( );
 
-  //
   //  Validate the address
-  //
   pIpAddress = (struct sockaddr_in *)pSockAddr;
   if ( INADDR_BROADCAST == pIpAddress->sin_addr.s_addr ) {
-    //
     //  The local address must not be the broadcast address
-    //
     Status = EFI_INVALID_PARAMETER;
     pPort->pSocket->errno = EADDRNOTAVAIL;
   }
   else {
     Status = EFI_SUCCESS;
 
-    //
     //  Set the local address
-    //
     pIpAddress = (struct sockaddr_in *)pSockAddr;
     pIpv4Address = (UINT8 *)&pIpAddress->sin_addr.s_addr;
     pConfig = &pPort->Context.Ip4.ModeData.ConfigData;
@@ -116,14 +101,10 @@ EslIp4LocalAddressSet (
     pConfig->StationAddress.Addr[2] = pIpv4Address[2];
     pConfig->StationAddress.Addr[3] = pIpv4Address[3];
 
-    //
     //  Determine if the default address is used
-    //
     pConfig->UseDefaultAddress = (BOOLEAN)( 0 == pIpAddress->sin_addr.s_addr );
 
-    //
     //  Display the local address
-    //
     DEBUG (( DEBUG_BIND,
               "0x%08x: Port, Local IP4 Address: %d.%d.%d.%d\r\n",
               pPort,
@@ -132,9 +113,7 @@ EslIp4LocalAddressSet (
               pConfig->StationAddress.Addr[2],
               pConfig->StationAddress.Addr[3]));
 
-    //
     //  Set the subnet mask
-    //
     if ( pConfig->UseDefaultAddress ) {
       pConfig->SubnetMask.Addr[0] = 0;
       pConfig->SubnetMask.Addr[1] = 0;
@@ -148,17 +127,13 @@ EslIp4LocalAddressSet (
       pConfig->SubnetMask.Addr[3] = ( 224 <= pConfig->StationAddress.Addr[0]) ? 0xff : 0;
     }
   }
-
-  //
   //  Return the operation status
-  //
   DBG_EXIT_STATUS ( Status );
   return Status;
 }
 
 
-/**
-  Get the option value
+/** Get the option value.
 
   This routine handles the IPv4 level options.
 
@@ -171,7 +146,6 @@ EslIp4LocalAddressSet (
   @param [out] pOptionLength    Buffer to receive the option length
 
   @retval EFI_SUCCESS - Socket data successfully received
-
  **/
 EFI_STATUS
 EslIp4OptionGet (
@@ -185,20 +159,14 @@ EslIp4OptionGet (
 
   DBG_ENTER ( );
 
-  //
   //  Assume success
-  //
   pSocket->errno = 0;
   Status = EFI_SUCCESS;
 
-  //
   //  Attempt to get the option
-  //
   switch ( OptionName ) {
   default:
-    //
     //  Option not supported
-    //
     pSocket->errno = ENOPROTOOPT;
     Status = EFI_INVALID_PARAMETER;
     break;
@@ -208,17 +176,13 @@ EslIp4OptionGet (
     *pOptionLength = sizeof ( pSocket->bIncludeHeader );
     break;
   }
-
-  //
   //  Return the operation status
-  //
   DBG_EXIT_STATUS ( Status );
   return Status;
 }
 
 
-/**
-  Set the option value
+/** Set the option value.
 
   This routine handles the IPv4 level options.
 
@@ -231,7 +195,6 @@ EslIp4OptionGet (
   @param [in] OptionLength    Length of the buffer in bytes
 
   @retval EFI_SUCCESS - Option successfully set
-
  **/
 EFI_STATUS
 EslIp4OptionSet (
@@ -242,28 +205,22 @@ EslIp4OptionSet (
   )
 {
   BOOLEAN bTrueFalse;
-  socklen_t LengthInBytes;
-  UINT8 * pOptionData;
+  //socklen_t LengthInBytes;
+  //UINT8 * pOptionData;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
 
-  //
   //  Assume success
-  //
   pSocket->errno = 0;
   Status = EFI_SUCCESS;
 
-  //
   //  Determine if the option protocol matches
-  //
-  LengthInBytes = 0;
-  pOptionData = NULL;
+  //LengthInBytes = 0;
+  //pOptionData = NULL;
   switch ( OptionName ) {
   default:
-    //
     //  Protocol level not supported
-    //
     DEBUG (( DEBUG_INFO | DEBUG_OPTION, "ERROR - Invalid protocol option\r\n" ));
     pSocket->errno = ENOTSUP;
     Status = EFI_UNSUPPORTED;
@@ -271,31 +228,22 @@ EslIp4OptionSet (
 
   case IP_HDRINCL:
 
-    //
     //  Validate the option length
-    //
     if ( sizeof ( UINT32 ) == OptionLength ) {
-      //
       //  Restrict the input to TRUE or FALSE
-      //
       bTrueFalse = TRUE;
       if ( 0 == *(UINT32 *)pOptionValue ) {
         bTrueFalse = FALSE;
       }
       pOptionValue = &bTrueFalse;
 
-      //
       //  Set the option value
-      //
-      pOptionData = (UINT8 *)&pSocket->bIncludeHeader;
-      LengthInBytes = sizeof ( pSocket->bIncludeHeader );
+      //pOptionData = (UINT8 *)&pSocket->bIncludeHeader;
+      //LengthInBytes = sizeof ( pSocket->bIncludeHeader );
     }
     break;
   }
-
-  //
   //  Return the operation status
-  //
   DBG_EXIT_STATUS ( Status );
   return Status;
 }
@@ -430,13 +378,13 @@ EslIp4PortAllocate (
   @param [in] pPort           Address of an ::ESL_PORT structure.
 
   @param [in] pPacket         Address of an ::ESL_PACKET structure.
-  
+
   @param [in] pbConsumePacket Address of a BOOLEAN indicating if the packet is to be consumed
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [out] pAddress       Network address to receive the remote system address
@@ -653,17 +601,15 @@ EslIp4RxComplete (
   )
 {
   size_t LengthInBytes;
-  ESL_PORT * pPort;
   ESL_PACKET * pPacket;
   EFI_IP4_RECEIVE_DATA * pRxData;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
-  
+
   //
   //  Get the operation status.
   //
-  pPort = pIo->pPort;
   Status = pIo->Token.Ip4Rx.Status;
 
   //
@@ -672,7 +618,7 @@ EslIp4RxComplete (
   pRxData = pIo->Token.Ip4Rx.Packet.RxData;
   LengthInBytes = pRxData->HeaderLength + pRxData->DataLength;
 
-  //
+  //{{
   //      +--------------------+   +----------------------+
   //      | ESL_IO_MGMT        |   |      Data Buffer     |
   //      |                    |   |     (Driver owned)   |
@@ -692,7 +638,7 @@ EslIp4RxComplete (
   //
   //
   //  Save the data in the packet
-  //
+  //}}
   pPacket = pIo->pPacket;
   pPacket->Op.Ip4Rx.pRxData = pRxData;
 
@@ -717,7 +663,7 @@ EslIp4RxComplete (
   that the socket is configured.
 
   @param [in] pSocket         Address of an ::ESL_SOCKET structure
-  
+
   @retval EFI_SUCCESS - The port is connected
   @retval EFI_NOT_STARTED - The port is not connected
 
@@ -904,7 +850,7 @@ EslIp4RxComplete (
   //  Determine the socket configuration status
   //
   Status = pSocket->bConfigured ? EFI_SUCCESS : EFI_NOT_STARTED;
-  
+
   //
   //  Return the port connected state.
   //
@@ -1188,9 +1134,9 @@ EslIp4TxComplete (
   ESL_PACKET * pPacket;
   ESL_SOCKET * pSocket;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
-  
+
   //
   //  Locate the active transmit packet
   //

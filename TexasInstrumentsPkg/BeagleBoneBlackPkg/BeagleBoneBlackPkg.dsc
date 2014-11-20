@@ -29,14 +29,9 @@
 [LibraryClasses.common]
   ArmPlatformLib|TexasInstrumentsPkg/BeagleBoneBlackPkg/Library/Am335xLib/Am335xLib.inf
 
-!if $(TARGET) == RELEASE
-  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
-!else
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
 #  UncachedMemoryAllocationLib|ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
-!endif
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -89,12 +84,6 @@
 
   # Networking Requirements for ArmPlatformPkg/Bds
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
-
-  # EBL Related Libraries
-  EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
-  EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
-  EblAddExternalCommandLib|EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
-  EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
 
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window 
@@ -250,11 +239,7 @@
   # CLEAR_MEMORY_ENABLED       0x08
   # ASSERT_BREAKPOINT_ENABLED  0x10
   # ASSERT_DEADLOOP_ENABLED    0x20
-!if $(TARGET) == RELEASE
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x21
-!else
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2f
-!endif
 
   #  DEBUG_INIT      0x00000001  // Initialization
   #  DEBUG_WARN      0x00000002  // Warnings
@@ -272,7 +257,11 @@
   #  DEBUG_LOADFILE  0x00020000  // UNDI Driver
   #  DEBUG_EVENT     0x00080000  // Event messages
   #  DEBUG_ERROR     0x80000000  // Error
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
+  !if $(TARGET) == RELEASE
+    gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  !else
+    gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000047
+  !endif
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
 
@@ -388,11 +377,6 @@
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-  
-  #
-  # Application
-  #  
-  EmbeddedPkg/Ebl/Ebl.inf
   
   # Bds
   #

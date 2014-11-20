@@ -48,7 +48,7 @@
   HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
   
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  PathLib|MdeModulePkg/Library/BasePathLib/BasePathLib.inf
+  PathLib|ShellPkg/Library/BasePathLib/BasePathLib.inf
   BcfgCommandLib|ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
 
 [LibraryClasses.ARM]

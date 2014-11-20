@@ -40,7 +40,6 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
-  ArmLib
 
 [FixedPcd]
   gArmJunoTokenSpaceGuid.PcdGenericWatchdogControlBase

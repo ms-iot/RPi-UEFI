@@ -32,11 +32,12 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
-  AcpiLib
+  ArmShellCmdRunAxfLib
   BaseMemoryLib
   BdsLib
   DebugLib
   DmaLib
+  DxeServicesTableLib
   FdtLib
   IoLib
   PcdLib
@@ -62,6 +63,9 @@
 [FixedPcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
+
+  gArmTokenSpaceGuid.PcdHypFvBaseAddress
+  gArmTokenSpaceGuid.PcdHypFvSize
 
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbEhciBaseAddress
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbOhciBaseAddress

@@ -49,16 +49,7 @@ NumBlocks     = 0xF0
 #
 ################################################################################
 
-!if $(ARCH) == "ARM"
-# For 32-bit ARM we add the shim to allow the transition from AArch64 to AArch32
-0x00000000|0x00008000
-gArmTokenSpaceGuid.PcdHypFvBaseAddress|gArmTokenSpaceGuid.PcdHypFvSize
-FV = FV_SHIM
-
-0x00008000|0x000E8000
-!else
 0x00000000|0x000F0000
-!endif
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
@@ -73,31 +64,6 @@ FV = FVMAIN_COMPACT
 # module statements.
 #
 ################################################################################
-
-#
-# AArch64 to AArch32 Shim
-#
-!if $(ARCH) == "ARM"
-[FV.FV_SHIM]
-FvAlignment        = 8
-ERASE_POLARITY     = 1
-MEMORY_MAPPED      = TRUE
-STICKY_WRITE       = TRUE
-LOCK_CAP           = TRUE
-LOCK_STATUS        = TRUE
-WRITE_DISABLED_CAP = TRUE
-WRITE_ENABLED_CAP  = TRUE
-WRITE_STATUS       = TRUE
-WRITE_LOCK_CAP     = TRUE
-WRITE_LOCK_STATUS  = TRUE
-READ_DISABLED_CAP  = TRUE
-READ_ENABLED_CAP   = TRUE
-READ_STATUS        = TRUE
-READ_LOCK_CAP      = TRUE
-READ_LOCK_STATUS   = TRUE
-
-  INF RuleOverride=SHIM ArmPkg/Extra/AArch64ToAArch32Shim/AArch64ToAArch32Shim.inf
-!endif
 
 [FV.FvMain]
 BlockSize          = 0x40
@@ -136,12 +102,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
-  #
-  # ACPI Support
-  #
-  INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  INF RuleOverride=ACPITABLE ArmPlatformPkg/ArmJunoPkg/AcpiTables/AcpiTables.inf
-
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
   #
@@ -170,9 +130,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   INF FatBinPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-
-  # FV Filesystem^M
-  INF MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
 
   #
   # Usb Support
@@ -214,7 +171,7 @@ READ_LOCK_STATUS   = TRUE
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-  INF ArmPlatformPkg/Bds/Bds.inf 
+  INF ArmPlatformPkg/Bds/Bds.inf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8
@@ -235,7 +192,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
   INF ArmPlatformPkg/PrePi/PeiMPCore.inf
- 
+
   FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
       SECTION FV_IMAGE = FVMAIN
@@ -303,7 +260,7 @@ READ_LOCK_STATUS   = TRUE
   FILE PEIM = $(NAMED_GUID) {
      PEI_DEPEX PEI_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
      TE       TE                        $(INF_OUTPUT)/$(MODULE_NAME).efi
-     UI       STRING="$(MODULE_NAME)" Optional        
+     UI       STRING="$(MODULE_NAME)" Optional
   }
 
 [Rule.Common.PEIM.TIANOCOMPRESSED]
@@ -344,7 +301,7 @@ READ_LOCK_STATUS   = TRUE
 
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
-    UI     STRING ="$(MODULE_NAME)" Optional        
+    UI     STRING ="$(MODULE_NAME)" Optional
     PE32   PE32                         $(INF_OUTPUT)/$(MODULE_NAME).efi
   }
 
@@ -361,10 +318,4 @@ READ_LOCK_STATUS   = TRUE
     PE32      PE32                    |.efi
     UI        STRING="$(MODULE_NAME)" Optional
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-  }
-
-[Rule.Common.USER_DEFINED.ACPITABLE]
-  FILE FREEFORM = $(NAMED_GUID) {
-    RAW ACPI               |.acpi
-    RAW ASL                |.aml
   }

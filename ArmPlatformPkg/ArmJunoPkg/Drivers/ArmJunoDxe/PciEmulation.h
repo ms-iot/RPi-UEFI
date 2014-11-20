@@ -65,7 +65,7 @@ typedef struct {
   EFI_HANDLE                                        Handle;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL                   Io;
   EFI_PCI_ROOT_BRIDGE_DEVICE_PATH                   DevicePath;
- 
+
   UINT8   StartBus;
   UINT8   EndBus;
   UINT16  Type;
@@ -74,7 +74,7 @@ typedef struct {
   UINTN   IoOffset;
   UINT32  IoStart;
   UINT32  IoSize;
-  UINT64  PciAttributes; 
+  UINT64  PciAttributes;
 
   ACPI_CONFIG_INFO  *Config;
 
@@ -106,7 +106,7 @@ PciRootBridgeIoPollMem (
   IN  UINT64                                 Delay,
   OUT UINT64                                 *Result
   );
- 
+
 EFI_STATUS
 EFIAPI
 PciRootBridgeIoPollIo (
@@ -118,7 +118,7 @@ PciRootBridgeIoPollIo (
   IN  UINT64                                 Delay,
   OUT UINT64                                 *Result
   );
- 
+
 EFI_STATUS
 EFIAPI
 PciRootBridgeIoMemRead (

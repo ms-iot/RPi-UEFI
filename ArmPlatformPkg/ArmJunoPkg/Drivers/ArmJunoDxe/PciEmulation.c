@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.<BR>
- 
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -340,7 +340,7 @@ PciIoAttributes (
   case EfiPciIoAttributeOperationDisable:
     // Since we are not a real PCI device no enable/set or disable operations exist.
     return EFI_SUCCESS;
-   
+
   default:
   ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;

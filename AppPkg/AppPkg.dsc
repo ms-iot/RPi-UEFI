@@ -82,7 +82,7 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
-  PathLib|MdeModulePkg/Library/BasePathLib/BasePathLib.inf
+  PathLib|ShellPkg/Library/BasePathLib/BasePathLib.inf
 
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
 
@@ -129,6 +129,9 @@
 
 #### Un-comment the following line to build Python.
 #  AppPkg/Applications/Python/PythonCore.inf
+
+#### Un-comment the following line to build Lua.
+  AppPkg/Applications/Lua/Lua.inf
 
 
 ##############################################################################

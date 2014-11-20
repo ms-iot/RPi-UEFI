@@ -24,6 +24,7 @@
 #
 ################################################################################
 
+!ifndef $(EDK2_ARMVE_SINGLE_BINARY)
 [FD.Sec_ArmVExpress_EFI]
 BaseAddress   = 0x44000000|gArmTokenSpaceGuid.PcdSecureFdBaseAddress  #The base address of the Secure FLASH Device.
 Size          = 0x00080000|gArmTokenSpaceGuid.PcdSecureFdSize         #The size in bytes of the Secure FLASH Device
@@ -50,20 +51,32 @@ NumBlocks     = 0x80
 0x00000000|0x00080000
 gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvSize
 FV = FVMAIN_SEC
-
+!endif
 
 [FD.ArmVExpress_EFI]
 !if $(EDK2_ARMVE_STANDALONE) == 1
+!if $(EDK2_ARMVE_SINGLE_BINARY) == 1
+BaseAddress   = 0x44000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in NOR Flash.
+!else
 BaseAddress   = 0x45000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in NOR Flash.
+!endif
 !else
 BaseAddress   = 0x80000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
 !endif
+!if $(EDK2_ARMVE_SINGLE_BINARY) == 1
+Size          = 0x00280000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
+!else
 Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
+!endif
 ErasePolarity = 1
 
 # This one is tricky, it must be: BlockSize * NumBlocks = Size
 BlockSize     = 0x00001000
+!if $(EDK2_ARMVE_SINGLE_BINARY) == 1
+NumBlocks     = 0x280
+!else
 NumBlocks     = 0x200
+!endif
 
 ################################################################################
 #
@@ -80,11 +93,19 @@ NumBlocks     = 0x200
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
+!if $(EDK2_ARMVE_SINGLE_BINARY) == 1
+0x00000000|0x00080000
+gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvSize
+FV = FVMAIN_SEC
 
+0x00080000|0x00200000
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
+FV = FVMAIN_COMPACT
+!else
 0x00000000|0x00200000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
-
+!endif
 
 ################################################################################
 #
@@ -240,8 +261,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF ArmPlatformPkg/Bds/Bds.inf
 
-  # FV Filesystem
-  INF MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8

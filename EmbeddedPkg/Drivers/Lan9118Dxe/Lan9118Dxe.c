@@ -99,16 +99,25 @@ Lan9118DxeEntry (
   SnpMode->NvRamSize = 0;           // No NVRAM with this device
   SnpMode->NvRamAccessSize = 0; // No NVRAM with this device
 
-  // Update network mode information
-  SnpMode->ReceiveFilterMask = EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST |
-                                 EFI_SIMPLE_NETWORK_RECEIVE_UNICAST |
-                                 EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST |
-                                 EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;/* |
-                                 EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;*/
-  // Current allowed settings
-  SnpMode->ReceiveFilterSetting = EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST |
-                                    EFI_SIMPLE_NETWORK_RECEIVE_UNICAST |
-                                    EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST;
+  //
+  // Claim that all receive filter settings are supported, though the MULTICAST mode
+  // is not completely supported. The LAN9118 Ethernet controller is only able to
+  // do a "hash filtering" and not a perfect filtering on multicast addresses. The
+  // controller does not filter the multicast addresses directly but a hash value
+  // of them. The hash value of a multicast address is derived from its CRC and
+  // ranges from 0 to 63 included.
+  // We claim that the perfect MULTICAST filtering mode is supported because
+  // we do not want the user to switch directly to the PROMISCOUS_MULTICAST mode
+  // and thus not being able to take advantage of the hash filtering.
+  //
+  SnpMode->ReceiveFilterMask = EFI_SIMPLE_NETWORK_RECEIVE_UNICAST              |
+                               EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST            |
+                               EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST            |
+                               EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS          |
+                               EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
+
+  // We do not intend to receive anything for the time being.
+  SnpMode->ReceiveFilterSetting = 0;
 
   // LAN9118 has 64bit hash table, can filter 64 MCast MAC Addresses
   SnpMode->MaxMCastFilterCount = MAX_MCAST_FILTER_CNT;
@@ -175,7 +184,7 @@ Lan9118DxeEntry (
 EFI_STATUS
 EFIAPI
 SnpStart (
-  IN        EFI_SIMPLE_NETWORK_PROTOCOL* Snp
+  IN  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp
  )
 {
   // Check Snp instance
@@ -184,10 +193,9 @@ SnpStart (
   }
 
   // Check state
-  if ((Snp->Mode->State == EfiSimpleNetworkStarted) || (Snp->Mode->State == EfiSimpleNetworkInitialized)) {
+  if ((Snp->Mode->State == EfiSimpleNetworkStarted)    ||
+      (Snp->Mode->State == EfiSimpleNetworkInitialized)  ) {
     return EFI_ALREADY_STARTED;
-  } else if (Snp->Mode->State == EfiSimpleNetworkMaxState) {
-    return EFI_DEVICE_ERROR;
   }
 
   // Change state
@@ -211,7 +219,7 @@ SnpStop (
   }
 
   // Check state of the driver
-  if ((Snp->Mode->State == EfiSimpleNetworkStopped) || (Snp->Mode->State == EfiSimpleNetworkMaxState)) {
+  if (Snp->Mode->State == EfiSimpleNetworkStopped) {
     return EFI_NOT_STARTED;
   }
 
@@ -345,12 +353,7 @@ SnpInitialize (
     return Status;
   }
 
-  // Enable the receiver and transmitter
-  Status = StartRx (0, Snp);
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
+  // Enable the transmitter
   Status = StartTx (START_TX_MAC | START_TX_CFG, Snp);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -473,7 +476,7 @@ SnpShutdown (
     DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver not yet initialized\n"));
     return EFI_DEVICE_ERROR;
   } else if (Snp->Mode->State == EfiSimpleNetworkStopped) {
-    DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver in stopped state\n"));
+    DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver not started\n"));
     return EFI_NOT_STARTED;
   }
 
@@ -490,167 +493,251 @@ SnpShutdown (
     return Status;
   }
 
+  // Back to the started and thus not initialized state
+  Snp->Mode->State = EfiSimpleNetworkStarted;
+
   return EFI_SUCCESS;
 }
 
+/**
+  Enable and/or disable the receive filters of the LAN9118
 
-/*
- *  UEFI ReceiveFilters() function
- *
- */
+  Please refer to the UEFI specification for the precedence rules among the
+  Enable, Disable and ResetMCastFilter parameters.
+
+  @param[in]  Snp               A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL
+                                instance.
+  @param[in]  Enable            A bit mask of receive filters to enable.
+  @param[in]  Disable           A bit mask of receive filters to disable.
+  @param[in]  ResetMCastFilter  Set to TRUE to reset the contents of the multicast
+                                receive filters on the network interface to
+                                their default values.
+  @param[in]  MCastFilterCnt    Number of multicast HW MAC addresses in the new
+                                MCastFilter list. This value must be less than or
+                                equal to the MCastFilterCnt field of
+                                EFI_SIMPLE_NETWORK_MODE. This field is optional if
+                                ResetMCastFilter is TRUE.
+  @param[in]  MCastFilter       A pointer to a list of new multicast receive
+                                filter HW MAC addresses. This list will replace
+                                any existing multicast HW MAC address list. This
+                                field is optional if ResetMCastFilter is TRUE.
+
+  @retval  EFI_SUCCESS            The receive filters of the LAN9118 were updated.
+  @retval  EFI_NOT_STARTED        The LAN9118 has not been started.
+  @retval  EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE :
+                                  . This is NULL
+                                  . Multicast is being enabled (the
+                                    EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST bit is set in
+                                    Enable, it is not set in Disable, and ResetMCastFilter
+                                    is FALSE) and MCastFilterCount is zero.
+                                  . Multicast is being enabled and MCastFilterCount is
+                                    greater than Snp->Mode->MaxMCastFilterCount.
+                                  . Multicast is being enabled and MCastFilter is NULL
+                                  . Multicast is being enabled and one or more of the
+                                    addresses in the MCastFilter list are not valid
+                                    multicast MAC addresses.
+  @retval  EFI_DEVICE_ERROR       The LAN9118 has been started but not initialized.
+
+**/
 EFI_STATUS
 EFIAPI
 SnpReceiveFilters (
-  IN        EFI_SIMPLE_NETWORK_PROTOCOL* Snp,
-  IN        UINT32 Enable,
-  IN        UINT32 Disable,
-  IN        BOOLEAN Reset,
-  IN        UINTN NumMfilter          OPTIONAL,
-  IN        EFI_MAC_ADDRESS *Mfilter  OPTIONAL
+  IN  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp,
+  IN  UINT32                       Enable,
+  IN  UINT32                       Disable,
+  IN  BOOLEAN                      ResetMCastFilter,
+  IN  UINTN                        MCastFilterCnt  OPTIONAL,
+  IN  EFI_MAC_ADDRESS              *MCastFilter  OPTIONAL
   )
 {
-  UINT32 MacCSRValue;
-  UINT32 MultHashTableHigh;
-  UINT32 MultHashTableLow;
-  UINT32 Crc;
-  UINT8 BitToSelect;
-  UINT32 Count;
+  EFI_SIMPLE_NETWORK_MODE  *Mode;
+  UINT32                   MultHashTableHigh;
+  UINT32                   MultHashTableLow;
+  UINT32                   Count;
+  UINT32                   Crc;
+  UINT8                    HashValue;
+  UINT32                   MacCSRValue;
+  UINT32                   ReceiveFilterSetting;
+  EFI_MAC_ADDRESS          *Mac;
+  EFI_MAC_ADDRESS          ZeroMac;
 
-  MacCSRValue = 0;
-  MultHashTableHigh = 0;
-  MultHashTableLow = 0;
-  Crc = 0xFFFFFFFF;
-  BitToSelect = 0;
-  Count = 0;
+  // Check Snp Instance
+  if (Snp == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  Mode = Snp->Mode;
 
   // Check that driver was started and initialised
-  if (Snp->Mode->State == EfiSimpleNetworkStarted) {
+  if (Mode->State == EfiSimpleNetworkStarted) {
     DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver not initialized\n"));
     return EFI_DEVICE_ERROR;
-  } else if (Snp->Mode->State == EfiSimpleNetworkStopped) {
+  } else if (Mode->State == EfiSimpleNetworkStopped) {
     DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver in stopped state\n"));
     return EFI_NOT_STARTED;
   }
 
-  // If reset then clear the filter registers
-  if (Reset) {
-    Enable |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST;
-    IndirectMACWrite32 (INDIRECT_MAC_INDEX_HASHL, 0x00000000);
-    IndirectMACWrite32 (INDIRECT_MAC_INDEX_HASHH, 0x00000000);
+  if ((Enable  & (~Mode->ReceiveFilterMask)) ||
+      (Disable & (~Mode->ReceiveFilterMask))    ) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  // Set the hash tables
-  if ((NumMfilter > 0) && (!Reset)) {
+  //
+  // Check the validity of the multicast setting and compute the
+  // hash values of the multicast mac addresses to listen to.
+  //
 
-    // Read the Multicast High Hash Table
-    MultHashTableHigh = IndirectMACRead32 (INDIRECT_MAC_INDEX_HASHH);
-
-    // Read the Multicast Low Hash Table
-    MultHashTableLow = IndirectMACRead32 (INDIRECT_MAC_INDEX_HASHL);
-
-    // Go through each filter address and set appropriate bits on hash table
-    for (Count = 0; Count < NumMfilter; Count++) {
-
-      // Generate a 32-bit CRC for Ethernet
-      Crc = GenEtherCrc32 (&Mfilter[Count],6);
-      //gBS->CalculateCrc32 ((VOID*)&Mfilter[Count],6,&Crc); <-- doesn't work as desired
-
-      // Get the most significant 6 bits to index hash registers
-      BitToSelect = (Crc >> 26) & 0x3F;
-
-      // Select hashlow register if MSB is not set
-      if ((BitToSelect & 0x20) == 0) {
-        MultHashTableLow |= (1 << BitToSelect);
-      } else {
-        MultHashTableHigh |= (1 << (BitToSelect & 0x1F));
+  MultHashTableHigh = 0;
+  MultHashTableLow  = 0;
+  if ((!ResetMCastFilter)                                     &&
+      ((Disable & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) == 0) &&
+      ((Enable  & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) != 0)    ) {
+    if ((MCastFilterCnt == 0)                        ||
+        (MCastFilterCnt > Mode->MaxMCastFilterCount) ||
+        (MCastFilter == NULL)                           ) {
+      return EFI_INVALID_PARAMETER;
+    }
+    //
+    // Check the validity of all multicast addresses before to change
+    // anything.
+    //
+    for (Count = 0; Count < MCastFilterCnt; Count++) {
+      if ((MCastFilter[Count].Addr[0] & 1) == 0) {
+        return EFI_INVALID_PARAMETER;
       }
     }
 
-    // Write the desired hash
-    IndirectMACWrite32 (INDIRECT_MAC_INDEX_HASHL, MultHashTableLow);
-    IndirectMACWrite32 (INDIRECT_MAC_INDEX_HASHH, MultHashTableHigh);
+    //
+    // Go through each filter address and set appropriate bits on hash table
+    //
+    for (Count = 0; Count < MCastFilterCnt; Count++) {
+      Mac = &(MCastFilter[Count]);
+      CopyMem (&Mode->MCastFilter[Count], Mac, sizeof(EFI_MAC_ADDRESS));
+
+      Crc = GenEtherCrc32 (Mac, NET_ETHER_ADDR_LEN);
+      //gBS->CalculateCrc32 ((VOID*)&Mfilter[Count],6,&Crc); <-- doesn't work as desired
+
+      //
+      // The most significant 6 bits of the MAC address CRC constitute the hash
+      // value of the MAC address.
+      //
+      HashValue = (Crc >> 26) & 0x3F;
+
+      // Select hashlow register if MSB is not set
+      if ((HashValue & 0x20) == 0) {
+        MultHashTableLow |= (1 << HashValue);
+      } else {
+        MultHashTableHigh |= (1 << (HashValue & 0x1F));
+      }
+    }
+    Mode->MCastFilterCount = MCastFilterCnt;
+  } else if (ResetMCastFilter) {
+    Mode->MCastFilterCount = 0;
+  } else {
+    MultHashTableLow  = IndirectMACRead32 (INDIRECT_MAC_INDEX_HASHL);
+    MultHashTableHigh = IndirectMACRead32 (INDIRECT_MAC_INDEX_HASHH);
   }
 
+  //
+  // Before to change anything, stop and reset the reception of
+  // packets.
+  //
+  StopRx (STOP_RX_CLEAR, Snp);
+
+  //
+  // Write the mask of the selected hash values for the multicast filtering.
+  // The two masks are set to zero if the multicast filtering is not enabled.
+  //
+  IndirectMACWrite32 (INDIRECT_MAC_INDEX_HASHL, MultHashTableLow);
+  IndirectMACWrite32 (INDIRECT_MAC_INDEX_HASHH, MultHashTableHigh);
+
+  ReceiveFilterSetting = (Mode->ReceiveFilterSetting | Enable) & (~Disable);
+
+  //
   // Read MAC controller
-  MacCSRValue = IndirectMACRead32 (INDIRECT_MAC_INDEX_CR);
+  //
+  MacCSRValue  = IndirectMACRead32 (INDIRECT_MAC_INDEX_CR);
+  MacCSRValue &= ~(MACCR_HPFILT | MACCR_BCAST | MACCR_PRMS | MACCR_MCPAS);
 
-  // Set the options for the MAC_CSR
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) {
-    StartRx (0, Snp);
+  if (ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) {
+    Lan9118SetMacAddress (&Mode->CurrentAddress, Snp);
     DEBUG ((DEBUG_NET, "Allowing Unicast Frame Reception\n"));
+  } else {
+    //
+    // The Unicast packets do not have to be listen to, set the MAC
+    // address of the LAN9118 to be the "not configured" all zeroes
+    // ethernet MAC address.
+    //
+    ZeroMem (&ZeroMac, NET_ETHER_ADDR_LEN);
+    Lan9118SetMacAddress (&ZeroMac, Snp);
   }
 
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) {
-    StopRx (0, Snp);
-    DEBUG ((DEBUG_NET, "Disabling Unicast Frame Reception\n"));
-  }
-
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) {
+  if (ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) {
     MacCSRValue |= MACCR_HPFILT;
     DEBUG ((DEBUG_NET, "Allowing Multicast Frame Reception\n"));
   }
 
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) {
-    MacCSRValue &= ~MACCR_HPFILT;
-    DEBUG ((DEBUG_NET, "Disabling Multicast Frame Reception\n"));
+  if (ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) {
+    MacCSRValue |= MACCR_MCPAS;
+    DEBUG ((DEBUG_NET, "Enabling Promiscuous Multicast Mode\n"));
   }
 
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) {
-    MacCSRValue &= ~(MACCR_BCAST);
+  if ((ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) == 0) {
+    MacCSRValue |= MACCR_BCAST;
+  } else {
     DEBUG ((DEBUG_NET, "Allowing Broadcast Frame Reception\n"));
   }
 
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) {
-    MacCSRValue |= MACCR_BCAST;
-    DEBUG ((DEBUG_NET, "Disabling Broadcast Frame Reception\n"));
-  }
-
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) {
+  if (ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) {
     MacCSRValue |= MACCR_PRMS;
     DEBUG ((DEBUG_NET, "Enabling Promiscuous Mode\n"));
   }
 
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) {
-    MacCSRValue &= ~MACCR_PRMS;
-    DEBUG ((DEBUG_NET, "Disabling Promiscuous Mode\n"));
-  }
-
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) {
-    MacCSRValue |= (MACCR_HPFILT | MACCR_PRMS);
-    DEBUG ((DEBUG_NET, "Enabling Promiscuous Multicast Mode\n"));
-  }
-
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) {
-    MacCSRValue &= ~(MACCR_HPFILT | MACCR_PRMS);
-    DEBUG ((DEBUG_NET, "Disabling Promiscuous Multicast Mode\n"));
-  }
-
+  //
   // Write the options to the MAC_CSR
+  //
   IndirectMACWrite32 (INDIRECT_MAC_INDEX_CR, MacCSRValue);
   gBS->Stall (LAN9118_STALL);
+
+  //
+  // If we have to retrieve something, start packet reception.
+  //
+  Mode->ReceiveFilterSetting = ReceiveFilterSetting;
+  if (ReceiveFilterSetting != 0) {
+    StartRx (0, Snp);
+  }
 
   return EFI_SUCCESS;
 }
 
-/*
- *  UEFI StationAddress() function
- *
- */
+/**
+  Modify of reset the current station address
+
+  @param[in]  Snp               A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL
+                                instance.
+  @param[in]  Reset             Flag used to reset the station address to the
+                                LAN9118's permanent address.
+  @param[in]  New               New station address to be used for the network interface.
+
+  @retval  EFI_SUCCESS            The LAN9118's station address was updated.
+  @retval  EFI_NOT_STARTED        The LAN9118 has not been started.
+  @retval  EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE :
+                                  . The "New" station address is invalid.
+                                  . "Reset" is FALSE and "New" is NULL.
+  @retval  EFI_DEVICE_ERROR       The LAN9118 has been started but not initialized.
+
+**/
 EFI_STATUS
 EFIAPI
 SnpStationAddress (
-  IN        EFI_SIMPLE_NETWORK_PROTOCOL *Snp,
-  IN        BOOLEAN Reset,
-  IN        EFI_MAC_ADDRESS *NewMac
+  IN  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp,
+  IN  BOOLEAN                      Reset,
+  IN  EFI_MAC_ADDRESS              *New
 )
 {
-  DEBUG ((DEBUG_NET, "SnpStationAddress()\n"));
-
   UINT32 Count;
-  UINT8  PermAddr[6];
-  UINT64 DefaultMacAddress;
+  UINT8  PermAddr[NET_ETHER_ADDR_LEN];
 
-  Count = 0;
+  DEBUG ((DEBUG_NET, "SnpStationAddress()\n"));
 
   // Check Snp instance
   if (Snp == NULL) {
@@ -670,25 +757,41 @@ SnpStationAddress (
   if (Reset) {
     // Try using EEPROM first. Read the first byte of data from EEPROM at the address 0x0
     if ((IndirectEEPROMRead32 (0) & 0xFF) == EEPROM_EXTERNAL_SERIAL_EEPROM) {
-      for (Count = 1; Count < 7; Count++) {
-        PermAddr[Count - 1] = IndirectEEPROMRead32 (Count);
+      for (Count = 0; Count < NET_ETHER_ADDR_LEN; Count++) {
+        PermAddr[Count] = IndirectEEPROMRead32 (Count + 1);
       }
-
-      // Write address
+      New = (EFI_MAC_ADDRESS *) PermAddr;
       Lan9118SetMacAddress ((EFI_MAC_ADDRESS *) PermAddr, Snp);
     } else {
       DEBUG ((EFI_D_ERROR, "Lan9118: Warning: No valid MAC address in EEPROM, using fallback\n"));
-      DefaultMacAddress = FixedPcdGet64 (PcdLan9118DefaultMacAddress);
-      Lan9118SetMacAddress ((EFI_MAC_ADDRESS *) &DefaultMacAddress, Snp);
+      New = (EFI_MAC_ADDRESS*) (FixedPcdGet64 (PcdLan9118DefaultMacAddress));
     }
   } else {
     // Otherwise use the specified new MAC address
-    if (NewMac == NULL) {
+    if (New == NULL) {
       return EFI_INVALID_PARAMETER;
     }
+    //
+    // If it is a multicast address, it is not valid.
+    //
+    if (New->Addr[0] & 0x01) {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
 
-    // Write address
-    Lan9118SetMacAddress (NewMac, Snp);
+  CopyMem (&Snp->Mode->CurrentAddress, New, NET_ETHER_ADDR_LEN);
+
+  //
+  // If packet reception is currently activated, stop and reset it,
+  // set the new ethernet address and restart the packet reception.
+  // Otherwise, nothing to do, the MAC address will be updated in
+  // SnpReceiveFilters() when the UNICAST packet reception will be
+  // activated.
+  //
+  if (Snp->Mode->ReceiveFilterSetting  != 0) {
+    StopRx (STOP_RX_CLEAR, Snp);
+    Lan9118SetMacAddress (New, Snp);
+    StartRx (0, Snp);
   }
 
   return EFI_SUCCESS;
@@ -707,7 +810,8 @@ SnpStatistics (
       OUT   EFI_NETWORK_STATISTICS *Statistics
   )
 {
-  LAN9118_DRIVER *LanDriver;
+  LAN9118_DRIVER  *LanDriver;
+  EFI_STATUS      Status;
 
   LanDriver = INSTANCE_FROM_SNP_THIS (Snp);
 
@@ -727,31 +831,39 @@ SnpStatistics (
     return EFI_NOT_STARTED;
   }
 
-  // Check pointless condition
-  if ((!Reset) && (StatSize == NULL) && (Statistics == NULL)) {
-    return EFI_SUCCESS;
-  }
-
-  // Check the parameters
-  if ((StatSize == NULL) && (Statistics != NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  // Do a reset if required
+  //
+  // Do a reset if required. It is not clearly stated in the UEFI specification
+  // whether the reset has to be done before to copy the statistics in "Statictics"
+  // or after. It is a bit strange to do it before but that is what is expected by
+  // the SCT test on Statistics() with reset : "0x3de76704,0x4bf5,0x42cd,0x8c,0x89,
+  // 0x54,0x7e,0x4f,0xad,0x4f,0x24".
+  //
   if (Reset) {
     ZeroMem (&LanDriver->Stats, sizeof(EFI_NETWORK_STATISTICS));
   }
 
-  // Check buffer size
-  if (*StatSize < sizeof(EFI_NETWORK_STATISTICS)) {
-    *StatSize = sizeof(EFI_NETWORK_STATISTICS);
-    return EFI_BUFFER_TOO_SMALL;
+  Status = EFI_SUCCESS;
+  if (StatSize == NULL) {
+    if (Statistics != NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+  } else {
+    if (Statistics == NULL) {
+      Status = EFI_BUFFER_TOO_SMALL;
+    } else {
+      // Fill in the statistics
+      CopyMem (
+        Statistics, &LanDriver->Stats,
+        MIN (*StatSize, sizeof (EFI_NETWORK_STATISTICS))
+        );
+      if (*StatSize < sizeof (EFI_NETWORK_STATISTICS)) {
+        Status = EFI_BUFFER_TOO_SMALL;
+      }
+    }
+    *StatSize = sizeof (EFI_NETWORK_STATISTICS);
   }
 
-  // Fill in the statistics
-  CopyMem(&Statistics, &LanDriver->Stats, sizeof(EFI_NETWORK_STATISTICS));
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /*
@@ -846,9 +958,9 @@ SnpNvData (
 EFI_STATUS
 EFIAPI
 SnpGetStatus (
-  IN        EFI_SIMPLE_NETWORK_PROTOCOL* Snp,
-      OUT   UINT32 *IrqStat  OPTIONAL,
-      OUT   VOID **TxBuff    OPTIONAL
+  IN   EFI_SIMPLE_NETWORK_PROTOCOL  *Snp,
+  OUT  UINT32                       *IrqStat  OPTIONAL,
+  OUT  VOID                         **TxBuff  OPTIONAL
   )
 {
   UINT32          FifoInt;
@@ -866,7 +978,12 @@ SnpGetStatus (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Snp->Mode->State != EfiSimpleNetworkInitialized) {
+  // Check that driver was started and initialised
+  if (Snp->Mode->State == EfiSimpleNetworkStarted) {
+    DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver not initialized\n"));
+    return EFI_DEVICE_ERROR;
+  } else if (Snp->Mode->State == EfiSimpleNetworkStopped) {
+    DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver in stopped state\n"));
     return EFI_NOT_STARTED;
   }
 
@@ -884,29 +1001,24 @@ SnpGetStatus (
 
   // Read interrupt status if IrqStat is not NULL
   if (IrqStat != NULL) {
+    *IrqStat = 0;
 
     // Check for receive interrupt
     if (MmioRead32 (LAN9118_INT_STS) & INSTS_RSFL) { // Data moved from rx FIFO
       *IrqStat |= EFI_SIMPLE_NETWORK_RECEIVE_INTERRUPT;
       MmioWrite32 (LAN9118_INT_STS,INSTS_RSFL);
-    } else {
-      *IrqStat &= ~EFI_SIMPLE_NETWORK_RECEIVE_INTERRUPT;
     }
 
     // Check for transmit interrupt
     if (MmioRead32 (LAN9118_INT_STS) & INSTS_TSFL) {
       *IrqStat |= EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
       MmioWrite32 (LAN9118_INT_STS,INSTS_TSFL);
-    } else {
-      *IrqStat &= ~EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
     }
 
     // Check for software interrupt
     if (MmioRead32 (LAN9118_INT_STS) & INSTS_SW_INT) {
       *IrqStat |= EFI_SIMPLE_NETWORK_SOFTWARE_INTERRUPT;
       MmioWrite32 (LAN9118_INT_STS,INSTS_SW_INT);
-    } else {
-      *IrqStat &= ~EFI_SIMPLE_NETWORK_SOFTWARE_INTERRUPT;
     }
   }
 
@@ -918,7 +1030,7 @@ SnpGetStatus (
     TxStatus = MmioRead32 (LAN9118_TX_STATUS);
     PacketTag = TxStatus >> 16;
     TxStatus = TxStatus & 0xFFFF;
-    if ((TxStatus & TXSTATUS_ES) && TxStatus != (TXSTATUS_ES | TXSTATUS_NO_CA)) {
+    if ((TxStatus & TXSTATUS_ES) && (TxStatus != (TXSTATUS_ES | TXSTATUS_NO_CA))) {
       DEBUG ((EFI_D_ERROR, "LAN9118: There was an error transmitting. TxStatus=0x%08x:", TxStatus));
       if (TxStatus & TXSTATUS_NO_CA) {
         DEBUG ((EFI_D_ERROR, "- No carrier\n"));
@@ -939,7 +1051,7 @@ SnpGetStatus (
         DEBUG ((EFI_D_ERROR, "- Lost carrier during Tx\n"));
       }
       return EFI_DEVICE_ERROR;
-    } else {
+    } else if (TxBuff != NULL) {
       LanDriver->Stats.TxTotalFrames += 1;
       *TxBuff = LanDriver->TxRing[PacketTag % LAN9118_TX_RING_NUM_ENTRIES];
     }
@@ -1018,7 +1130,13 @@ SnpTransmit (
   if ((Snp == NULL) || (Data == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  if (Snp->Mode->State != EfiSimpleNetworkInitialized) {
+
+  // Check that driver was started and initialised
+  if (Snp->Mode->State == EfiSimpleNetworkStarted) {
+    DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver not initialized\n"));
+    return EFI_DEVICE_ERROR;
+  } else if (Snp->Mode->State == EfiSimpleNetworkStopped) {
+    DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver in stopped state\n"));
     return EFI_NOT_STARTED;
   }
 
@@ -1031,6 +1149,13 @@ SnpTransmit (
     if ((DstAddr == NULL) || (Protocol == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
+  }
+
+  //
+  // Check validity of BufferSize
+  //
+  if (BuffSize < Snp->Mode->MediaHeaderSize) {
+      return EFI_BUFFER_TOO_SMALL;
   }
 
   // Before transmitting check the link status
@@ -1193,11 +1318,16 @@ SnpReceive (
 #endif
 
   // Check preliminaries
-  if ((Snp == NULL) || (Data == NULL)) {
+  if ((Snp == NULL) || (Data == NULL) || (BuffSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Snp->Mode->State != EfiSimpleNetworkInitialized) {
+  // Check that driver was started and initialised
+  if (Snp->Mode->State == EfiSimpleNetworkStarted) {
+    DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver not initialized\n"));
+    return EFI_DEVICE_ERROR;
+  } else if (Snp->Mode->State == EfiSimpleNetworkStopped) {
+    DEBUG ((EFI_D_WARN, "Warning: LAN9118 Driver in stopped state\n"));
     return EFI_NOT_STARTED;
   }
 

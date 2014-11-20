@@ -77,6 +77,9 @@
   gArmTokenSpaceGuid.PcdVFPEnabled|0|UINT32|0x00000024
 
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000080000000|UINT64|0x00000002
+  # This PCD will free the unallocated buffers if their size reach this threshold.
+  # We set the default value to 512MB.
+  gArmTokenSpaceGuid.PcdArmFreeUncachedMemorySizeThreshold|0x20000000|UINT64|0x00000043
   gArmTokenSpaceGuid.PcdArmCacheOperationThreshold|1024|UINT32|0x00000003
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xffff0000|UINT32|0x00000004
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
@@ -84,17 +87,17 @@
   #
   # ARM Secure Firmware PCDs
   #
-  gArmTokenSpaceGuid.PcdSecureFdBaseAddress|0|UINT32|0x00000015
+  gArmTokenSpaceGuid.PcdSecureFdBaseAddress|0|UINT64|0x00000015
   gArmTokenSpaceGuid.PcdSecureFdSize|0|UINT32|0x00000016
-  gArmTokenSpaceGuid.PcdSecureFvBaseAddress|0x0|UINT32|0x0000002F
+  gArmTokenSpaceGuid.PcdSecureFvBaseAddress|0x0|UINT64|0x0000002F
   gArmTokenSpaceGuid.PcdSecureFvSize|0x0|UINT32|0x00000030
 
   #
   # ARM Normal (or Non Secure) Firmware PCDs
   #
-  gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT32|0x0000002B
+  gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B
   gArmTokenSpaceGuid.PcdFdSize|0|UINT32|0x0000002C
-  gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT32|0x0000002D
+  gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT64|0x0000002D
   gArmTokenSpaceGuid.PcdFvSize|0|UINT32|0x0000002E
 
   #
@@ -231,11 +234,3 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
   gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
-
-  #
-  # ARM PSCI function invocations can be done either through hypervisor
-  # calls (HVC) or secure monitor calls (SMC).
-  # PcdArmPsciMethod == 1 : use HVC
-  # PcdArmPsciMethod == 2 : use SMC
-  #
-  gArmTokenSpaceGuid.PcdArmPsciMethod|0|UINT32|0x00000042

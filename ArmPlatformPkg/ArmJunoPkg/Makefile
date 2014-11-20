@@ -15,8 +15,8 @@
 # - ARMGCC_TOOLS_PATH: for ARMGCC toolchain
 # - ARMLINUXGCC_TOOLS_PATH: for ARMLINUXGCC
 
-EDK2_TOOLCHAIN ?= GCC48
-GCC48_AARCH64_PREFIX ?= aarch64-linux-gnu-
+EDK2_TOOLCHAIN ?= GCC49
+GCC49_AARCH64_PREFIX ?= aarch64-none-elf-
 EDK2_ARCH ?= AARCH64
 EDK2_BUILD ?= DEBUG
 EDK2_DSC = ArmPlatformPkg/ArmJunoPkg/ArmJuno.dsc
@@ -57,7 +57,7 @@ all: $(EDK2_CONF)
 ifeq ("$(OS)","Windows_NT")
 	build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS)
 else
-	. ./edksetup.sh; GCC47_AARCH64_PREFIX=$(GCC47_AARCH64_PREFIX) build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS)
+	. ./edksetup.sh; GCC49_AARCH64_PREFIX=$(GCC49_AARCH64_PREFIX) build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS)
 endif
 ifeq ("$(OS)","Windows_NT")
 	$(SILENT)$(ECHO) "Warning: The UEFI Firmware must be added to the Firmware Image Package (FIP)."

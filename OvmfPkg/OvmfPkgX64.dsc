@@ -336,6 +336,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|800
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
 
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
+
+  # Set video resolution for text setup.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
 
 ################################################################################
 #
@@ -433,6 +438,8 @@
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+  OvmfPkg/XenBusDxe/XenBusDxe.inf
+  OvmfPkg/XenPvBlkDxe/XenPvBlkDxe.inf
   OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf {
     <LibraryClasses>
       PlatformFvbLib|OvmfPkg/Library/EmuVariableFvbLib/EmuVariableFvbLib.inf
@@ -549,7 +556,7 @@
       ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
       SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
       PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-      PathLib|MdeModulePkg/Library/BasePathLib/BasePathLib.inf
+      PathLib|ShellPkg/Library/BasePathLib/BasePathLib.inf
 #      SafeBlockIoLib|ShellPkg/Library/SafeBlockIoLib/SafeBlockIoLib.inf
 #      SafeOpenProtocolLib|ShellPkg/Library/SafeOpenProtocolLib/SafeOpenProtocolLib.inf
       BcfgCommandLib|ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf

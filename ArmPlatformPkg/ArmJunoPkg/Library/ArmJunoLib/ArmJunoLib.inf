@@ -29,6 +29,7 @@
 [LibraryClasses]
   IoLib
   ArmLib
+  HobLib
   MemoryAllocationLib
   SerialPortLib
 

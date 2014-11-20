@@ -14,6 +14,7 @@
 
 #include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -21,7 +22,7 @@
 #include <ArmPlatform.h>
 
 // The total number of descriptors, including the final "end-of-table" descriptor.
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS 11
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS 12
 
 // DDR attributes
 #define DDR_ATTRIBUTES_CACHED           ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
@@ -45,8 +46,27 @@ ArmPlatformGetVirtualMemoryMap (
   ARM_MEMORY_REGION_ATTRIBUTES  CacheAttributes;
   UINTN                         Index = 0;
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
+  EFI_RESOURCE_ATTRIBUTE_TYPE   ResourceAttributes;
 
   ASSERT (VirtualMemoryMap != NULL);
+
+  //
+  // Declared the additional 6GB of memory
+  //
+  ResourceAttributes =
+      EFI_RESOURCE_ATTRIBUTE_PRESENT |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_TESTED;
+
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_SYSTEM_MEMORY,
+    ResourceAttributes,
+    ARM_JUNO_EXTRA_SYSTEM_MEMORY_BASE,
+    ARM_JUNO_EXTRA_SYSTEM_MEMORY_SZ);
 
   VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR*)AllocatePages(EFI_SIZE_TO_PAGES (sizeof(ARM_MEMORY_REGION_DESCRIPTOR) * MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS));
   if (VirtualMemoryTable == NULL) {
@@ -100,10 +120,16 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[Index].Length          = ARM_JUNO_SOC_PERIPHERALS_SZ;
   VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
-  // DDR
+  // DDR - 2GB
   VirtualMemoryTable[++Index].PhysicalBase  = PcdGet64 (PcdSystemMemoryBase);
   VirtualMemoryTable[Index].VirtualBase     = PcdGet64 (PcdSystemMemoryBase);
   VirtualMemoryTable[Index].Length          = PcdGet64 (PcdSystemMemorySize);
+  VirtualMemoryTable[Index].Attributes      = CacheAttributes;
+
+  // DDR - 6GB
+  VirtualMemoryTable[++Index].PhysicalBase  = ARM_JUNO_EXTRA_SYSTEM_MEMORY_BASE;
+  VirtualMemoryTable[Index].VirtualBase     = ARM_JUNO_EXTRA_SYSTEM_MEMORY_BASE;
+  VirtualMemoryTable[Index].Length          = ARM_JUNO_EXTRA_SYSTEM_MEMORY_SZ;
   VirtualMemoryTable[Index].Attributes      = CacheAttributes;
 
   // End of Table

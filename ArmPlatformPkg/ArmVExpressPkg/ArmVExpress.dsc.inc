@@ -94,8 +94,7 @@
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   EblAddExternalCommandLib|EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
-  PathLib|MdeModulePkg/Library/BasePathLib/BasePathLib.inf
-  
+
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
   # in the debugger will show load and unload commands for symbols. You can cut and paste this
@@ -113,9 +112,14 @@
 
   # BDS Libraries
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
-
-  AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
+
+  # RunAxf support via Dynamic Shell Command protocol
+  # It uses the Shell libraries.
+  ArmShellCmdRunAxfLib|ArmPlatformPkg/Library/ArmShellCmdRunAxf/ArmShellCmdRunAxf.inf
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+  FileHandleLib|ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
 
 [LibraryClasses.common.SEC]
   ArmPlatformSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf
@@ -365,6 +369,12 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi()"
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
+  # RunAxf support via Dynamic Shell Command protocol
+  # We want to use the Shell Libraries but don't want it to initialise
+  # automatically. We initialise the libraries when the command is called by the
+  # Shell.
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+
 !ifdef EDK2_ENABLE_SMSC_91X
   # Ethernet (SMSC 91C111)
   gEmbeddedTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
@@ -403,6 +413,3 @@
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   ArmPlatformPkg/ArmVExpressPkg/ArmVExpressFastBootDxe/ArmVExpressFastBootDxe.inf
-
-  # FV Filesystem
-  MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf

@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+# Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,7 +22,6 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = EfiResetSystemLib
-  CONSTRUCTOR                    = ArmPsciResetSystemLibConstructor
 
 [Sources]
   ArmPsciResetSystemLib.c
@@ -35,7 +35,3 @@
   DebugLib
   BaseLib
   ArmSmcLib
-  ArmHvcLib
-
-[Pcd]
-  gArmTokenSpaceGuid.PcdArmPsciMethod

@@ -171,7 +171,7 @@
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
 
-  gArmTokenSpaceGuid.PcdArmPsciMethod|0
+  gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod|0
 
 ################################################################################
 #

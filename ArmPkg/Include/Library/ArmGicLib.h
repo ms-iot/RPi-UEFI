@@ -18,6 +18,10 @@
 //
 // GIC definitions
 //
+typedef enum {
+  ARM_GIC_ARCH_REVISION_2,
+  ARM_GIC_ARCH_REVISION_3
+} ARM_GIC_ARCH_REVISION;
 
 //
 // GIC Distributor
@@ -75,6 +79,15 @@
 #define ARM_GIC_ICCIIDR_GET_ARCH_VERSION(IccIidr) (((IccIidr) >> 16) & 0xF)
 #define ARM_GIC_ICCIIDR_GET_REVISION(IccIidr)     (((IccIidr) >> 12) & 0xF)
 #define ARM_GIC_ICCIIDR_GET_IMPLEMENTER(IccIidr)  ((IccIidr) & 0xFFF)
+
+// Bit Mask for
+#define ARM_GIC_ICCIAR_ACKINTID                 0x3FF
+
+ARM_GIC_ARCH_REVISION
+EFIAPI
+ArmGicGetSupportedArchRevision (
+  VOID
+  );
 
 UINTN
 EFIAPI

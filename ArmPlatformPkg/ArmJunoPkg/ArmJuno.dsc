@@ -35,7 +35,7 @@
 
   ArmPlatformSysConfigLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSysConfigLib/ArmVExpressSysConfigLib.inf
   NorFlashPlatformLib|ArmPlatformPkg/ArmJunoPkg/Library/NorFlashJunoLib/NorFlashJunoLib.inf
-  EfiResetSystemLib|ArmPlatformPkg/ArmJunoPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  EfiResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
@@ -79,7 +79,6 @@
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Juno"
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"1.1"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmJuno"
 
   #
@@ -133,7 +132,7 @@
   #
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from NOR Flash"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/Image"
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno"
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno.dtb"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,115200 earlyprintk=pl011,0x7ff80000 root=/dev/sda1 rootwait verbose debug"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
 
@@ -197,12 +196,6 @@
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
-  #
-  # ACPI Support
-  #
-  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  ArmPlatformPkg/ArmJunoPkg/AcpiTables/AcpiTables.inf
-
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
@@ -244,3 +237,4 @@
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   ArmPlatformPkg/Bds/Bds.inf
+
