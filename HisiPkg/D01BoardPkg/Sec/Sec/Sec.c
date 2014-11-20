@@ -118,7 +118,7 @@ CEntryPoint (
     copy_cpsr_into_spsr ();
 
     // Call the Platform specific function to execute additional actions if required
-    JumpAddress = PcdGet32 (PcdFvBaseAddress);
+    JumpAddress = PcdGet64 (PcdFvBaseAddress);
     ArmPlatformSecExtraAction (MpId, &JumpAddress);
 
     NonTrustedWorldTransition (MpId, JumpAddress);
@@ -162,7 +162,7 @@ TrustedWorldInitialization (
   }
 
   // Call the Platform specific function to execute additional actions if required
-  JumpAddress = PcdGet32 (PcdFvBaseAddress);
+  JumpAddress = PcdGet64 (PcdFvBaseAddress);
   ArmPlatformSecExtraAction (MpId, &JumpAddress);
 
   // Write to CP15 Non-secure Access Control Register
