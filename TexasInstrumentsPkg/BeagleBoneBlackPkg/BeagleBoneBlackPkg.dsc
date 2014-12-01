@@ -300,6 +300,8 @@
   
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|4000
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|25000
+  gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
+  gBeagleBoneBlackTokenSpaceGuid.PcdTimerInterruptNumber|66
 
   #
   # ARM Pcds
