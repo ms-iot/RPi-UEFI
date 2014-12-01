@@ -41,13 +41,6 @@ volatile UINT64 mTimerPeriod = 0;
 // Cached copy of the Hardware Interrupt protocol instance
 EFI_HARDWARE_INTERRUPT_PROTOCOL *gInterrupt = NULL;
 
-// Cached registers
-volatile UINT32 TISR;
-volatile UINT32 TCLR;
-volatile UINT32 TLDR;
-volatile UINT32 TCRR;
-volatile UINT32 TIER;
-
 // Cached interrupt vector
 volatile UINTN  gVector;
 
@@ -88,10 +81,10 @@ TimerInterruptHandler (
   }
 
   // Clear all timer interrupts
-  MmioWrite32 (TISR, TISR_CLEAR_ALL);  
+  MmioWrite32 (DMTIMER0_BASE + DMTIMER_TISR, TISR_CLEAR_ALL);
 
   // Poll interrupt status bits to ensure clearing
-  while ((MmioRead32 (TISR) & TISR_ALL_INTERRUPT_MASK) != TISR_NO_INTERRUPTS_PENDING);
+  while ((MmioRead32 (DMTIMER0_BASE + DMTIMER_TISR) & TISR_ALL_INTERRUPT_MASK) != TISR_NO_INTERRUPTS_PENDING);
 
   gBS->RestoreTPL (OriginalTPL);
 }
@@ -180,30 +173,40 @@ TimerDriverSetTimerPeriod (
   )
 {
   EFI_STATUS  Status;
-  UINT64      TimerCount;
-  INT32       LoadValue;
-  
+  UINT64      TimerTicks;
+
+  // disable the timer
+  MmioAnd32 (DMTIMER0_BASE + DMTIMER_TCLR, TCLR_ST_OFF);
+
   if (TimerPeriod == 0) {
-    // Turn off GPTIMER3
-    MmioWrite32 (TCLR, TCLR_ST_OFF);
-    
-    Status = gInterrupt->DisableInterruptSource(gInterrupt, gVector);    
-  } else {  
-    // Calculate required timer count
-    TimerCount = DivU64x32(TimerPeriod * 100, PcdGet32(PcdEmbeddedPerformanceCounterPeriodInNanoseconds));
+    // Leave timer disabled from above, and...
 
-    // Set GPTIMER3 Load register
-    LoadValue = (INT32) -TimerCount;
-    MmioWrite32 (TLDR, LoadValue);
-    MmioWrite32 (TCRR, LoadValue);
+    // Disable timer 0/1 interrupt for a TimerPeriod of 0
+    Status = gInterrupt->DisableInterruptSource (gInterrupt, gVector);
+  } else {
+    // Convert TimerPeriod to TimerTicks
+    TimerTicks = MultU64x32 (TimerPeriod, 32);
+    TimerTicks = DivU64x32 (TimerTicks, 10000);
 
-    // Enable Overflow interrupt
-    MmioWrite32 (TIER, TIER_TCAR_IT_DISABLE | TIER_OVF_IT_ENABLE | TIER_MAT_IT_DISABLE);
+    // if it's larger than 32-bits, pin to highest value
+    if (TimerTicks > 0xffffffff) {
+      TimerTicks = 0xffffffff;
+    }
 
-    // Turn on GPTIMER3, it will reload at overflow
-    MmioWrite32 (TCLR, TCLR_AR_AUTORELOAD | TCLR_ST_ON);
+    TimerTicks = (INT32) -TimerTicks;
 
-    Status = gInterrupt->EnableInterruptSource(gInterrupt, gVector);    
+    // write count to timer
+    MmioWrite32 (DMTIMER0_BASE + DMTIMER_TLDR, TimerTicks);
+    MmioWrite32 (DMTIMER0_BASE + DMTIMER_TCRR, TimerTicks);
+
+    // enable overflow interrupt
+    MmioWrite32(DMTIMER0_BASE + DMTIMER_IRQENABLE_SET, TIER_TCAR_IT_DISABLE | TIER_OVF_IT_ENABLE | TIER_MAT_IT_DISABLE);
+
+    // enable the timer to autoreload
+    MmioWrite32 (DMTIMER0_BASE + DMTIMER_TCLR, TCLR_AR_AUTORELOAD | TCLR_ST_ON);
+
+    // enable timer 0/1 interrupts
+    Status = gInterrupt->EnableInterruptSource (gInterrupt, gVector);
   }
 
   //
@@ -310,19 +313,6 @@ EFI_TIMER_ARCH_PROTOCOL   gTimer = {
   TimerDriverGenerateSoftInterrupt
 };
 
-UINTN
-InterruptVectorForTimer (
-  IN  UINTN Timer
-  )
-{
-  if ((Timer < 1) || (Timer > 12)) {
-    ASSERT(FALSE);
-    return 0xFFFFFFFF;
-  }
-
-  return 0x24 + Timer;
-}
-
 /**
   Initialize the state information for the Timer Architectural Protocol and
   the Timer Debug support protocol that allows the debugger to break into a
@@ -343,24 +333,25 @@ TimerInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_HANDLE  Handle = NULL;
-  EFI_STATUS  Status;
-  //UINT32      TimerBaseAddress;
+  EFI_HANDLE Handle = NULL;
+  EFI_STATUS Status;
 
-  // Find the interrupt controller protocol.  ASSERT if not found.
   Status = gBS->LocateProtocol (&gHardwareInterruptProtocolGuid, NULL, (VOID **)&gInterrupt);
   ASSERT_EFI_ERROR (Status);
 
-  // Set up the timer registers
-  //TimerBaseAddress = DMTIMER2_BASE;
-
   // Disable the timer
-  //Status = TimerDriverSetTimerPeriod (&gTimer, 0);
-  //ASSERT_EFI_ERROR (Status);
+  Status = TimerDriverSetTimerPeriod (&gTimer, 0);
+  ASSERT_EFI_ERROR (Status);
+
+  // Get timer interrupt number
+  gVector = FixedPcdGet32 (PcdTimerInterruptNumber);
 
   // Install interrupt handler
-  gVector = InterruptVectorForTimer (2);  // Using DMTIMER2
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, gVector, TimerInterruptHandler);
+  ASSERT_EFI_ERROR (Status);
+
+  // Set up default timer
+  Status = TimerDriverSetTimerPeriod (&gTimer, FixedPcdGet32(PcdTimerPeriod));
   ASSERT_EFI_ERROR (Status);
 
   // Install the Timer Architectural Protocol onto a new handle

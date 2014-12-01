@@ -50,7 +50,7 @@
 
 [Pcd.common]
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds
+  gBeagleBoneBlackTokenSpaceGuid.PcdTimerInterruptNumber
 
 [Depex]
   gHardwareInterruptProtocolGuid

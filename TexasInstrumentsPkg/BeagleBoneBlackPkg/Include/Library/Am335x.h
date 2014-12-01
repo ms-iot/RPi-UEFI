@@ -53,10 +53,10 @@
 #define WDTIMER2_BASE   (0x44E35000)
 
 #define DMTIMER_TIOCP_CFG (0x0010)
-//#define DMTIMER_TISTAT    (0x0014)
-//#define DMTIMER_TISR      (0x0018)
-//#define DMTIMER_TIER      (0x001C)
-//#define DMTIMER_TWER      (0x0020)
+#define DMTIMER_IRQENABLE_SET (0x002C)
+#define DMTIMER_TISR      (0x0028)  // IRQSTATUS
+#define DMTIMER_TIER      (0x001C)
+#define DMTIMER_TWER      (0x0020)
 #define DMTIMER_TCLR      (0x0038)
 #define DMTIMER_TCRR      (0x003C)
 #define DMTIMER_TLDR      (0x0040)
@@ -66,13 +66,6 @@
 #define DMTIMER_TCAR1     (0x0050)
 #define DMTIMER_TSICR     (0x0054)
 #define DMTIMER_TCAR2     (0x0058)
-/*#define DMTIMER_TPIR      (0x0048)
-#define DMTIMER_TNIR      (0x004C)
-#define DMTIMER_TCVR      (0x0050)
-#define DMTIMER_TOCR      (0x0054)
-#define DMTIMER_TOWR      (0x0058)
-*/
-//#define WSPR              (0x048)
 
 #define TISR_TCAR_IT_FLAG_MASK  BIT2
 #define TISR_OVF_IT_FLAG_MASK   BIT1
