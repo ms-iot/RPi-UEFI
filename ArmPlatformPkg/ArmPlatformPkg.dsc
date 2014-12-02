@@ -109,8 +109,10 @@
 
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
 
+!ifndef INTEL_BDS
   # BDS Libraries
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+!endif
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
 [LibraryClasses.ARM]

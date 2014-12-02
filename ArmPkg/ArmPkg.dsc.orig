@@ -75,9 +75,7 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
 
-!ifndef INTEL_BDS
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
-!endif
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf

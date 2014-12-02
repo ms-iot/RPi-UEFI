@@ -95,8 +95,10 @@
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   DebugAgentTimerLib|EmbeddedPkg/Library/DebugAgentTimerLibNull/DebugAgentTimerLibNull.inf
 
+!ifndef INTEL_BDS
   # BDS Libraries
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+!endif
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
 [LibraryClasses.common.SEC]
