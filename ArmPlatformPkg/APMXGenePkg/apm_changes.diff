@@ -1,0 +1,533 @@
+diff --git a/ArmPkg/ArmPkg.dec b/ArmPkg/ArmPkg.dec
+index 14f16b8..8fe1e1e 100755
+--- a/ArmPkg/ArmPkg.dec
++++ b/ArmPkg/ArmPkg.dec
+@@ -90,17 +90,17 @@
+   #
+   # ARM Secure Firmware PCDs
+   #
+-  gArmTokenSpaceGuid.PcdSecureFdBaseAddress|0|UINT32|0x00000015
++  gArmTokenSpaceGuid.PcdSecureFdBaseAddress|0|UINT64|0x00000015
+   gArmTokenSpaceGuid.PcdSecureFdSize|0|UINT32|0x00000016
+-  gArmTokenSpaceGuid.PcdSecureFvBaseAddress|0x0|UINT32|0x0000002F
++  gArmTokenSpaceGuid.PcdSecureFvBaseAddress|0x0|UINT64|0x0000002F
+   gArmTokenSpaceGuid.PcdSecureFvSize|0x0|UINT32|0x00000030
+ 
+   #
+   # ARM Normal (or Non Secure) Firmware PCDs
+   #
+-  gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT32|0x0000002B
++  gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B
+   gArmTokenSpaceGuid.PcdFdSize|0|UINT32|0x0000002C
+-  gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT32|0x0000002D
++  gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT64|0x0000002D
+   gArmTokenSpaceGuid.PcdFvSize|0|UINT32|0x0000002E
+ 
+   #
+diff --git a/ArmPlatformPkg/ArmPlatformPkg.dec b/ArmPlatformPkg/ArmPlatformPkg.dec
+index d4f6261..a0446de 100755
+--- a/ArmPlatformPkg/ArmPlatformPkg.dec
++++ b/ArmPlatformPkg/ArmPlatformPkg.dec
+@@ -68,7 +68,7 @@
+   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecSecondaryStackSize|0x1000|UINT32|0x00000006
+ 
+   # Stack for CPU Cores in Non Secure Mode
+-  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0|UINT32|0x00000009
++  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0|UINT64|0x00000009
+   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x10000|UINT32|0x00000037
+   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x1000|UINT32|0x0000000A
+     
+diff --git a/ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.c b/ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.c
+index df3e129..7027efe 100755
+--- a/ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.c
++++ b/ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.c
+@@ -34,7 +34,7 @@ ArmPlatformGetGlobalVariable (
+   // Ensure the Global Variable Size have been initialized
+   ASSERT (VariableOffset < PcdGet32 (PcdPeiGlobalVariableSize));
+ 
+-  GlobalVariableBase = PcdGet32 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize);
++  GlobalVariableBase = PcdGet64 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize);
+ 
+   if (VariableSize == 4) {
+     *(UINT32*)Variable = ReadUnaligned32 ((CONST UINT32*)(GlobalVariableBase + VariableOffset));
+@@ -57,7 +57,7 @@ ArmPlatformSetGlobalVariable (
+   // Ensure the Global Variable Size have been initialized
+   ASSERT (VariableOffset < PcdGet32 (PcdPeiGlobalVariableSize));
+ 
+-  GlobalVariableBase = PcdGet32 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize);
++  GlobalVariableBase = PcdGet64 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize);
+ 
+   if (VariableSize == 4) {
+     WriteUnaligned32 ((UINT32*)(GlobalVariableBase + VariableOffset), *(UINT32*)Variable);
+@@ -78,7 +78,7 @@ ArmPlatformGetGlobalVariableAddress (
+   // Ensure the Global Variable Size have been initialized
+   ASSERT (VariableOffset < PcdGet32 (PcdPeiGlobalVariableSize));
+ 
+-  GlobalVariableBase = PcdGet32 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize);
++  GlobalVariableBase = PcdGet64 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize);
+ 
+   return (VOID*)(GlobalVariableBase + VariableOffset);
+ }
+diff --git a/ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.c b/ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.c
+index 02cbb00..50479b4 100755
+--- a/ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.c
++++ b/ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.c
+@@ -19,8 +19,8 @@
+ #include <Library/PcdLib.h>
+ #include <Library/DebugLib.h>
+ 
+-#define IS_XIP() (((UINT32)PcdGet32 (PcdFdBaseAddress) > (UINT32)(PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize))) || \
+-                  ((PcdGet32 (PcdFdBaseAddress) + PcdGet32 (PcdFdSize)) < PcdGet64 (PcdSystemMemoryBase)))
++#define IS_XIP() (((UINT64)PcdGet64 (PcdFdBaseAddress) > (UINT64)(PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize))) || \
++                  ((PcdGet64 (PcdFdBaseAddress) + PcdGet32 (PcdFdSize)) < PcdGet64 (PcdSystemMemoryBase)))
+ 
+ // Declared by ArmPlatformPkg/PrePi Module
+ extern UINTN mGlobalVariableBase;
+diff --git a/ArmPlatformPkg/Library/ArmPlatformSecLibNull/ArmPlatformLibNullSec.c b/ArmPlatformPkg/Library/ArmPlatformSecLibNull/ArmPlatformLibNullSec.c
+index 41f4f74..a45e790 100755
+--- a/ArmPlatformPkg/Library/ArmPlatformSecLibNull/ArmPlatformLibNullSec.c
++++ b/ArmPlatformPkg/Library/ArmPlatformSecLibNull/ArmPlatformLibNullSec.c
+@@ -70,5 +70,5 @@ ArmPlatformSecExtraAction (
+   OUT UINTN*        JumpAddress
+   )
+ {
+-  *JumpAddress = PcdGet32(PcdFvBaseAddress);
++  *JumpAddress = PcdGet64(PcdFvBaseAddress);
+ }
+diff --git a/ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.c b/ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.c
+index 1e1b1ea..585d096 100755
+--- a/ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.c
++++ b/ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.c
+@@ -35,7 +35,7 @@ NonSecureWaitForFirmware (
+   UINTN InterruptId;
+ 
+   // The secondary cores will execute the firmware once wake from WFI.
+-  SecondaryStart = (VOID (*)())PcdGet32 (PcdFvBaseAddress);
++  SecondaryStart = (VOID (*)())PcdGet64 (PcdFvBaseAddress);
+ 
+   ArmCallWFI ();
+ 
+@@ -77,7 +77,7 @@ ArmPlatformSecExtraAction (
+     //
+ 
+     if (ArmPlatformIsPrimaryCore (MpId)) {
+-      UINTN*   StartAddress = (UINTN*)PcdGet32(PcdFvBaseAddress);
++      UINTN*   StartAddress = (UINTN*)PcdGet64(PcdFvBaseAddress);
+ 
+       // Patch the DRAM to make an infinite loop at the start address
+       *StartAddress = 0xEAFFFFFE; // opcode for while(1)
+@@ -85,7 +85,7 @@ ArmPlatformSecExtraAction (
+       CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Waiting for firmware at 0x%08X ...\n\r",StartAddress);
+       SerialPortWrite ((UINT8 *) Buffer, CharCount);
+ 
+-      *JumpAddress = PcdGet32(PcdFvBaseAddress);
++      *JumpAddress = PcdGet64(PcdFvBaseAddress);
+     } else {
+       // When the primary core is stopped by the hardware debugger to copy the firmware
+       // into DRAM. The secondary cores are still running. As soon as the first bytes of
+@@ -107,7 +107,7 @@ ArmPlatformSecExtraAction (
+       ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
+ 
+       // To enter into Non Secure state, we need to make a return from exception
+-      *JumpAddress = PcdGet32(PcdFvBaseAddress);
++      *JumpAddress = PcdGet64(PcdFvBaseAddress);
+     } else {
+       // We wait for the primary core to finish to initialize the System Memory. Otherwise the secondary
+       // cores would make crash the system by setting their stacks in DRAM before the primary core has not
+@@ -115,6 +115,6 @@ ArmPlatformSecExtraAction (
+       *JumpAddress = (UINTN)NonSecureWaitForFirmware;
+     }
+   } else {
+-    *JumpAddress = PcdGet32(PcdFvBaseAddress);
++    *JumpAddress = PcdGet64(PcdFvBaseAddress);
+   }
+ }
+diff --git a/ArmPlatformPkg/PlatformPei/PlatformPeiLib.c b/ArmPlatformPkg/PlatformPei/PlatformPeiLib.c
+index 508b10d..d802c9a 100755
+--- a/ArmPlatformPkg/PlatformPei/PlatformPeiLib.c
++++ b/ArmPlatformPkg/PlatformPei/PlatformPeiLib.c
+@@ -24,7 +24,7 @@ PlatformPeim (
+   VOID
+   )
+ {
+-  BuildFvHob (PcdGet32(PcdFvBaseAddress), PcdGet32(PcdFvSize));
++  BuildFvHob (PcdGet64(PcdFvBaseAddress), PcdGet32(PcdFvSize));
+ 
+   return EFI_SUCCESS;
+ }
+diff --git a/ArmPlatformPkg/PrePeiCore/AArch64/PrePeiCoreEntryPoint.S b/ArmPlatformPkg/PrePeiCore/AArch64/PrePeiCoreEntryPoint.S
+index b84190c..4e87f5b
+--- a/ArmPlatformPkg/PrePeiCore/AArch64/PrePeiCoreEntryPoint.S
++++ b/ArmPlatformPkg/PrePeiCore/AArch64/PrePeiCoreEntryPoint.S
+@@ -60,7 +60,7 @@ ASM_PFX(MainEntryPoint):
+   bl    ASM_PFX(ArmPlatformIsPrimaryCore)
+ 
+   // Get the top of the primary stacks (and the base of the secondary stacks)
+-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresStackBase), x1)
++  LoadConstantToReg (FixedPcdGet64(PcdCPUCoresStackBase), x1)
+   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), x2)
+   add   x1, x1, x2
+ 
+diff --git a/ArmPlatformPkg/PrePeiCore/Arm/PrePeiCoreEntryPoint.S b/ArmPlatformPkg/PrePeiCore/Arm/PrePeiCoreEntryPoint.S
+index af4350b..1681b58 100755
+--- a/ArmPlatformPkg/PrePeiCore/Arm/PrePeiCoreEntryPoint.S
++++ b/ArmPlatformPkg/PrePeiCore/Arm/PrePeiCoreEntryPoint.S
+@@ -41,7 +41,7 @@ ASM_PFX(_ModuleEntryPoint):
+   bl    ASM_PFX(ArmPlatformIsPrimaryCore)
+ 
+   // Get the top of the primary stacks (and the base of the secondary stacks)
+-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresStackBase), r1)
++  LoadConstantToReg (FixedPcdGet64(PcdCPUCoresStackBase), r1)
+   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
+   add   r1, r1, r2
+ 
+@@ -67,7 +67,7 @@ _SetupSecondaryCoreStack:
+ 
+ _PrepareArguments:
+   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
+-  LoadConstantToReg (FixedPcdGet32(PcdFvBaseAddress), r2)
++  LoadConstantToReg (FixedPcdGet64(PcdFvBaseAddress), r2)
+   add   r2, r2, #4
+   ldr   r1, [r2]
+ 
+diff --git a/ArmPlatformPkg/PrePeiCore/Arm/PrePeiCoreEntryPoint.asm b/ArmPlatformPkg/PrePeiCore/Arm/PrePeiCoreEntryPoint.asm
+index be1a767..10742bb 100755
+--- a/ArmPlatformPkg/PrePeiCore/Arm/PrePeiCoreEntryPoint.asm
++++ b/ArmPlatformPkg/PrePeiCore/Arm/PrePeiCoreEntryPoint.asm
+@@ -43,7 +43,7 @@ _ModuleEntryPoint
+   bl	ArmPlatformIsPrimaryCore
+ 
+   // Get the top of the primary stacks (and the base of the secondary stacks)
+-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresStackBase), r1)
++  LoadConstantToReg (FixedPcdGet64(PcdCPUCoresStackBase), r1)
+   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
+   add   r1, r1, r2
+ 
+@@ -69,7 +69,7 @@ _SetupSecondaryCoreStack
+ 
+ _PrepareArguments
+   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
+-  LoadConstantToReg (FixedPcdGet32(PcdFvBaseAddress), r2)
++  LoadConstantToReg (FixedPcdGet64(PcdFvBaseAddress), r2)
+   add   r2, r2, #4
+   ldr   r1, [r2]
+ 
+diff --git a/ArmPlatformPkg/PrePeiCore/MainMPCore.c b/ArmPlatformPkg/PrePeiCore/MainMPCore.c
+index d40594f..c368a19 100755
+--- a/ArmPlatformPkg/PrePeiCore/MainMPCore.c
++++ b/ArmPlatformPkg/PrePeiCore/MainMPCore.c
+@@ -131,7 +131,7 @@ PrimaryMain (
+   // Adjust the Temporary Ram as the new Ppi List (Common + Platform Ppi Lists) is created at
+   // the base of the primary core stack
+   PpiListSize = ALIGN_VALUE(PpiListSize, 0x4);
+-  TemporaryRamBase = (UINTN)PcdGet32 (PcdCPUCoresStackBase) + PpiListSize;
++  TemporaryRamBase = (UINTN)PcdGet64 (PcdCPUCoresStackBase) + PpiListSize;
+   TemporaryRamSize = (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) - PpiListSize;
+ 
+   // Make sure the size is 8-byte aligned. Once divided by 2, the size should be 4-byte aligned
+@@ -144,7 +144,7 @@ PrimaryMain (
+   // Note also:  HOBs (pei temp ram) MUST be above stack
+   //
+   SecCoreData.DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
+-  SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet32 (PcdFvBaseAddress);
++  SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet64 (PcdFvBaseAddress);
+   SecCoreData.BootFirmwareVolumeSize = PcdGet32 (PcdFvSize);
+   SecCoreData.TemporaryRamBase       = (VOID *)TemporaryRamBase; // We run on the primary core (and so we use the first stack)
+   SecCoreData.TemporaryRamSize       = TemporaryRamSize;
+diff --git a/ArmPlatformPkg/PrePeiCore/MainUniCore.c b/ArmPlatformPkg/PrePeiCore/MainUniCore.c
+index b437ad6..776da1b 100755
+--- a/ArmPlatformPkg/PrePeiCore/MainUniCore.c
++++ b/ArmPlatformPkg/PrePeiCore/MainUniCore.c
+@@ -40,7 +40,7 @@ PrimaryMain (
+   // Adjust the Temporary Ram as the new Ppi List (Common + Platform Ppi Lists) is created at
+   // the base of the primary core stack
+   PpiListSize = ALIGN_VALUE(PpiListSize, 0x4);
+-  TemporaryRamBase = (UINTN)PcdGet32 (PcdCPUCoresStackBase) + PpiListSize;
++  TemporaryRamBase = (UINTN)PcdGet64 (PcdCPUCoresStackBase) + PpiListSize;
+   TemporaryRamSize = (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) - PpiListSize;
+ 
+   // Make sure the size is 8-byte aligned. Once divided by 2, the size should be 4-byte aligned
+@@ -53,7 +53,7 @@ PrimaryMain (
+   // Note also:  HOBs (pei temp ram) MUST be above stack
+   //
+   SecCoreData.DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
+-  SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet32 (PcdFvBaseAddress);
++  SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet64 (PcdFvBaseAddress);
+   SecCoreData.BootFirmwareVolumeSize = PcdGet32 (PcdFvSize);
+   SecCoreData.TemporaryRamBase       = (VOID *)TemporaryRamBase; // We run on the primary core (and so we use the first stack)
+   SecCoreData.TemporaryRamSize       = TemporaryRamSize;
+diff --git a/ArmPlatformPkg/PrePeiCore/PrePeiCore.c b/ArmPlatformPkg/PrePeiCore/PrePeiCore.c
+index 1abefae..7ffc249
+--- a/ArmPlatformPkg/PrePeiCore/PrePeiCore.c
++++ b/ArmPlatformPkg/PrePeiCore/PrePeiCore.c
+@@ -53,7 +53,7 @@ CreatePpiList (
+   ArmPlatformGetPlatformPpiList (&PlatformPpiListSize, &PlatformPpiList);
+ 
+   // Copy the Common and Platform PPis in Temporrary Memory
+-  ListBase = PcdGet32 (PcdCPUCoresStackBase);
++  ListBase = PcdGet64 (PcdCPUCoresStackBase);
+   CopyMem ((VOID*)ListBase, gCommonPpiTable, sizeof(gCommonPpiTable));
+   CopyMem ((VOID*)(ListBase + sizeof(gCommonPpiTable)), PlatformPpiList, PlatformPpiListSize);
+ 
+@@ -77,7 +77,9 @@ CEntryPoint (
+   ArmInvalidateDataCache ();
+   // Invalidate instruction cache
+   ArmInvalidateInstructionCache ();
+-  // Enable Instruction Caches on all cores.
++
++  // Enable Instruction & Data caches
++  ArmEnableDataCache ();
+   ArmEnableInstructionCache ();
+ 
+   //
+@@ -153,7 +155,7 @@ PrePeiCoreGetGlobalVariableMemory (
+ {
+   ASSERT (GlobalVariableBase != NULL);
+ 
+-  *GlobalVariableBase = (UINTN)PcdGet32 (PcdCPUCoresStackBase) +
++  *GlobalVariableBase = (UINTN)PcdGet64 (PcdCPUCoresStackBase) +
+                         (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) -
+                         (UINTN)PcdGet32 (PcdPeiGlobalVariableSize);
+ 
+diff --git a/ArmPlatformPkg/PrePi/AArch64/ModuleEntryPoint.S b/ArmPlatformPkg/PrePi/AArch64/ModuleEntryPoint.S
+index fcea949..0a964e1 100755
+--- a/ArmPlatformPkg/PrePi/AArch64/ModuleEntryPoint.S
++++ b/ArmPlatformPkg/PrePi/AArch64/ModuleEntryPoint.S
+@@ -48,7 +48,7 @@ _SetupStackPosition:
+   add   x1, x1, x2      // x1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
+ 
+   // Calculate Top of the Firmware Device
+-  LoadConstantToReg (FixedPcdGet32(PcdFdBaseAddress), x2)
++  LoadConstantToReg (FixedPcdGet64(PcdFdBaseAddress), x2)
+   LoadConstantToReg (FixedPcdGet32(PcdFdSize), x3)
+   sub   x3, x3, #1
+   add   x3, x3, x2      // x3 = FdTop = PcdFdBaseAddress + PcdFdSize
+diff --git a/ArmPlatformPkg/PrePi/Arm/ModuleEntryPoint.S b/ArmPlatformPkg/PrePi/Arm/ModuleEntryPoint.S
+index 4fe10ad..93f181c 100755
+--- a/ArmPlatformPkg/PrePi/Arm/ModuleEntryPoint.S
++++ b/ArmPlatformPkg/PrePi/Arm/ModuleEntryPoint.S
+@@ -56,7 +56,7 @@ _SetupStackPosition:
+   add   r1, r1, r2      // r1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
+ 
+   // Calculate Top of the Firmware Device
+-  LoadConstantToReg (FixedPcdGet32(PcdFdBaseAddress), r2)
++  LoadConstantToReg (FixedPcdGet64(PcdFdBaseAddress), r2)
+   LoadConstantToReg (FixedPcdGet32(PcdFdSize), r3)
+   sub   r3, r3, #1
+   add   r3, r3, r2      // r3 = FdTop = PcdFdBaseAddress + PcdFdSize
+diff --git a/ArmPlatformPkg/PrePi/Arm/ModuleEntryPoint.asm b/ArmPlatformPkg/PrePi/Arm/ModuleEntryPoint.asm
+index 028a9a1..44be245 100755
+--- a/ArmPlatformPkg/PrePi/Arm/ModuleEntryPoint.asm
++++ b/ArmPlatformPkg/PrePi/Arm/ModuleEntryPoint.asm
+@@ -58,7 +58,7 @@ _SetupStackPosition
+   add   r1, r1, r2      // r1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
+ 
+   // Calculate Top of the Firmware Device
+-  LoadConstantToReg (FixedPcdGet32(PcdFdBaseAddress), r2)
++  LoadConstantToReg (FixedPcdGet64(PcdFdBaseAddress), r2)
+   LoadConstantToReg (FixedPcdGet32(PcdFdSize), r3)
+   sub   r3, r3, #1
+   add   r3, r3, r2      // r3 = FdTop = PcdFdBaseAddress + PcdFdSize
+diff --git a/ArmPlatformPkg/PrePi/PrePi.c b/ArmPlatformPkg/PrePi/PrePi.c
+index 84b01b3..5ca9119 100755
+--- a/ArmPlatformPkg/PrePi/PrePi.c
++++ b/ArmPlatformPkg/PrePi/PrePi.c
+@@ -30,8 +30,8 @@
+ #include "PrePi.h"
+ #include "LzmaDecompress.h"
+ 
+-#define IS_XIP() (((UINT32)FixedPcdGet32 (PcdFdBaseAddress) > (UINT32)(FixedPcdGet64 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize))) || \
+-                  ((FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < FixedPcdGet64 (PcdSystemMemoryBase)))
++#define IS_XIP() (((UINT64)FixedPcdGet64 (PcdFdBaseAddress) > (UINT64)(FixedPcdGet64 (PcdSystemMemoryBase) + FixedPcdGet64 (PcdSystemMemorySize))) || \
++                  ((FixedPcdGet64 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < FixedPcdGet64 (PcdSystemMemoryBase)))
+ 
+ // Not used when PrePi in run in XIP mode
+ UINTN mGlobalVariableBase = 0;
+@@ -108,8 +108,8 @@ PrePiMain (
+ 
+   // If ensure the FD is either part of the System Memory or totally outside of the System Memory (XIP)
+   ASSERT (IS_XIP() || 
+-          ((FixedPcdGet32 (PcdFdBaseAddress) >= FixedPcdGet64 (PcdSystemMemoryBase)) &&
+-           ((UINT32)(FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= (UINT32)(FixedPcdGet64 (PcdSystemMemoryBase) + FixedPcdGet64 (PcdSystemMemorySize)))));
++          ((FixedPcdGet64 (PcdFdBaseAddress) >= FixedPcdGet64 (PcdSystemMemoryBase)) &&
++           ((UINT64)(FixedPcdGet64 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= (UINT64)(FixedPcdGet64 (PcdSystemMemoryBase) + FixedPcdGet64 (PcdSystemMemorySize)))));
+ 
+   // Initialize the architecture specific bits
+   ArchInitialize ();
+diff --git a/ArmPlatformPkg/Sec/AArch64/SecEntryPoint.S b/ArmPlatformPkg/Sec/AArch64/SecEntryPoint.S
+index 3512ccd..c2e662e 100755
+--- a/ArmPlatformPkg/Sec/AArch64/SecEntryPoint.S
++++ b/ArmPlatformPkg/Sec/AArch64/SecEntryPoint.S
+@@ -139,5 +139,5 @@ _PrepareArguments:
+   ret
+ 
+ ASM_PFX(JumpToPEI):
+-  LoadConstantToReg (FixedPcdGet32(PcdFvBaseAddress), x0)
++  LoadConstantToReg (FixedPcdGet64(PcdFvBaseAddress), x0)
+   blr   x0
+diff --git a/ArmPlatformPkg/Sec/Sec.c b/ArmPlatformPkg/Sec/Sec.c
+index 088a924..6f146c0 100755
+--- a/ArmPlatformPkg/Sec/Sec.c
++++ b/ArmPlatformPkg/Sec/Sec.c
+@@ -118,7 +118,7 @@ CEntryPoint (
+     copy_cpsr_into_spsr ();
+ 
+     // Call the Platform specific function to execute additional actions if required
+-    JumpAddress = PcdGet32 (PcdFvBaseAddress);
++    JumpAddress = PcdGet64 (PcdFvBaseAddress);
+     ArmPlatformSecExtraAction (MpId, &JumpAddress);
+ 
+     NonTrustedWorldTransition (MpId, JumpAddress);
+@@ -162,7 +162,7 @@ TrustedWorldInitialization (
+   }
+ 
+   // Call the Platform specific function to execute additional actions if required
+-  JumpAddress = PcdGet32 (PcdFvBaseAddress);
++  JumpAddress = PcdGet64 (PcdFvBaseAddress);
+   ArmPlatformSecExtraAction (MpId, &JumpAddress);
+ 
+   // Initialize architecture specific security policy
+diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
+index 28493ad..4cf56fd 100755
+--- a/BaseTools/Conf/tools_def.template
++++ b/BaseTools/Conf/tools_def.template
+@@ -3133,7 +3133,7 @@ DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -
+ DEFINE GCC_X64_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mno-red-zone -Wno-address -mno-stack-arg-probe
+ DEFINE GCC_IPF_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -minline-int-divide-min-latency
+ DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mword-relocations -mlittle-endian -mabi=aapcs -mapcs -fno-short-enums -save-temps -fsigned-char -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address -mthumb -mfloat-abi=soft
+-DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mcmodel=large -mlittle-endian -fno-short-enums -save-temps -fverbose-asm -fsigned-char  -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-builtin -Wno-address
++DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mcmodel=large -mlittle-endian -fno-short-enums -save-temps -fverbose-asm -fsigned-char  -ffunction-sections -fdata-sections -fno-builtin -Wno-address -mno-omit-leaf-frame-pointer
+ DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
+ DEFINE GCC_IA32_X64_DLINK_COMMON   = DEF(GCC_DLINK_FLAGS_COMMON) --gc-sections
+ DEFINE GCC_ARM_AARCH64_DLINK_COMMON= -Ttext=0x0 --emit-relocs -nostdlib --gc-sections -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+@@ -5783,16 +5783,16 @@ RELEASE_ARMGCC_AARCH64_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_AARC
+ # ARM definitions
+ ##################
+ 
+-*_ARMLINUXGCC_ARM_ASLCC_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
+-*_ARMLINUXGCC_ARM_ASLDLINK_PATH   = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-ld
+-*_ARMLINUXGCC_ARM_ASLPP_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
++*_ARMLINUXGCC_ARM_ASLCC_PATH      = ENV(CROSS_COMPILE)gcc
++*_ARMLINUXGCC_ARM_ASLDLINK_PATH   = ENV(CROSS_COMPILE)ld
++*_ARMLINUXGCC_ARM_ASLPP_PATH      = ENV(CROSS_COMPILE)gcc
+ 
+-*_ARMLINUXGCC_ARM_CC_PATH         = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
+-*_ARMLINUXGCC_ARM_SLINK_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-ar
+-*_ARMLINUXGCC_ARM_DLINK_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-ld
+-*_ARMLINUXGCC_ARM_ASM_PATH        = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-as
+-*_ARMLINUXGCC_ARM_PP_PATH         = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
+-*_ARMLINUXGCC_ARM_VFRPP_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
++*_ARMLINUXGCC_ARM_CC_PATH         = ENV(CROSS_COMPILE)gcc
++*_ARMLINUXGCC_ARM_SLINK_PATH      = ENV(CROSS_COMPILE)ar
++*_ARMLINUXGCC_ARM_DLINK_PATH      = ENV(CROSS_COMPILE)ld
++*_ARMLINUXGCC_ARM_ASM_PATH        = ENV(CROSS_COMPILE)as
++*_ARMLINUXGCC_ARM_PP_PATH         = ENV(CROSS_COMPILE)gcc
++*_ARMLINUXGCC_ARM_VFRPP_PATH      = ENV(CROSS_COMPILE)gcc
+ 
+ #
+ # Use default values, or override in DSC file
+diff --git a/BaseTools/Source/C/GenFw/Elf64Convert.c b/BaseTools/Source/C/GenFw/Elf64Convert.c
+index 606c728..5c9641a 100755
+--- a/BaseTools/Source/C/GenFw/Elf64Convert.c
++++ b/BaseTools/Source/C/GenFw/Elf64Convert.c
+@@ -697,15 +697,44 @@ WriteSections64 (
+             break;
+ 
+           case R_AARCH64_CALL26:
+-            if  (Rel->r_addend != 0 ) { /* TODO */
+-              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_CALL26 Need to fixup with addend!.");
+-            }
+-            break;
+-
+-          case R_AARCH64_JUMP26:
+-            if  (Rel->r_addend != 0 ) { /* TODO : AArch64 '-O2' optimisation. */
+-              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_JUMP26 Need to fixup with addend!.");
+-            }
++	  case R_AARCH64_JUMP26:
++	    /* N.B.: The entire implementation of this file is not
++	       endian-safe and can not operate in a cross-endian
++	       (e.g. compiling for a little-endian target on a
++	       big-endian build host). Endianness-conversions are
++	       performed neither on the read-path (from ELF) nor on
++	       the write-patch (to COFF).
++
++	       To keep with the spirit of this (as this limitation
++	       would first need to be fixed throughout the GenFw
++	       source), our implementation of the CALL26 and JUMP26
++	       relocations will too work for matching target and host
++	       endianness only.
++	    */
++	    {
++	      /* We could simply compute the relative offset of the
++		 two involved sections (i.e. the section containing
++		 the relocation and the section containing the target)
++		 and combine this into the original IMM26 field. As it
++		 is somewhat easier to understand and check using
++		 readelf, we instead compute a new IMM26 from the
++		 offset between the full target address and the full
++		 relocation address. */
++
++	      UINT64  target_addr = mCoffSectionsOffset[Sym->st_shndx] + Sym->st_value + Rel->r_addend;
++	      UINT64  reloc_addr  = SecOffset + Rel->r_offset;
++
++	      UINT32  imm26       = ((target_addr - reloc_addr) >> 2) & ((1 << 26) - 1);
++
++	      /* All instructions containing an IMM26 have a similar
++		 structure with the uppermost 6 bits for the opcode. */
++	      UINT32  opcode      = *(UINT32*)Targ & 0xfc000000;
++
++	      VerboseMsg ("0x%016x: relocating IMM26 in insn: %08x -> %08x", 
++			  Rel->r_offset, *(UINT32*)Targ, (opcode | imm26));
++
++	      *(UINT32 *)Targ = opcode | imm26;
++	    }
+             break;
+ 
+           case R_AARCH64_ADR_PREL_PG_HI21:
+diff --git a/BaseTools/Source/C/VfrCompile/VfrSyntax.g b/BaseTools/Source/C/VfrCompile/VfrSyntax.g
+index a38f770..a15f7a3 100755
+--- a/BaseTools/Source/C/VfrCompile/VfrSyntax.g
++++ b/BaseTools/Source/C/VfrCompile/VfrSyntax.g
+@@ -1652,7 +1652,7 @@ vfrStatementSubTitle :
+   |
+     { "," vfrStatementStatTagList}
+     { "," (vfrStatementStat | vfrStatementQuestions)*}
+-    E: EndSubtitle ";"                                  << CRT_END_OP (E); >>
++    F: EndSubtitle ";"                                  << CRT_END_OP (F); >>
+   )
+   ;
+ 
+diff --git a/BaseTools/Source/Python/GNUmakefile b/BaseTools/Source/Python/GNUmakefile
+index ed00a7b..50869e8 100755
+--- a/BaseTools/Source/Python/GNUmakefile
++++ b/BaseTools/Source/Python/GNUmakefile
+@@ -14,5 +14,5 @@
+ all:
+ 
+ clean:
+-	find . -name '*.pyc' -exec rm '{}' ';'
++	find . -name '*.pyc' -exec rm -f '{}' ';'
+ 
+diff --git a/BaseTools/Tests/GNUmakefile b/BaseTools/Tests/GNUmakefile
+index b7cb226..33046ee 100755
+--- a/BaseTools/Tests/GNUmakefile
++++ b/BaseTools/Tests/GNUmakefile
+@@ -17,5 +17,5 @@ test:
+ 	@python RunTests.py
+ 
+ clean:
+-	find . -name '*.pyc' -exec rm '{}' ';'
++	find . -name '*.pyc' -exec rm -f '{}' ';'
+ 
+diff --git a/EmbeddedPkg/Library/FdtLib/FdtLib.inf b/EmbeddedPkg/Library/FdtLib/FdtLib.inf
+index aee99bd..2752666 100755
+--- a/EmbeddedPkg/Library/FdtLib/FdtLib.inf
++++ b/EmbeddedPkg/Library/FdtLib/FdtLib.inf
+@@ -32,6 +32,7 @@
+   fdt_sw.c
+   fdt_wip.c
+   fdt.c
++  fdt_empty_tree.c
+ 
+ [Packages]
+   MdePkg/MdePkg.dec

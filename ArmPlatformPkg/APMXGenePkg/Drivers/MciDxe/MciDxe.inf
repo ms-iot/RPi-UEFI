@@ -1,0 +1,57 @@
+##  
+#  Component description file for SDIO module
+#  
+#  Copyright (c) 2013, AppliedMicro Corp. All rights reserved.
+#  
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MciDxe
+  FILE_GUID                      = 8e6a0723-8eed-42e1-ad07-9f65f32785cc 
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  
+  ENTRY_POINT                    = MciDxeInitialize
+
+[Sources.common]
+  MciDxe.c
+
+[LibraryClasses]
+  DebugLib
+  BaseLib
+  TimerLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  ArmLib
+  IoLib
+  TimerLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiMmcHostProtocolGuid
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/APMXGenePkg/APMXGene.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdAHBCRegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSDIORegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSDIOHostPhyEnableMask
+  gArmPlatformTokenSpaceGuid.PcdSDIOCapLow
+  gArmPlatformTokenSpaceGuid.PcdSDIOCapHigh
+
+[Depex]
+  TRUE
