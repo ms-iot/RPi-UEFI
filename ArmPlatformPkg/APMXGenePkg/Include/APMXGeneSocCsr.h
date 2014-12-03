@@ -1,0 +1,158 @@
+/**
+ * Copyright (c) 2013, AppliedMicro Corp. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are licensed and made available under the terms and conditions of the BSD License
+ * which accompanies this distribution.  The full text of the license may be found at
+ * http://opensource.org/licenses/bsd-license.php
+ *
+ * THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+ *
+ **/
+#ifndef _APMXGENESOCCSR_H_
+#define _APMXGENESOCCSR_H_
+
+/****************************************************************
+ *  XGENE GLOBAL ADDRESS MAP        *
+ ****************************************************************/
+/* 510GB IO-B Space for PCIE0-4, DEBUG APB and GFC/EBUS */
+#define XGENE_IOB_BASE    0x08080000000
+
+/* 1GB DRAM-A */
+#define XGENE_DRAMA_BASE  0x08000000000
+
+/* DRAMB is split between DRAMB1 (508GB) DRAMB2 (2GB) */
+#define XGENE_DRAMB1_BASE 0x00100000000
+#define XGENE_DRAMB2_BASE 0x00080000000
+
+/* 64MB REGBUS IOB */
+#define XGENE_REGBUS_BASE 0x0007C000000
+
+/* 64MB GIC IOB */
+#define XGENE_GIC_BASE    0x00078000000
+
+/* 1.4GB IOA-2 PCIe0-PCIe4 based on BARs */
+#define XGENE_IOA2_BASE   0x00020000000
+
+/* 512MB IOA-1 Space for CSRs, OCM/Boot, AHB + APB Devices,
+ * OMTM-SOC + QMI, SATA, USB, XGE Power Island Devices,
+ * Standby CSRs, Standby Power Island Devices, Boot
+ */
+#define XGENE_IOA1_BASE   0x00000000000
+
+/****************************************************************
+ *  XGENE IO-B ADDRESS SPACE (PCIe and GFC/EBUS SPACE)  *
+ ****************************************************************/
+#define XGENE_PCIE0_IOB_SPACE_BASE  (XGENE_IOB_BASE + 0x5F80000000) /* 128GB */
+#define XGENE_PCIE1_IOB_SPACE_BASE  (XGENE_IOB_BASE + 0x4F80000000) /*  64GB */
+#define XGENE_PCIE4_IOB_SPACE_BASE  (XGENE_IOB_BASE + 0x3F80000000) /*  64GB */
+#define XGENE_PCIE3_IOB_SPACE_BASE  (XGENE_IOB_BASE + 0x1F80000000) /* 128GB */
+#define XGENE_DEBUG_APM_SPACE_BASE  (XGENE_IOB_BASE + 0x1780000000) /*  32GB */
+#define XGENE_PCIE2_IOB_SPACE_BASE  (XGENE_IOB_BASE + 0x0F80000000) /*  32GB */
+#define XGENE_GFC_IOB_SPACE_BASE  (XGENE_IOB_BASE + 0x0080000000) /*   1GB */
+
+/****************************************************************
+ *  XGENE IOA-2 ADDRESS SPACE       *
+ ****************************************************************/
+/* Boot */
+#define XGENE_GFC_BOOT_SPACE_BASE XGENE_IOA1_BASE     /* 256MB */
+
+/* Standby Power Island Devices */
+#define XGENE_QMLITE_SPACE_BASE     (XGENE_IOA1_BASE + 0x10000000)  /*   4MB */
+#define XGENE_ENET4_SPACE_BASE      (XGENE_IOA1_BASE + 0x10400000)  /*   4MB */
+#define XGENE_SLIMPRO_SPACE_BASE    (XGENE_IOA1_BASE + 0x10500000)  /*   1MB */
+#define XGENE_SLIMPRO_DRAM_SPACE_BASE   (XGENE_IOA1_BASE + 0x10500000)  /*  64KB */
+#define XGENE_SLIMPRO_RTC_SPACE_BASE    (XGENE_IOA1_BASE + 0x10510000)  /*   1KB */
+#define XGENE_SLIMPRO_IIC1_SPACE_BASE   (XGENE_IOA1_BASE + 0x10511000)  /*   4KB */
+#define XGENE_SLIMPRO_IIC0_SPACE_BASE   (XGENE_IOA1_BASE + 0x10512000)  /*   4KB */
+#define XGENE_SLIMPRO_PKA_SPACE_BASE    (XGENE_IOA1_BASE + 0x10520000)  /*  32KB */
+#define XGENE_SLIMPRO_TRNG_SPACE_BASE   (XGENE_IOA1_BASE + 0x10528000)  /*  32KB */
+#define XGENE_SLIMPRO_QMI_SPACE_BASE    (XGENE_IOA1_BASE + 0x10530000)  /*   4KB */
+#define XGENE_SLIMPRO_DOORBELLS_SPACE_BASE  (XGENE_IOA1_BASE + 0x10540000)  /*  64KB */
+#define XGENE_SLIMPRO_GLBL_TIMER_SPACE_BASE (XGENE_IOA1_BASE + 0x10580000)  /* 128KB */
+
+/* Standby CSRs */
+#define XGENE_STB_PWR_ISLAND_SPACE_BASE   (XGENE_IOA1_BASE + 0x17000000)
+#define XGENE_SLIMPRO_CSR_BASE      (XGENE_IOA1_BASE + 0x17000000)  /*  64KB */
+#define XGENE_GFC_CSR_BASE      (XGENE_IOA1_BASE + 0x17010000)  /*  64KB */
+#define XGENE_ENET4_CSR_BASE      (XGENE_IOA1_BASE + 0x17020000)  /*  64KB */
+#define XGENE_QMLITE_CSR_BASE     (XGENE_IOA1_BASE + 0x17030000)  /*  64KB */
+
+/* XGE Power Island Devices */
+#define XGENE_XGENET1_SPACE_BASE    (XGENE_IOA1_BASE + 0x18500000)  /*   1MB */
+#define XGENE_XGENET0_SPACE_BASE    (XGENE_IOA1_BASE + 0x18400000)  /*   1MB */
+#define XGENE_QMTM1_XGE_SPACE_BASE    (XGENE_IOA1_BASE + 0x18000000)  /*   4MB */
+
+/* USB */
+#define XGENE_USB0_SPACE_BASE     (XGENE_IOA1_BASE + 0x19000000)  /*   1MB */
+#define XGENE_USB1_SPACE_BASE     (XGENE_IOA1_BASE + 0x19800000)  /*   1MB */
+
+/* SATA */
+#define XGENE_SATA01_SPACE_BASE     (XGENE_IOA1_BASE + 0x1A000000)  /*   1MB */
+#define XGENE_SATA23_SPACE_BASE     (XGENE_IOA1_BASE + 0x1A400000)  /*   1MB */
+#define XGENE_SATA45_SPACE_BASE     (XGENE_IOA1_BASE + 0x1A800000)  /*   1MB */
+
+/* QMTM-SOC + QMI */
+#define XGENE_QMTM0_SOC_SPACE_BASE    (XGENE_IOA1_BASE + 0x1B000000)  /*   4MB */
+#define XGENE_ENET01_SPACE_BASE     (XGENE_IOA1_BASE + 0x1B400000)  /*   4KB */
+#define XGENE_ENET23_SPACE_BASE     (XGENE_IOA1_BASE + 0x1B401000)  /*   4KB */
+#define XGENE_CLE_SPACE_BASE      (XGENE_IOA1_BASE + 0x1B402000)  /*   4KB */
+#define XGENE_SEC_SPACE_BASE      (XGENE_IOA1_BASE + 0x1B403000)  /*   4KB */
+#define XGENE_COP_SPACE_BASE      (XGENE_IOA1_BASE + 0x1B404000)  /*   4KB */
+#define XGENE_PDMA_SPACE_BASE     (XGENE_IOA1_BASE + 0x1B405000)  /*   4KB */
+#define XGENE_CXM_SPACE_BASE      (XGENE_IOA1_BASE + 0x1B406000)  /*   4KB */
+#define XGENE_COP_DOORBELLS_SPACE_BASE    (XGENE_IOA1_BASE + 0x1B480000)  /*   1MB */
+
+/* AHB + APB Devices CSRs */
+#define XGENE_AHBC_SPACE_BASE     (XGENE_IOA1_BASE + 0x1C000000)
+#define XGENE_SDIO0_CSR_BASE      (XGENE_IOA1_BASE + 0x1C000000)  /*   256B */
+#define XGENE_SDIO1_CSR_BASE      (XGENE_IOA1_BASE + 0x1C000100)  /*   256B */
+#define XGENE_AHB_ARBITER_SPACE_BASE    (XGENE_IOA1_BASE + 0x1C010000)  /*   64KB */
+#define XGENE_APB_BRIDGE_SPACE_BASE   (XGENE_IOA1_BASE + 0x1C020000)
+#define XGENE_UART0_CSR_BASE      (XGENE_IOA1_BASE + 0x1C020000)  /*    4KB */
+#define XGENE_UART1_CSR_BASE      (XGENE_IOA1_BASE + 0x1C021000)  /*    4KB */
+#define XGENE_UART2_CSR_BASE      (XGENE_IOA1_BASE + 0x1C022000)  /*    4KB */
+#define XGENE_UART3_CSR_BASE      (XGENE_IOA1_BASE + 0x1C023000)  /*    4KB */
+#define XGENE_GPIO_CSR_BASE     (XGENE_IOA1_BASE + 0x1C024000)  /*    4KB */
+#define XGENE_SPI0_CSR_BASE     (XGENE_IOA1_BASE + 0x1C025000)  /*    4KB */
+#define XGENE_SPI1_CSR_BASE     (XGENE_IOA1_BASE + 0x1C026000)  /*    4KB */
+
+/* OCM */
+#define XGENE_OCM_BASE        (XGENE_IOA1_BASE + 0x1D000000)  /*    1MB */
+
+/* XGENE CSRs */
+/* SOC Power Island */
+#define XGENE_QMTM0_SOC_CSR_BASE    (XGENE_IOA1_BASE + 0x1F200000)  /*   64KB */
+#define XGENE_ENET01_CSR_BASE     (XGENE_IOA1_BASE + 0x1F210000)  /*   64KB */
+#define XGENE_SATA01_CSR_BASE     XGENE_ENET01_CSR_BASE
+#define XGENE_ENET23_CSR_BASE     (XGENE_IOA1_BASE + 0x1F220000)  /*   64KB */
+#define XGENE_SATA23_CSR_BASE     XGENE_ENET23_CSR_BASE
+#define XGENE_SATA45_CSR_BASE     (XGENE_IOA1_BASE + 0x1F230000)  /*   64KB */
+#define XGENE_CLE_CSR_BASE      (XGENE_IOA1_BASE + 0x1F240000)  /*   64KB */
+#define XGENE_SEC_CSR_BASE      (XGENE_IOA1_BASE + 0x1F250000)  /*   64KB */
+#define XGENE_CXM_CSR_BASE      (XGENE_IOA1_BASE + 0x1F260000)  /*   64KB */
+#define XGENE_PDMA_CSR_BASE     (XGENE_IOA1_BASE + 0x1F270000)  /*   64KB */
+#define XGENE_USB0_CSR_BASE     (XGENE_IOA1_BASE + 0x1F280000)  /*   64KB */
+#define XGENE_USB1_CSR_BASE     (XGENE_IOA1_BASE + 0x1F290000)  /*   64KB */
+#define XGENE_AHBC_CSR_BASE     (XGENE_IOA1_BASE + 0x1F2A0000)  /*   64KB */
+#define XGENE_PCIE0_CSR_BASE      (XGENE_IOA1_BASE + 0x1F2B0000)  /*   64KB */
+#define XGENE_PCIE1_CSR_BASE      (XGENE_IOA1_BASE + 0x1F2C0000)  /*   64KB */
+#define XGENE_PCIE2_CSR_BASE      (XGENE_IOA1_BASE + 0x1F2D0000)  /*   64KB */
+#define XGENE_TRACE_CSR_BASE      (XGENE_IOA1_BASE + 0x1F2E0000)  /*   64KB */
+
+/* COP Power Island */
+#define XGENE_COP_CSR_BASE      (XGENE_IOA1_BASE + 0x1F400000)  /*   64KB */
+#define XGENE_OCM_CSR_BASE      (XGENE_IOA1_BASE + 0x1F410000)  /*   64KB */
+
+/* PCIe Power Island */
+#define XGENE_PCIE3_CSR_BASE      (XGENE_IOA1_BASE + 0x1F500000)  /*   64KB */
+#define XGENE_PCIE4_CSR_BASE      (XGENE_IOA1_BASE + 0x1F510000)  /*   64KB */
+
+/* XGE Power Island */
+#define XGENE_QMTM_XGE_CSR_BASE     (XGENE_IOA1_BASE + 0x1F600000)  /*   64KB */
+#define XGENE_XGENET0_CSR_BASE      (XGENE_IOA1_BASE + 0x1F610000)  /*   64KB */
+#define XGENE_XGENET1_CSR_BASE      (XGENE_IOA1_BASE + 0x1F620000)  /*   64KB */
+
+
+#endif /* _APMXGENESOCCSR_H_ */

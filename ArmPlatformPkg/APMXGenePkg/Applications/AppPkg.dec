@@ -1,0 +1,31 @@
+##
+#  Copyright (c) 2013, AppliedMicro Corp. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+##
+
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = AppPkg
+  PACKAGE_GUID                   = B6C4E1A0-AA18-11E3-A5E2-0800200C9A66
+  PACKAGE_VERSION                = 0.01
+
+
+[Guids]
+  gAppPkgTokenSpaceGuid          = { 0xd85f7b40, 0xaa18, 0x11e3, { 0xa5, 0xe2, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66 }}
+
+
+[PcdsFixedAtBuild]
+  gAppPkgTokenSpaceGuid.EepromAddrLen|2|UINT32|0
+  gAppPkgTokenSpaceGuid.EepromPageWriteBits|8|UINT32|1
+  gAppPkgTokenSpaceGuid.EepromAddr|0x52|UINT32|2
+  gAppPkgTokenSpaceGuid.FirmwareBlockDevicePath|L"VenHw(6C9CEEF0-A406-11E3-A5E2-0800200C9A66)"|VOID*|4
+  gAppPkgTokenSpaceGuid.FirmwareBlockDevicePathNext|L"VenHw(02118005-9DA7-443A-92D5-781F022AEDBB)"|VOID*|5
+
