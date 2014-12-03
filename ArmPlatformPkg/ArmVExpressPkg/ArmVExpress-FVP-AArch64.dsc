@@ -277,6 +277,11 @@
 !endif
   ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
+  # SMBIOS Support
+
+  ArmPlatformPkg/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+
   #
   # Semi-hosting filesystem
   #
