@@ -37,6 +37,7 @@ typedef unsigned char   U8;
 #define RAM_TEST_NOWORK_TAG          (0x0A0A0A0A) 
 
 EFI_HANDLE mImageHandle;
+static int skip_enter_bootwrapper;
 
 //************************************************
 #define SEEK_SET  0
@@ -748,6 +749,7 @@ BdsEntry (
 //        }
 
         /*---------------OS-----------------*/
+        skip_enter_bootwrapper = 1;
         BootOptionList (&BootOptionsList);
         BootGo (&BootOptionsList);
         #endif
@@ -761,6 +763,30 @@ BdsEntry (
   Status = BootMenuMain ();
   ASSERT_EFI_ERROR (Status);
 
+}
+
+long bootwrapper_saved_stack;
+static void EnterBootwrapper(void)
+{
+#if !defined(__thumb__)
+#error Please compile in thumb mode
+#endif
+
+  /*
+   * This chunk of assembly enters the bootwrapper code, then
+   * immediately returns here and recovers all clobbered registers
+   */
+  asm volatile("ldr	r0, =return_from_bootwrapper	\n\
+		orr	r0, r0, #1			\n\
+		ldr	r4, =bootwrapper_saved_stack	\n\
+		str	sp, [r4]			\n\
+		b	RunBootwrapper			\n\
+		return_from_bootwrapper:		\n\
+		ldr	r4, =bootwrapper_saved_stack	\n\
+		ldr	sp, [r4]"
+		: :
+		: "cc", "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8",
+		  "r9", "r10", "r11", "r12", "r14");
 }
 
 /**
@@ -783,6 +809,11 @@ ExitBootServicesEvent (
   )
 {
   ReadBootwrapper();
+
+  if (skip_enter_bootwrapper)
+    return;
+
+  EnterBootwrapper();
 }
 
 EFI_BDS_ARCH_PROTOCOL  gBdsProtocol = {

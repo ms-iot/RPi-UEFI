@@ -784,6 +784,26 @@ EFI_STATUS LoadLinuxAtSecEnd()
     return Status;
 }
 
+EFI_STATUS RunBootwrapper()
+{
+  EFI_STATUS Status;
+
+  *(UINTN*)(UINTN)(0xe302b000 + 0x18) = 0;
+  *(UINTN*)(UINTN)(0xe302b000 + 0x1c) = 0;
+
+  *(volatile UINT32 *)(0xe0000000 + 0x100) = TEXT_DDR_BASE;
+
+  ArmCleanDataCache();
+  *(UINT8*)(0xf4007000) = 'G';
+  Status = LoadLinuxAtSecEnd();
+  if (EFI_ERROR(Status))
+  {
+      (VOID)AsciiPrint ("GoCmd error!\n");
+  }
+
+  return Status;
+}
+
 EFI_STATUS
 BootGo (
   IN LIST_ENTRY *BootOptionsList
@@ -795,18 +815,8 @@ BootGo (
   if(EFI_ERROR(Status)) {
   DEBUG((EFI_D_ERROR,"ERROR: Can not shutdown UEFI boot services. Status=0x%X\n", Status));
   }
-  
-  *(UINTN*)(UINTN)(0xe302b000 + 0x18) = 0;
-  *(UINTN*)(UINTN)(0xe302b000 + 0x1c) = 0;
 
-  *(volatile UINT32 *)(0xe0000000 + 0x100) = TEXT_DDR_BASE;
-  ArmCleanDataCache();
-  *(UINT8*)(0xf4007000) = 'G';
-  Status = LoadLinuxAtSecEnd();
-  if (EFI_ERROR(Status))
-  {
-      (VOID)AsciiPrint ("GoCmd error!\n");
-  }
+  Status = RunBootwrapper();
 
   return Status;
 }
