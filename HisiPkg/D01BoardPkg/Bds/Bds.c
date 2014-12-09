@@ -555,9 +555,33 @@ EFI_STATUS CopyNandToMem(void* Dest, UINT32 StartBlockNum, UINT32 LengthCopy)
 }
 #define NANDFLASHREAD 1
 
+static void ReadBootwrapper(void)
+{
+    (VOID)AsciiPrint("\nCopy BootWrapper from FLASH to DDR...");
+
+    #ifdef NANDFLASHREAD
+        CopyNandToMem((void *)TEXT_DDR_BASE, TEXT_BLOCKNUM_NANDFLASH, TEXT_COPY_SIZE);
+        (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
+    #else
+         /* copy.text */
+        memcpy((void *)TEXT_DDR_BASE, (void *)TEXT_FLASH_BASE, TEXT_COPY_SIZE);
+        (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
+    #endif
+
+    #ifdef NANDFLASHREAD
+         /* copy .monitor */
+        CopyNandToMem((void *)MONITOR_DDR_BASE, MONITOR_BLOCKNUM_NANDFLASH, MONITOR_COPY_SIZE);
+        (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
+    #else
+         /* copy .monitor */
+        memcpy((void *)MONITOR_DDR_BASE, (void *)MONITOR_FLASH_BASE, MONITOR_COPY_SIZE);
+        (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
+    #endif
+}
+
 /**
-  This function uses policy data from the platform to determine what operating 
-  system or system utility should be loaded and invoked.  This function call 
+  This function uses policy data from the platform to determine what operating
+  system or system utility should be loaded and invoked.  This function call
   also optionally make the use of user input to determine the operating system 
   or system utility to be loaded and invoked.  When the DXE Core has dispatched 
   all the drivers on the dispatch queue, this function is called.  This 
@@ -683,50 +707,14 @@ BdsEntry (
         }
 
         //Status = BootMenuMain ();
-        //ASSERT_EFI_ERROR (Status);    
-        
+        //ASSERT_EFI_ERROR (Status);
+
         #if 1
+
+        ReadBootwrapper();
+
         /*2.copy image from FLASH to DDR,and start*/
         (VOID)AsciiPrint("\nTransmit  OS from FLASH to DDR now, please wait!");
-        
-        #ifdef NANDFLASHREAD
-            CopyNandToMem((void *)TEXT_DDR_BASE, TEXT_BLOCKNUM_NANDFLASH, TEXT_COPY_SIZE);
-            (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
-        #else
-             /* copy.text */
-            memcpy((void *)TEXT_DDR_BASE, (void *)TEXT_FLASH_BASE, TEXT_COPY_SIZE);
-            (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
-        #endif
-//        /* compare text in FLASH and the same file in DDR*/
-//        if (CompareMem((void *)TEXT_DDR_BASE, (void *)TEXT_FLASH_BASE, TEXT_COPY_SIZE) != 0)
-//        {
-//            (VOID)AsciiPrint("The .text file check fail!\n");
-//            //return;
-//        }
-//        else
-//        {
-//            (VOID)AsciiPrint("The .text file check sucess!\n");
-//        }
-         
-        #ifdef NANDFLASHREAD
-             /* copy .monitor */
-            CopyNandToMem((void *)MONITOR_DDR_BASE, MONITOR_BLOCKNUM_NANDFLASH, MONITOR_COPY_SIZE);
-            (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
-        #else
-             /* copy .monitor */
-            memcpy((void *)MONITOR_DDR_BASE, (void *)MONITOR_FLASH_BASE, MONITOR_COPY_SIZE);
-            (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
-        #endif
-//        /* compare uimage in FLASH and the same file in DDR*/
-//        if (CompareMem((void *)MONITOR_DDR_BASE, (void *)MONITOR_FLASH_BASE, MONITOR_COPY_SIZE) != 0)
-//        {
-//            (VOID)AsciiPrint("The .monitor file check fail!\n");
-//            //return;
-//        }
-//        else
-//        {
-//            (VOID)AsciiPrint("The .monitor file check sucess!\n");
-//        }
 
         #ifdef NANDFLASHREAD
              /* copy.kernel */
