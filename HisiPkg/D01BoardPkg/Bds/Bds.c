@@ -711,8 +711,6 @@ BdsEntry (
 
         #if 1
 
-        ReadBootwrapper();
-
         /*2.copy image from FLASH to DDR,and start*/
         (VOID)AsciiPrint("\nTransmit  OS from FLASH to DDR now, please wait!");
 
@@ -771,6 +769,28 @@ BdsEntry (
 
 }
 
+/**
+  EFI Exit Event
+
+  Exiting EFI Boot Services can only mean we're bootstrapping into a real OS.
+  So let's copy the bootwrapper code into place to make sure the OS can use it.
+
+  @param[in]  Event   The Event that is being processed
+  @param[in]  Context Event Context
+**/
+
+static EFI_EVENT EfiExitBootServicesEvent;
+
+VOID
+EFIAPI
+ExitBootServicesEvent (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  ReadBootwrapper();
+}
+
 EFI_BDS_ARCH_PROTOCOL  gBdsProtocol = {
   BdsEntry,
 };
@@ -791,6 +811,10 @@ BdsInitialize (
                   &gEfiBdsArchProtocolGuid, &gBdsProtocol,
                   NULL
                   );
+  ASSERT_EFI_ERROR (Status);
+
+  // Register for an ExitBootServicesEvent
+  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY, ExitBootServicesEvent, NULL, &EfiExitBootServicesEvent);
   ASSERT_EFI_ERROR (Status);
 
   return Status;
