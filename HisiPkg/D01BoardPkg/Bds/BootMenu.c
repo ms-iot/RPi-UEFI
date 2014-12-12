@@ -784,7 +784,7 @@ EFI_STATUS LoadLinuxAtSecEnd()
     return Status;
 }
 
-EFI_STATUS RunBootwrapper()
+EFI_STATUS RunBootwrapper(unsigned long kernel_entry)
 {
   EFI_STATUS Status;
 
@@ -792,6 +792,7 @@ EFI_STATUS RunBootwrapper()
   *(UINTN*)(UINTN)(0xe302b000 + 0x1c) = 0;
 
   *(volatile UINT32 *)(0xe0000000 + 0x100) = TEXT_SRAM_BASE;
+  *(volatile UINT32 *)(TEXT_SRAM_BASE + 0x800) = kernel_entry;
 
   ArmCleanDataCache();
   *(UINT8*)(0xf4007000) = 'G';
@@ -816,7 +817,7 @@ BootGo (
   DEBUG((EFI_D_ERROR,"ERROR: Can not shutdown UEFI boot services. Status=0x%X\n", Status));
   }
 
-  Status = RunBootwrapper();
+  Status = RunBootwrapper(KERNEL_DDR_BASE);
 
   return Status;
 }
