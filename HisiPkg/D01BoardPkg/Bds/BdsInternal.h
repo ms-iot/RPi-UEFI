@@ -37,6 +37,12 @@
 #define BOOT_DEVICE_OPTION_MAX        300
 #define BOOT_DEVICE_ADDRESS_MAX       (sizeof(L"0x0000000000000000"))
 
+//address of Linux in DDR
+#define TEXT_DDR_BASE                   0x10c00000
+#define MONITOR_DDR_BASE                0x10c08000
+#define KERNEL_DDR_BASE                 0x10008000
+#define FILESYSTEM_DDR_BASE             0x10d00000
+
 #define ARM_BDS_OPTIONAL_DATA_SIGNATURE   SIGNATURE_32('a', 'b', 'o', 'd')
 
 #define IS_ARM_BDS_BOOTENTRY(ptr)  \
