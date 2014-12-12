@@ -1,0 +1,65 @@
+##
+# Component name for module SnpDxe
+#
+#  Copyright (c) 2013, 2014, AppliedMicro Corp. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SnpDxe
+  FILE_GUID                      = F2AD0AD0-D4B6-11E3-9C1A-0800200C9A66
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeSnpDxeDriver
+  UNLOAD_IMAGE                   = SnpDxeUnload
+
+[Sources]
+  SnpDxe.h
+  SnpDxe.c
+  ComponentName.c
+  Mellanox.c
+  hermon.c
+  ib_smc.c
+  infiniband.c
+  pcibackup.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/APMXGenePkg/APMXGene.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DevicePathLib
+  DebugLib
+  NetLib
+  DevicePathLib
+  TimerLib
+
+[Guids]
+  gShellVariableGuid
+
+[Protocols]
+  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
