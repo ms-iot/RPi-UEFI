@@ -80,8 +80,8 @@ BootGo (
 #define FILESYSTEM_SIZE                 0x1800000
 
 //actual size of copying file to DDR, it should not bigger than estimate size
-#define TEXT_COPY_SIZE                  0x20000
-#define MONITOR_COPY_SIZE               0x20000
+#define TEXT_COPY_SIZE                  0x8000
+#define MONITOR_COPY_SIZE               0x8000
 #define KERNEL_COPY_SIZE                0xa00000
 #define FILESYSTEM_COPY_SIZE            0x1800000
 
@@ -552,26 +552,40 @@ EFI_STATUS CopyNandToMem(void* Dest, UINT32 StartBlockNum, UINT32 LengthCopy)
 
 static void ReadBootwrapper(void)
 {
-    (VOID)AsciiPrint("\nCopy BootWrapper from FLASH to DDR...");
+    void *buf;
+    NAND_CMD_INFO_STRU ulNandCMDInfo = { 0 };
+    #ifdef NANDFLASHREAD
+    EFI_NAND_DRIVER_PROTOCOL *nandDriver = NULL;
+
+    gBS->LocateProtocol (&gNANDDriverProtocolGuid, NULL, (VOID *) &nandDriver);
+    ulNandCMDInfo = nandDriver->NandFlashGetCMDInfo(nandDriver);
+    #endif
+    buf = AllocatePool(ulNandCMDInfo.ulBlockSize);
+
+    (VOID)AsciiPrint("\nCopy Bootwrapper from FLASH to SRAM...");
 
     #ifdef NANDFLASHREAD
-        CopyNandToMem((void *)TEXT_DDR_BASE, TEXT_BLOCKNUM_NANDFLASH, TEXT_COPY_SIZE);
+        CopyNandToMem(buf, TEXT_BLOCKNUM_NANDFLASH, ulNandCMDInfo.ulBlockSize);
+        memcpy((void *)TEXT_SRAM_BASE, buf, TEXT_COPY_SIZE);
         (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
     #else
          /* copy.text */
-        memcpy((void *)TEXT_DDR_BASE, (void *)TEXT_FLASH_BASE, TEXT_COPY_SIZE);
+        memcpy((void *)TEXT_SRAM_BASE, (void *)TEXT_FLASH_BASE, TEXT_COPY_SIZE);
         (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
     #endif
 
     #ifdef NANDFLASHREAD
          /* copy .monitor */
-        CopyNandToMem((void *)MONITOR_DDR_BASE, MONITOR_BLOCKNUM_NANDFLASH, MONITOR_COPY_SIZE);
+        CopyNandToMem(buf, MONITOR_BLOCKNUM_NANDFLASH, ulNandCMDInfo.ulBlockSize);
+        memcpy((void *)MONITOR_SRAM_BASE, buf, MONITOR_COPY_SIZE);
         (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
     #else
          /* copy .monitor */
-        memcpy((void *)MONITOR_DDR_BASE, (void *)MONITOR_FLASH_BASE, MONITOR_COPY_SIZE);
+        memcpy((void *)MONITOR_SRAM_BASE, (void *)MONITOR_FLASH_BASE, MONITOR_COPY_SIZE);
         (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
     #endif
+
+    gBS->FreePool(buf);
 }
 
 /**

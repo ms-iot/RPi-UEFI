@@ -772,14 +772,14 @@ BootLinuxAtagLoader (
 
 EFI_STATUS LoadLinuxAtSecEnd()
 {
-    LinuxEntry entry = (LinuxEntry)(TEXT_DDR_BASE);
+    LinuxEntry entry = (LinuxEntry)(TEXT_SRAM_BASE);
     EFI_STATUS Status = EFI_SUCCESS;
     ArmDisableDataCache();
     ArmCleanInvalidateDataCache();
     ArmDisableInstructionCache ();
     ArmInvalidateInstructionCache ();
     ArmDisableMmu();
-    DEBUG(( EFI_D_ERROR, "MOVE PC TEXT_DDR_BASE\n"));
+    DEBUG(( EFI_D_ERROR, "MOVE PC TEXT_SRAM_BASE\n"));
     (void)entry();
     return Status;
 }
@@ -791,7 +791,7 @@ EFI_STATUS RunBootwrapper()
   *(UINTN*)(UINTN)(0xe302b000 + 0x18) = 0;
   *(UINTN*)(UINTN)(0xe302b000 + 0x1c) = 0;
 
-  *(volatile UINT32 *)(0xe0000000 + 0x100) = TEXT_DDR_BASE;
+  *(volatile UINT32 *)(0xe0000000 + 0x100) = TEXT_SRAM_BASE;
 
   ArmCleanDataCache();
   *(UINT8*)(0xf4007000) = 'G';
