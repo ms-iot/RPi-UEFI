@@ -166,7 +166,7 @@
   #
   # ARM Architectual Timer Frequency
   #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|168750000
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|50000000
 
   gHwTokenSpaceGuid.PcdNorFlashBase|0xf0000000
 
