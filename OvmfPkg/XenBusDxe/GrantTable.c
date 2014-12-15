@@ -74,7 +74,7 @@ XenGrantTableGetFreeEntry (
   VOID
   )
 {
-  UINTN Ref;
+  grant_ref_t Ref;
 
   EfiAcquireLock (&mGrantListLock);
   Ref = GrantList[0];
@@ -97,11 +97,11 @@ XenGrantTableGrantAccess (
   )
 {
   grant_ref_t Ref;
-  UINT32 Flags;
+  UINT16 Flags;
 
   ASSERT (GrantTable != NULL);
   Ref = XenGrantTableGetFreeEntry ();
-  GrantTable[Ref].frame = Frame;
+  GrantTable[Ref].frame = (UINT32)Frame;
   GrantTable[Ref].domid = DomainId;
   MemoryFence ();
   Flags = GTF_permit_access;
@@ -152,7 +152,7 @@ XenGrantTableInit (
 #endif
   EfiInitializeLock (&mGrantListLock, TPL_NOTIFY);
   for (Index = NR_RESERVED_ENTRIES; Index < NR_GRANT_ENTRIES; Index++) {
-    XenGrantTablePutFreeEntry (Index);
+    XenGrantTablePutFreeEntry ((grant_ref_t)Index);
   }
 
   GrantTable = (VOID*)(UINTN) MmioAddr;

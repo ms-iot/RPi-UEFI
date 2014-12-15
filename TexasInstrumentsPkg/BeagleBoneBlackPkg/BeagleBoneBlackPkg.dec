@@ -21,5 +21,8 @@
 
 [Protocols]
 
+[PcdsFixedAtBuild.common]
+  gBeagleBoneBlackTokenSpaceGuid.PcdTimerInterruptNumber|0|UINT32|0x00000001
+
 [Guids]
   gBeagleBoneBlackTokenSpaceGuid    =  { 0x6834fe45, 0x4aee, 0x4fc6, { 0xbc, 0xb5, 0xff, 0x45, 0xb7, 0xa8, 0x71, 0xe2 } }

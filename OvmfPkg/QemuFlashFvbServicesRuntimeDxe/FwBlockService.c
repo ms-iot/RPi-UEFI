@@ -895,7 +895,7 @@ STATIC
 EFI_STATUS
 MarkMemoryRangeForRuntimeAccess (
   EFI_PHYSICAL_ADDRESS                BaseAddress,
-  UINT64                              Length
+  UINTN                               Length
   )
 {
   EFI_STATUS                          Status;
@@ -919,7 +919,7 @@ MarkMemoryRangeForRuntimeAccess (
   Status = gBS->AllocatePages (
                   AllocateAddress,
                   EfiRuntimeServicesData,
-                  (UINTN) EFI_SIZE_TO_PAGES (Length),
+                  EFI_SIZE_TO_PAGES (Length),
                   &BaseAddress
                   );
   ASSERT_EFI_ERROR (Status);
@@ -979,7 +979,7 @@ InitializeVariableFvHeader (
     // Erase all the blocks
     //
     for (Offset = Start; Offset < Start + Length; Offset += BlockSize) {
-      Status = QemuFlashEraseBlock ((EFI_LBA) Offset / BlockSize);
+      Status = QemuFlashEraseBlock (Offset / BlockSize);
       ASSERT_EFI_ERROR (Status);
     }
 
@@ -988,7 +988,7 @@ InitializeVariableFvHeader (
     //
     WriteLength = GoodFwVolHeader->HeaderLength;
     Status = QemuFlashWrite (
-               (EFI_LBA) Start / BlockSize,
+               Start / BlockSize,
                0,
                &WriteLength,
                (UINT8 *) GoodFwVolHeader);
@@ -1026,7 +1026,7 @@ Returns:
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *OldFwbInterface;
   UINT32                              MaxLbaSize;
   EFI_PHYSICAL_ADDRESS                BaseAddress;
-  UINT64                              Length;
+  UINTN                               Length;
   UINTN                               NumOfBlocks;
   EFI_EVENT                           VirtualAddressChangeEvent;
 

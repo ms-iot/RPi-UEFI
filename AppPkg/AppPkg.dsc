@@ -23,8 +23,8 @@
   PLATFORM_VERSION               = 0.01
   DSC_SPECIFICATION              = 0x00010006
   OUTPUT_DIRECTORY               = Build/AppPkg
-  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|ARM|AARCH64
-  BUILD_TARGETS                  = DEBUG|RELEASE
+  SUPPORTED_ARCHITECTURES        = IA32|X64|ARM|AARCH64
+  BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
 #
@@ -131,7 +131,7 @@
 #  AppPkg/Applications/Python/PythonCore.inf
 
 #### Un-comment the following line to build Lua.
-  AppPkg/Applications/Lua/Lua.inf
+#  AppPkg/Applications/Lua/Lua.inf
 
 
 ##############################################################################

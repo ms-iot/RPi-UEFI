@@ -3,6 +3,7 @@
 
   Copyright (c) 2007-2008 Samuel Thibault.
   Copyright (C) 2014, Citrix Ltd.
+  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -33,11 +34,6 @@
 
 #include <IndustryStandard/Xen/io/protocols.h>
 #include <IndustryStandard/Xen/io/xenbus.h>
-
-//
-// Header used for UINT32_MAX and UINT16_MAX
-//
-#include "inttypes.h"
 
 /**
   Helper to read an integer from XenStore.
@@ -191,12 +187,12 @@ XenPvBlockFrontInitialization (
   FreePool (DeviceType);
 
   Status = XenBusReadUint64 (XenBusIo, "backend-id", FALSE, &Value);
-  if (Status != XENSTORE_STATUS_SUCCESS || Value > UINT16_MAX) {
+  if (Status != XENSTORE_STATUS_SUCCESS || Value > MAX_UINT16) {
     DEBUG ((EFI_D_ERROR, "XenPvBlk: Failed to get backend-id (%d)\n",
             Status));
     goto Error;
   }
-  Dev->DomainId = Value;
+  Dev->DomainId = (domid_t)Value;
   XenBusIo->EventChannelAllocate (XenBusIo, Dev->DomainId, &Dev->EventChannel);
 
   SharedRing = (blkif_sring_t*) AllocatePages (1);
@@ -259,10 +255,10 @@ Again:
   }
 
   Status = XenBusReadUint64 (XenBusIo, "info", TRUE, &Value);
-  if (Status != XENSTORE_STATUS_SUCCESS || Value > UINT32_MAX) {
+  if (Status != XENSTORE_STATUS_SUCCESS || Value > MAX_UINT32) {
     goto Error2;
   }
-  Dev->MediaInfo.VDiskInfo = Value;
+  Dev->MediaInfo.VDiskInfo = (UINT32)Value;
   if (Dev->MediaInfo.VDiskInfo & VDISK_READONLY) {
     Dev->MediaInfo.ReadWrite = FALSE;
   } else {
@@ -275,10 +271,10 @@ Again:
   }
 
   Status = XenBusReadUint64 (XenBusIo, "sector-size", TRUE, &Value);
-  if (Status != XENSTORE_STATUS_SUCCESS || Value > UINT32_MAX) {
+  if (Status != XENSTORE_STATUS_SUCCESS || Value > MAX_UINT32) {
     goto Error2;
   }
-  if (Value % 512 != 0) {
+  if ((UINT32)Value % 512 != 0) {
     //
     // This is not supported by the driver.
     //
@@ -286,7 +282,7 @@ Again:
             "it must be a multiple of 512\n", Value));
     goto Error2;
   }
-  Dev->MediaInfo.SectorSize = Value;
+  Dev->MediaInfo.SectorSize = (UINT32)Value;
 
   // Default value
   Value = 0;
@@ -443,7 +439,7 @@ XenPvBlockAsyncIo (
 
   Start = (UINTN) IoData->Buffer & ~EFI_PAGE_MASK;
   End = ((UINTN) IoData->Buffer + IoData->Size + EFI_PAGE_SIZE - 1) & ~EFI_PAGE_MASK;
-  IoData->NumRef = NumSegments = (End - Start) / EFI_PAGE_SIZE;
+  IoData->NumRef = NumSegments = (INT32)((End - Start) / EFI_PAGE_SIZE);
 
   ASSERT (NumSegments <= BLKIF_MAX_SEGMENTS_PER_REQUEST);
 
@@ -452,7 +448,7 @@ XenPvBlockAsyncIo (
   Request = RING_GET_REQUEST (&Dev->Ring, RingIndex);
 
   Request->operation = IsWrite ? BLKIF_OP_WRITE : BLKIF_OP_READ;
-  Request->nr_segments = NumSegments;
+  Request->nr_segments = (UINT8)NumSegments;
   Request->handle = Dev->DeviceId;
   Request->id = (UINTN) IoData;
   Request->sector_number = IoData->Sector;
@@ -461,9 +457,9 @@ XenPvBlockAsyncIo (
     Request->seg[Index].first_sect = 0;
     Request->seg[Index].last_sect = EFI_PAGE_SIZE / 512 - 1;
   }
-  Request->seg[0].first_sect = ((UINTN) IoData->Buffer & EFI_PAGE_MASK) / 512;
+  Request->seg[0].first_sect = (UINT8)(((UINTN) IoData->Buffer & EFI_PAGE_MASK) / 512);
   Request->seg[NumSegments - 1].last_sect =
-      (((UINTN) IoData->Buffer + IoData->Size - 1) & EFI_PAGE_MASK) / 512;
+      (UINT8)((((UINTN) IoData->Buffer + IoData->Size - 1) & EFI_PAGE_MASK) / 512);
   for (Index = 0; Index < NumSegments; Index++) {
     UINTN Data = Start + Index * EFI_PAGE_SIZE;
     XenBusIo->GrantAccess (XenBusIo, Dev->DomainId,

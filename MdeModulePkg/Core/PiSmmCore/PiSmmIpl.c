@@ -257,7 +257,7 @@ SMM_IPL_EVENT_NOTIFICATION  mSmmIplEvents[] = {
   //
   { TRUE,  FALSE, &gEfiSmmConfigurationProtocolGuid,  SmmIplSmmConfigurationEventNotify, &gEfiSmmConfigurationProtocolGuid,  TPL_NOTIFY,   NULL },
   //
-  // Declare protocl notification on DxeSmmReadyToLock protocols.  When this notification is etablished, 
+  // Declare protocol notification on DxeSmmReadyToLock protocols.  When this notification is established, 
   // the associated event is immediately signalled, so the notification function will be executed and the 
   // DXE SMM Ready To Lock Protocol will be found if it is already in the handle database.
   //
@@ -659,7 +659,7 @@ SmmIplSmmConfigurationEventNotify (
 
 /**
   Event notification that is fired every time a DxeSmmReadyToLock protocol is added
-  or if gEfiEventReadyToBootGuid is signalled.
+  or if gEfiEventReadyToBootGuid is signaled.
 
   @param  Event                 The Event that is being processed, not used.
   @param  Context               Event Context, not used.
@@ -694,7 +694,7 @@ SmmIplReadyToLockEventNotify (
   } else {
     //
     // If SMM is not locked yet and we got here from gEfiEventReadyToBootGuid being 
-    // signalled, then gEfiDxeSmmReadyToLockProtocolGuid was not installed as expected.
+    // signaled, then gEfiDxeSmmReadyToLockProtocolGuid was not installed as expected.
     // Print a warning on debug builds.
     //
     DEBUG ((DEBUG_WARN, "SMM IPL!  DXE SMM Ready To Lock Protocol not installed before Ready To Boot signal\n"));
@@ -979,6 +979,13 @@ ExecuteSmmCoreFromSmram (
       //
       DEBUG ((DEBUG_INFO, "SMM IPL calling SMM Core at SMRAM address %p\n", (VOID *)(UINTN)ImageContext.EntryPoint));
 
+      gSmmCorePrivate->PiSmmCoreImageBase = ImageContext.ImageAddress;
+      gSmmCorePrivate->PiSmmCoreImageSize = ImageContext.ImageSize;
+      DEBUG ((DEBUG_INFO, "PiSmmCoreImageBase - 0x%016lx\n", gSmmCorePrivate->PiSmmCoreImageBase));
+      DEBUG ((DEBUG_INFO, "PiSmmCoreImageSize - 0x%016lx\n", gSmmCorePrivate->PiSmmCoreImageSize));
+
+      gSmmCorePrivate->PiSmmCoreEntryPoint = ImageContext.EntryPoint;
+
       //
       // Execute image
       //
@@ -1075,6 +1082,14 @@ SmmIplEntry (
   ASSERT_EFI_ERROR (Status);
 
   gSmmCorePrivate->SmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
+
+  //
+  // Save a full copy
+  //
+  gSmmCorePrivate->FullSmramRangeCount = gSmmCorePrivate->SmramRangeCount;
+  gSmmCorePrivate->FullSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+  ASSERT (gSmmCorePrivate->FullSmramRanges != NULL);
+  CopyMem (gSmmCorePrivate->FullSmramRanges, gSmmCorePrivate->SmramRanges, Size);
 
   //
   // Open all SMRAM ranges
