@@ -296,7 +296,7 @@ OnEndOfDxe (
   )
 {
   EFI_DEVICE_PATH *DevicePathNode;
-  EFI_HANDLE       Handle;
+  //  EFI_HANDLE       Handle;
   EFI_STATUS       Status;
   UINTN            VariableSize;
   CHAR16*          FdtDevicePathStr;
@@ -395,7 +395,7 @@ OnEndOfDxe (
   //
   // Force to connect the FileSystem that contains the FDT
   //
-  BdsConnectDevicePath (mFdtFileSystemDevicePath, &Handle, NULL);
+  //  BdsConnectDevicePath (mFdtFileSystemDevicePath, &Handle, NULL);
 }
 
 EFI_STATUS

@@ -34,7 +34,7 @@
 [LibraryClasses]
   ArmShellCmdRunAxfLib
   BaseMemoryLib
-  BdsLib
+#  BdsLib
   DebugLib
   DmaLib
   DxeServicesTableLib
