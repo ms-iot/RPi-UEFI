@@ -588,6 +588,17 @@ static void ReadBootwrapper(void)
     gBS->FreePool(buf);
 }
 
+static void ReadNandFileSystem(void)
+{
+    #ifdef NANDFLASHREAD
+        CopyNandToMem((VOID *)FILESYSTEM_DDR_BASE, FILESYSTEM_BLOCKNUM_NANDFLASH, FILESYSTEM_COPY_SIZE);
+        (VOID)AsciiPrint("THE .FILESYSTEM FILE IS TRANSMITTED OK!\n");
+    #else
+        memcpy((VOID *)FILESYSTEM_DDR_BASE, (VOID *)FILESYSTEM_FLASH_BASE, FILESYSTEM_COPY_SIZE);
+        (VOID)AsciiPrint("THE .FILESYSTEM FILE IS TRANSMITTED OK!\n");
+    #endif
+}
+
 /**
   This function uses policy data from the platform to determine what operating
   system or system utility should be loaded and invoked.  This function call
@@ -743,14 +754,6 @@ BdsEntry (
 //            (VOID)AsciiPrint("The .kernel file check sucess!\n\n");
 //        }
 
-        #ifdef NANDFLASHREAD
-            CopyNandToMem((void *)FILESYSTEM_DDR_BASE, FILESYSTEM_BLOCKNUM_NANDFLASH, FILESYSTEM_COPY_SIZE);
-            (VOID)AsciiPrint("The .filesystem file is transmitted ok!\n");
-        #else
-            memcpy((void *)FILESYSTEM_DDR_BASE, (void *)FILESYSTEM_FLASH_BASE, FILESYSTEM_COPY_SIZE);
-            (VOID)AsciiPrint("The .filesystem file is transmitted ok!\n");
-        #endif
-
 //        /* compare initrd in FLASH and the same file in DDR*/
 //        if (CompareMem((void *)FILESYSTEM_DDR_BASE, (void *)FILESYSTEM_FLASH_BASE, FILESYSTEM_COPY_SIZE) != 0)
 //        {
@@ -823,6 +826,7 @@ ExitBootServicesEvent (
   )
 {
   ReadBootwrapper();
+  ReadNandFileSystem();
 
   if (skip_enter_bootwrapper)
     return;
