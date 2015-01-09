@@ -1,0 +1,89 @@
+##
+#  SEC - Reset vector code that jumps to C and loads DXE core
+#
+#  Copyright (c) 2013, AppliedMicro Corp. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = APMXGeneSec
+  FILE_GUID                      = 02d68e4a-ad95-4fdc-861b-2de4ad69aac6 
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+[Sources.ARM]
+
+[Sources.AARCH64]
+  SlimproBooting.c
+  Sec.c
+  SecEntryPoint.S | GCC
+  Exception.S     | GCC
+  Helper.S        | GCC
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/APMXGenePkg/APMXGene.dec
+
+[LibraryClasses]
+  #ArmCpuLib
+  #ArmPlatformSecLib
+  #ArmTrustedMonitorLib
+  IoLib  
+  ArmPlatformSecLib
+  BaseLib
+  ArmLib
+  TimerLib
+  DebugLib
+  ArmGicLib
+  PrintLib
+  SerialPortLib
+
+[FeaturePcd]
+ gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
+ 
+[FixedPcd]
+ gArmPlatformTokenSpaceGuid.PcdFirmwareVendor
+ gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+
+ gArmTokenSpaceGuid.PcdTrustzoneSupport
+ gArmTokenSpaceGuid.PcdVFPEnabled
+
+ gArmTokenSpaceGuid.PcdArmNonSecModeTransition
+
+ gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+ gArmTokenSpaceGuid.PcdArmPrimaryCore
+
+ gArmTokenSpaceGuid.PcdSecureFvBaseAddress
+ gArmTokenSpaceGuid.PcdSecureFvSize
+
+ gArmTokenSpaceGuid.PcdFvBaseAddress
+
+ gArmTokenSpaceGuid.PcdFdSize
+ gArmTokenSpaceGuid.PcdFdBaseAddress
+
+ gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase
+ gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize
+ gArmPlatformTokenSpaceGuid.PcdCPUCoreSecSecondaryStackSize
+ gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase
+ gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize
+ gArmPlatformTokenSpaceGuid.PcdKernMailboxAddr
+
+ gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz
+ gArmTokenSpaceGuid.PcdGicDistributorBase
+ gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+
+ gArmPlatformTokenSpaceGuid.PcdSecGlobalVariableSize
+ 
