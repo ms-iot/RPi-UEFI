@@ -39,6 +39,14 @@
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
+  ArmBdsHelperLib|ArmPkg/Library/ArmBdsHelperLib/ArmBdsHelperLib.inf
+!ifdef INTEL_BDS
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  PlatformBdsLib|ArmPlatformPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
+  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+!endif
+
   # USB Requirements
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
 
@@ -146,6 +154,11 @@
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|50000000
   gEmbeddedTokenSpaceGuid.PcdMetronomeTickPeriod|1000
 
+!ifdef INTEL_BDS
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
+!endif
+
 [PcdsPatchableInModule]
   # Console Resolution (Full HD)
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|1920
@@ -243,6 +256,12 @@
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+!ifdef INTEL_BDS
+  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+!else
   ArmPlatformPkg/Bds/Bds.inf
+!endif
   MdeModulePkg/Universal/Fdt/FdtTableDxe/FdtTableDxe.inf
 
