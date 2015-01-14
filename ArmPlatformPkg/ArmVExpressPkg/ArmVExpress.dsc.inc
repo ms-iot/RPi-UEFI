@@ -111,6 +111,7 @@
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
 
   # BDS Libraries
+  ArmBdsHelperLib|ArmPkg/Library/ArmBdsHelperLib/ArmBdsHelperLib.inf
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
 
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
