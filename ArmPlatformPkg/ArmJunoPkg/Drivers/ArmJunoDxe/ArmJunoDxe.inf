@@ -33,9 +33,9 @@
 
 [LibraryClasses]
   AcpiLib
+  ArmBdsHelperLib
   ArmShellCmdRunAxfLib
   BaseMemoryLib
-  BdsLib
   DebugLib
   DmaLib
   DxeServicesTableLib
