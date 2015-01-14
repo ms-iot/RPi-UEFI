@@ -43,9 +43,9 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  ArmBdsHelperLib
   BaseLib
   BaseMemoryLib
-  BdsLib
   DebugLib
   DevicePathLib
   MemoryAllocationLib
