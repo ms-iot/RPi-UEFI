@@ -113,7 +113,9 @@
 
   # BDS Libraries
   ArmBdsHelperLib|ArmPkg/Library/ArmBdsHelperLib/ArmBdsHelperLib.inf
+!ifndef INTEL_BDS
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+!endif
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
