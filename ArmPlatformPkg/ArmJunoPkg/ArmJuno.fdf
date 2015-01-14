@@ -173,6 +173,11 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF ArmPlatformPkg/Bds/Bds.inf
 
+  INF MdeModulePkg/Universal/Fdt/FdtTableDxe/FdtTableDxe.inf
+  FILE FREEFORM = PCD(gEfiMdeModulePkgTokenSpaceGuid.PcdFdtImage) {
+    SECTION RAW = ArmPlatformPkg/ArmJunoPkg/dts/juno.dtb
+  }
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8
 ERASE_POLARITY     = 1

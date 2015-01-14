@@ -1,0 +1,340 @@
+/dts-v1/;
+
+/ {
+	model = "Juno";
+	compatible = "arm,juno", "arm,vexpress";
+	interrupt-parent = <0x1>;
+	#address-cells = <0x2>;
+	#size-cells = <0x2>;
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	aliases {
+		serial0 = "/uart@7ff80000";
+	};
+
+	cpus {
+		#address-cells = <0x2>;
+		#size-cells = <0x0>;
+
+		cpu@100 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x100>;
+			enable-method = "psci";
+		};
+
+		cpu@101 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x101>;
+			enable-method = "psci";
+		};
+
+		cpu@102 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x102>;
+			enable-method = "psci";
+		};
+
+		cpu@103 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x103>;
+			enable-method = "psci";
+		};
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a57", "arm,armv8";
+			reg = <0x0 0x0>;
+			enable-method = "psci";
+		};
+
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a57", "arm,armv8";
+			reg = <0x0 0x1>;
+			enable-method = "psci";
+		};
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x7f000000 0x8 0x80000000 0x1 0x80000000>;
+	};
+
+	interrupt-controller@2c001000 {
+		compatible = "arm,cortex-a15-gic";
+		#interrupt-cells = <0x3>;
+		#address-cells = <0x0>;
+		interrupt-controller;
+		reg = <0x0 0x2c010000 0x0 0x1000 0x0 0x2c02f000 0x0 0x2000 0x0 0x2c04f000 0x0 0x2000 0x0 0x2c06f000 0x0 0x2000>;
+		interrupts = <0x1 0x9 0x3f04>;
+		linux,phandle = <0x1>;
+		phandle = <0x1>;
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <0x1 0xd 0x3f01 0x1 0xe 0x3f01 0x1 0xb 0x3f01 0x1 0xa 0x3f01>;
+	};
+
+	pmu {
+		compatible = "arm,armv8-pmuv3";
+		interrupts = <0x0 0x12 0x4 0x0 0x16 0x4 0x0 0x1a 0x4 0x0 0x1e 0x4 0x0 0x2 0x4 0x0 0x6 0x4>;
+	};
+
+	psci {
+		compatible = "arm,psci-0.2";
+		method = "smc";
+	};
+
+	refclk72738khz {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <0x6efd48>;
+		clock-output-names = "juno:uartclk";
+		linux,phandle = <0x4>;
+		phandle = <0x4>;
+	};
+
+	clk48mhz {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <0x2dc6c00>;
+		clock-output-names = "clk48mhz";
+		linux,phandle = <0x6>;
+		phandle = <0x6>;
+	};
+
+	clk50mhz {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <0x2faf080>;
+		clock-output-names = "smc_clk";
+		linux,phandle = <0x2>;
+		phandle = <0x2>;
+	};
+
+	refclk100mhz {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <0x5f5e100>;
+		clock-output-names = "apb_pclk";
+		linux,phandle = <0x5>;
+		phandle = <0x5>;
+	};
+
+	clk24mhz {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <0x16e3600>;
+		clock-output-names = "juno:clk24mhz";
+		linux,phandle = <0xa>;
+		phandle = <0xa>;
+	};
+
+	refclk533mhz {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <0x1fc4ef40>;
+		clock-output-names = "faxi_clk";
+		linux,phandle = <0x3>;
+		phandle = <0x3>;
+	};
+
+	clk25mhz {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <0x17d7840>;
+		clock-output-names = "ethclk25mhz";
+		linux,phandle = <0x8>;
+		phandle = <0x8>;
+	};
+
+	fixedregulator@0 {
+		compatible = "regulator-fixed";
+		regulator-name = "3V3";
+		regulator-min-microvolt = <0x325aa0>;
+		regulator-max-microvolt = <0x325aa0>;
+		regulator-always-on;
+		linux,phandle = <0x9>;
+		phandle = <0x9>;
+	};
+
+	memory-controller@7ffd0000 {
+		compatible = "arm,pl354", "arm,primecell";
+		reg = <0x0 0x7ffd0000 0x0 0x1000>;
+		interrupts = <0x0 0x56 0x4 0x0 0x57 0x4>;
+		clocks = <0x2>;
+		clock-names = "apb_pclk";
+		chip5-memwidth = <0x10>;
+	};
+
+	dma@0x7ff00000 {
+		compatible = "arm,pl330", "arm,primecell";
+		reg = <0x0 0x7ff00000 0x0 0x1000>;
+		interrupts = <0x0 0x5f 0x4 0x0 0x58 0x4 0x0 0x59 0x4 0x0 0x5a 0x4 0x0 0x5b 0x4 0x0 0x6c 0x4 0x0 0x6d 0x4 0x0 0x6e 0x4 0x0 0x6f 0x4>;
+		#dma-cells = <0x1>;
+		#dma-channels = <0x8>;
+		#dma-requests = <0x20>;
+		clocks = <0x3>;
+		clock-names = "apb_pclk";
+	};
+
+	uart@7ff80000 {
+		compatible = "arm,pl011", "arm,primecell";
+		reg = <0x0 0x7ff80000 0x0 0x1000>;
+		interrupts = <0x0 0x53 0x4>;
+		clocks = <0x4 0x5>;
+		clock-names = "uartclk", "apb_pclk";
+	};
+
+	phy@0 {
+		compatible = "phy-ulpi-generic";
+		reg = <0x0 0x94 0x0 0x4>;
+		phy-id = <0x0>;
+		linux,phandle = <0x7>;
+		phandle = <0x7>;
+	};
+
+	ehci@7ffc0000 {
+		compatible = "generic-ehci";
+		reg = <0x0 0x7ffc0000 0x0 0x10000>;
+		interrupts = <0x0 0x75 0x4>;
+		clocks = <0x6>;
+		phys = <0x7>;
+		phy-names = "usb_ulpi";
+	};
+
+	ohci@0x7ffb0000 {
+		compatible = "generic-ohci";
+		reg = <0x0 0x7ffb0000 0x0 0x10000>;
+		interrupts = <0x0 0x74 0x4>;
+		clocks = <0x6>;
+		phys = <0x7>;
+		phy-names = "usb_ulpi";
+	};
+
+	i2c@0x7ffa0000 {
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+		compatible = "snps,designware-i2c";
+		reg = <0x0 0x7ffa0000 0x0 0x1000>;
+		interrupts = <0x0 0x68 0x4>;
+		clock-frequency = <0x61a80>;
+		i2c-sda-hold-time-ns = <0x1f4>;
+		clocks = <0x2>;
+
+		dvi-transmitter@70 {
+			compatible = "nxp,tda998x";
+			reg = <0x70>;
+		};
+
+		dvi-transmitter@71 {
+			compatible = "nxp,tda998x";
+			reg = <0x71>;
+		};
+	};
+
+	smb {
+		compatible = "simple-bus";
+		#address-cells = <0x2>;
+		#size-cells = <0x1>;
+		ranges = <0x0 0x0 0x0 0x8000000 0x4000000 0x1 0x0 0x0 0x14000000 0x4000000 0x2 0x0 0x0 0x18000000 0x4000000 0x3 0x0 0x0 0x1c000000 0x4000000 0x4 0x0 0x0 0xc000000 0x4000000 0x5 0x0 0x0 0x10000000 0x4000000>;
+		#interrupt-cells = <0x1>;
+		interrupt-map-mask = <0x0 0x0 0xf>;
+		interrupt-map = <0x0 0x0 0x0 0x1 0x0 0x44 0x4 0x0 0x0 0x1 0x1 0x0 0x45 0x4 0x0 0x0 0x2 0x1 0x0 0x46 0x4 0x0 0x0 0x3 0x1 0x0 0xa0 0x4 0x0 0x0 0x4 0x1 0x0 0xa1 0x4 0x0 0x0 0x5 0x1 0x0 0xa2 0x4 0x0 0x0 0x6 0x1 0x0 0xa3 0x4 0x0 0x0 0x7 0x1 0x0 0xa4 0x4 0x0 0x0 0x8 0x1 0x0 0xa5 0x4 0x0 0x0 0x9 0x1 0x0 0xa6 0x4 0x0 0x0 0xa 0x1 0x0 0xa7 0x4 0x0 0x0 0xb 0x1 0x0 0xa8 0x4 0x0 0x0 0xc 0x1 0x0 0xa9 0x4>;
+
+		motherboard {
+			model = "V2M-Juno";
+			arm,hbi = <0x252>;
+			arm,vexpress,site = <0x0>;
+			arm,v2m-memory-map = "rs1";
+			compatible = "arm,vexpress,v2p-p1", "simple-bus";
+			#address-cells = <0x2>;
+			#size-cells = <0x1>;
+			#interrupt-cells = <0x1>;
+			ranges;
+
+			usb@5,00000000 {
+				compatible = "nxp,usb-isp1763";
+				reg = <0x5 0x0 0x20000>;
+				bus-width = <0x10>;
+				interrupts = <0x4>;
+			};
+
+			ethernet@2,00000000 {
+				compatible = "smsc,lan9118", "smsc,lan9115";
+				reg = <0x2 0x0 0x10000>;
+				interrupts = <0x3>;
+				phy-mode = "mii";
+				reg-io-width = <0x4>;
+				smsc,irq-active-high;
+				smsc,irq-push-pull;
+				clocks = <0x8>;
+				vdd33a-supply = <0x9>;
+				vddvario-supply = <0x9>;
+			};
+
+			iofpga@3,00000000 {
+				compatible = "arm,amba-bus", "simple-bus";
+				#address-cells = <0x1>;
+				#size-cells = <0x1>;
+				ranges = <0x0 0x3 0x0 0x200000>;
+
+				kmi@060000 {
+					compatible = "arm,pl050", "arm,primecell";
+					reg = <0x60000 0x1000>;
+					interrupts = <0x8>;
+					clocks = <0xa 0x2>;
+					clock-names = "KMIREFCLK", "apb_pclk";
+				};
+
+				kmi@070000 {
+					compatible = "arm,pl050", "arm,primecell";
+					reg = <0x70000 0x1000>;
+					interrupts = <0x8>;
+					clocks = <0xa 0x2>;
+					clock-names = "KMIREFCLK", "apb_pclk";
+				};
+
+				wdt@0f0000 {
+					compatible = "arm,sp805", "arm,primecell";
+					reg = <0xf0000 0x10000>;
+					interrupts = <0x7>;
+					clocks = <0xa 0x2>;
+					clock-names = "wdogclk", "apb_pclk";
+				};
+
+				timer@110000 {
+					compatible = "arm,sp804", "arm,primecell";
+					reg = <0x110000 0x10000>;
+					interrupts = <0x9>;
+					clocks = <0xa 0x2>;
+					clock-names = "timclken1", "apb_pclk";
+				};
+
+				timer@120000 {
+					compatible = "arm,sp804", "arm,primecell";
+					reg = <0x120000 0x10000>;
+					interrupts = <0x9>;
+					clocks = <0xa 0x2>;
+					clock-names = "timclken1", "apb_pclk";
+				};
+
+				rtc@170000 {
+					compatible = "arm,pl031", "arm,primecell";
+					reg = <0x170000 0x10000>;
+					interrupts = <0x0>;
+					clocks = <0x2>;
+					clock-names = "apb_pclk";
+				};
+			};
+		};
+	};
+};
