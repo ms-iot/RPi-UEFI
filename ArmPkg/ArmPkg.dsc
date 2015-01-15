@@ -138,7 +138,9 @@
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
+!ifndef NO_LINUX_LOADER
   ArmPkg/Application/LinuxLoader/LinuxFdtLoader.inf
+!endif
 
 [Components.ARM]
   ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
@@ -154,7 +156,9 @@
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
 
+!ifndef NO_LINUX_LOADER
   ArmPkg/Application/LinuxLoader/LinuxAtagLoader.inf
+!endif
 
 [Components.AARCH64]
   ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf
