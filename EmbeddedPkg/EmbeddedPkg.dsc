@@ -267,9 +267,11 @@
   # FDT Support
   EmbeddedPkg/Library/FdtLoadLib/FdtLoadLib.inf
 
+!ifndef NO_LINUX_LOADER
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportTcpDxe/FastbootTransportTcpDxe.inf
+!endif
 
   # Drivers
   EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf
