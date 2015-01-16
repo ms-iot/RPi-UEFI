@@ -48,6 +48,13 @@
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
 
+!ifdef INTEL_BDS
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  PlatformBdsLib|ArmPlatformPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
+  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+!endif
+
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPlatformSecLib|HisiPkg/D01BoardPkg/Library/D01SecLibRTSM/D01SecLib.inf
@@ -140,6 +147,7 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0xe0C01000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0xe0C02000
 
+!ifndef NO_LINUX_LOADER
   #
   # ARM OS Loader
   #
@@ -152,6 +160,7 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenMsg(06ED4DD0-FF78-11D3-BDC4-00A0C94053D1,0000000000000000)/initrd"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"mem=256M console=ttyAMA0,115200"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
+!endif
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   #gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
@@ -176,6 +185,12 @@
   gArmTokenSpaceGuid.PcdTimer0InterruptNum|130
   
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"EVB_SECURE_UEFI_BIOS"
+
+!ifdef INTEL_BDS
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
+!endif
+
   
 ################################################################################
 #
@@ -324,10 +339,16 @@
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+!ifdef INTEL_BDS
+  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+!else
   HisiPkg/D01BoardPkg/Bds/Bds.inf
-
+!endif
+!ifndef NO_LINUX_LOADER
   HisiPkg/Drivers/LinuxAtagList/LinuxAtagList.inf
-
+!endif
   #HisiPkg/Drivers/AtaAtapiPassThru/AtaAtapiPassThru.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
   
