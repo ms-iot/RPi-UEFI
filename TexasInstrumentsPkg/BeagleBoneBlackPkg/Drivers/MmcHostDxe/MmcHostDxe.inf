@@ -1,0 +1,50 @@
+#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#  
+#  This program and the accompanying materials                          
+#  are licensed and made available under the terms and conditions of the BSD License         
+#  which accompanies this distribution.  The full text of the license may be found at        
+#  http://opensource.org/licenses/bsd-license.php                                            
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MMC
+  FILE_GUID                      = ba16face-f583-475b-a0c6-77b234c62fd0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = MMCInitialize
+
+
+[Sources.common]
+  MmcHostDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  TexasInstrumentsPkg/BeagleBoneBlackPkg/BeagleBoneBlackPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  UefiLib
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  IoLib
+  DmaLib
+
+[Guids]
+  
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEmbeddedExternalDeviceProtocolGuid
+  gEfiMmcHostProtocolGuid
+
+[Pcd]
+
+[depex]
+  TRUE
