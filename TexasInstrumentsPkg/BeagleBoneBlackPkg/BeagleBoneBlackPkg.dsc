@@ -101,7 +101,7 @@
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf  
 
   # BDS Libraries
-  BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+  ArmBdsHelperLib|ArmPkg/Library/ArmBdsHelperLib/ArmBdsHelperLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
