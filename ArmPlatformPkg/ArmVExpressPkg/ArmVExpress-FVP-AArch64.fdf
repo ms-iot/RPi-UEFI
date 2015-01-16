@@ -181,6 +181,12 @@ READ_LOCK_STATUS   = TRUE
 !endif
 
   #
+  # SMBIOS Support
+  #
+  INF ArmPlatformPkg/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+
+  #
   # Platform Driver
   #
   INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmFvpDxe.inf
@@ -202,6 +208,19 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF ArmPlatformPkg/Bds/Bds.inf
 
+
+  #
+  # Embedded device tree image
+  #
+  INF MdeModulePkg/Universal/Fdt/FdtTableDxe/FdtTableDxe.inf
+
+  FILE FREEFORM = PCD(gEfiMdeModulePkgTokenSpaceGuid.PcdFdtImage) {
+!ifdef ARM_FOUNDATION_FVP
+    SECTION RAW = ArmPlatformPkg/ArmVExpressPkg/dts/fvp-foundation-gicv2-psci.dtb
+!else
+    SECTION RAW = ArmPlatformPkg/ArmVExpressPkg/dts/fvp-base-gicv2-psci.dtb
+!endif
+  }
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
