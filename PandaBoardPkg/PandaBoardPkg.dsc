@@ -132,6 +132,7 @@
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
+  ArmBdsHelperLib|ArmPkg/Library/ArmBdsHelperLib/ArmBdsHelperLib.inf
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
 
 [LibraryClasses.common.SEC]
