@@ -43,6 +43,7 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
+  ArmBdsHelperLib
   ArmLib
   ArmSmcLib
   BaseLib

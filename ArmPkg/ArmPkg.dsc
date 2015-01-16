@@ -75,7 +75,9 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
 
+!ifndef INTEL_BDS
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+!endif
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -108,7 +110,9 @@
   ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
   ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
+!ifndef INTEL_BDS
   ArmPkg/Library/BdsLib/BdsLib.inf
+!endif
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
   ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
@@ -138,7 +142,9 @@
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
+!ifndef NO_LINUX_LOADER
   ArmPkg/Application/LinuxLoader/LinuxFdtLoader.inf
+!endif
 
 [Components.ARM]
   ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
@@ -154,7 +160,9 @@
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
 
+!ifndef NO_LINUX_LOADER
   ArmPkg/Application/LinuxLoader/LinuxAtagLoader.inf
+!endif
 
 [Components.AARCH64]
   ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf

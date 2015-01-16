@@ -98,6 +98,7 @@
 
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
 
+  AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
   # Networking Requirements
@@ -266,9 +267,11 @@
   # FDT Support
   EmbeddedPkg/Library/FdtLoadLib/FdtLoadLib.inf
 
+!ifndef NO_LINUX_LOADER
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportTcpDxe/FastbootTransportTcpDxe.inf
+!endif
 
   # Drivers
   EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf
