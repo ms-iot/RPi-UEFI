@@ -854,6 +854,8 @@
   # @Prompt Memory profile memory type.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType|0x0|UINT64|0x30001042
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFdtImage|{ 0x66,0x0f,0xe1,0x96,0xa5,0x0f,0x43,0x8c,0xa9,0x50,0xbe,0x6a,0x58,0xb9,0x12,0x1b }|VOID*|0x30001043
+
   ## UART clock frequency is for the baud rate configuration.
   # @Prompt Serial Port Clock Rate.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|1843200|UINT32|0x00010066
