@@ -1,0 +1,58 @@
+#/*++
+#
+# Copyright (c) 2004, Intel Corporation  
+# Copyright (c) Huawei Technologies Co., Ltd. 2013. All rights reserved.                                                       
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+# 
+#  Module Name:
+#
+#    
+#Mem.c 
+#
+#  Abstract:
+#
+#    Component description file for set cmd reg module.
+#
+#--*/
+[Defines]
+
+INF_VERSION                    = 0x00010005
+BASE_NAME                      = ramdisk
+FILE_GUID                      = A8D2D6E6-D256-4c7a-B835-D6D1422212DB
+MODULE_TYPE                    = UEFI_DRIVER
+VERSION_STRING                 = 1.0
+ENTRY_POINT                    = InitializeRamDiskDriver
+
+[Sources]
+ramdisk.c
+ramdisk.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+#  PV600Pkg/PV600Pkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  
+  BaseMemoryLib
+  #DebugLib
+  #PcdLib
+  #UefiRuntimeServicesTableLib
+  #UefiBootServicesTableLib
+  
+[Protocols]
+   gEfiBlockIoProtocolGuid
+   gEfiLoadedImageProtocolGuid
+
+
+    
