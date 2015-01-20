@@ -573,6 +573,12 @@ EhcCheckUrbResult (
 
   ASSERT ((Ehc != NULL) && (Urb != NULL) && (Urb->Qh != NULL));
 
+  // The URB is already being processed, we do not want the callback to be
+  // called twice for the same URB
+  if (Urb->InProgress) {
+    return FALSE;
+  }
+
   Finished        = TRUE;
   Urb->Completed  = 0;
 
@@ -991,6 +997,9 @@ EhcMonitorAsyncRequests (
     if (!Finished) {
       continue;
     }
+
+    // Mark the URB as 'in-progress' to prevent the URB to be processed twice.
+    Urb->InProgress = TRUE;
 
     //
     // Flush any PCI posted write transactions from a PCI host

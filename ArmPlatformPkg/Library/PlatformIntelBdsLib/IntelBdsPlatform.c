@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "IntelBdsPlatform.h"
+#include <Library/ArmBdsHelperLib.h>
 
 ///
 /// Predefined platform default time out value
