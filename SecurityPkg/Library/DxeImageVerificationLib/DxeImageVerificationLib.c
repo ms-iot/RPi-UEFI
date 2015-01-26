@@ -769,7 +769,7 @@ AddImageExeInfo (
   }
 
   DevicePathSize            = GetDevicePathSize (DevicePath);
-  NewImageExeInfoEntrySize  = sizeof (EFI_IMAGE_EXECUTION_INFO) + NameStringLen + DevicePathSize + SignatureSize;
+  NewImageExeInfoEntrySize  = sizeof (EFI_IMAGE_EXECUTION_INFO) - sizeof (EFI_SIGNATURE_LIST) + NameStringLen + DevicePathSize + SignatureSize;
   NewImageExeInfoTable      = (EFI_IMAGE_EXECUTION_INFO_TABLE *) AllocateRuntimePool (ImageExeInfoTableSize + NewImageExeInfoEntrySize);
   if (NewImageExeInfoTable == NULL) {
     return ;
@@ -841,7 +841,7 @@ IsCertHashFoundInDatabase (
   )
 {
   BOOLEAN             IsFound;
-  EFI_STATUS          Status;
+  BOOLEAN             Status;
   EFI_SIGNATURE_LIST  *DbxList;
   UINTN               DbxSize;
   EFI_SIGNATURE_DATA  *CertHash;
@@ -852,6 +852,8 @@ IsCertHashFoundInDatabase (
   UINT8               CertDigest[MAX_DIGEST_SIZE];
   UINT8               *DbxCertHash;
   UINTN               SiglistHeaderSize;
+  UINT8               *TBSCert;
+  UINTN               TBSCertSize;
 
   IsFound  = FALSE;
   DbxList  = SignatureList;
@@ -859,7 +861,16 @@ IsCertHashFoundInDatabase (
   HashCtx  = NULL;
   HashAlg  = HASHALG_MAX;
 
-  ASSERT (RevocationTime != NULL);
+  if ((RevocationTime == NULL) || (DbxList == NULL)) {
+    return FALSE;
+  }
+
+  //
+  // Retrieve the TBSCertificate from the X.509 Certificate.
+  //
+  if (!X509GetTBSCert (Certificate, CertSize, &TBSCert, &TBSCertSize)) {
+    return FALSE;
+  }
 
   while ((DbxSize > 0) && (SignatureListSize >= DbxList->SignatureListSize)) {
     //
@@ -878,7 +889,7 @@ IsCertHashFoundInDatabase (
     }
 
     //
-    // Calculate the hash value of current db certificate for comparision.
+    // Calculate the hash value of current TBSCertificate for comparision.
     //
     if (mHash[HashAlg].GetContextSize == NULL) {
       goto Done;
@@ -892,7 +903,7 @@ IsCertHashFoundInDatabase (
     if (!Status) {
       goto Done;
     }
-    Status = mHash[HashAlg].HashUpdate (HashCtx, Certificate, CertSize);
+    Status = mHash[HashAlg].HashUpdate (HashCtx, TBSCert, TBSCertSize);
     if (!Status) {
       goto Done;
     }
@@ -1132,15 +1143,16 @@ PassTimestampCheck (
   //
   DbtDataSize = 0;
   Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid, NULL, &DbtDataSize, NULL);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    DbtData = (UINT8 *) AllocateZeroPool (DbtDataSize);
-    if (DbtData == NULL) {
-      goto Done;
-    }
-    Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid, NULL, &DbtDataSize, (VOID *) DbtData);
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    goto Done;
+  }
+  DbtData = (UINT8 *) AllocateZeroPool (DbtDataSize);
+  if (DbtData == NULL) {
+    goto Done;
+  }
+  Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid, NULL, &DbtDataSize, (VOID *) DbtData);
+  if (EFI_ERROR (Status)) {
+    goto Done;
   }
 
   CertList = (EFI_SIGNATURE_LIST *) DbtData;
@@ -1229,14 +1241,15 @@ IsForbiddenByDbx (
   //
   DataSize = 0;
   Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, NULL);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    Data = (UINT8 *) AllocateZeroPool (DataSize);
-    if (Data == NULL) {
-      return IsForbidden;
-    }
-
-    Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, (VOID *) Data);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    return IsForbidden;
   }
+  Data = (UINT8 *) AllocateZeroPool (DataSize);
+  if (Data == NULL) {
+    return IsForbidden;
+  }
+
+  Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, (VOID *) Data);
   if (EFI_ERROR (Status)) {
     return IsForbidden;
   }
@@ -1254,7 +1267,7 @@ IsForbiddenByDbx (
   //       UINT8  Certn[];
   //
   Pkcs7GetSigners (AuthData, AuthDataSize, &CertBuffer, &BufferLength, &TrustedCert, &TrustedCertLength);
-  if (BufferLength == 0) {
+  if ((BufferLength == 0) || (CertBuffer == NULL)) {
     IsForbidden = TRUE;
     goto Done;
   }
@@ -1472,6 +1485,7 @@ DxeImageVerificationHandler (
   UINTN                                AuthDataSize;
   EFI_IMAGE_DATA_DIRECTORY             *SecDataDir;
   UINT32                               OffSet;
+  CHAR16                               *NameStr;
 
   SignatureList     = NULL;
   SignatureListSize = 0;
@@ -1775,7 +1789,12 @@ Done:
     //
     // Policy decides to defer or reject the image; add its information in image executable information table.
     //
-    AddImageExeInfo (Action, NULL, File, SignatureList, SignatureListSize);
+    NameStr = ConvertDevicePathToText (File, FALSE, TRUE);
+    AddImageExeInfo (Action, NameStr, File, SignatureList, SignatureListSize);
+    if (NameStr != NULL) {
+      DEBUG((EFI_D_INFO, "The image doesn't pass verification: %s\n", NameStr));
+      FreePool(NameStr);
+    }
     Status = EFI_SECURITY_VIOLATION;
   }
 

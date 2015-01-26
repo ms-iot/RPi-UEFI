@@ -22,7 +22,11 @@
   PLATFORM_GUID                  = 37d7e986-f7e9-45c2-8067-e371421a626c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
+!ifdef EDK2_OUT_DIR
+  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)-$(ARCH)
+!else
   OUTPUT_DIRECTORY               = Build/ArmVirtualizationQemu-$(ARCH)
+!endif
   SUPPORTED_ARCHITECTURES        = AARCH64|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -42,17 +46,20 @@
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+  QemuFwCfgLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
 
   ArmPlatformLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationPlatformLib/ArmVirtualizationPlatformLib.inf
   ArmPlatformSysConfigLib|ArmPlatformPkg/Library/ArmPlatformSysConfigLibNull/ArmPlatformSysConfigLibNull.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
+  ArmBdsHelperLib|ArmPkg/Library/ArmBdsHelperLib/ArmBdsHelperLib.inf
 !ifdef INTEL_BDS
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
-  PlatformBdsLib|ArmPlatformPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
+  PlatformBdsLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+  QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
 !endif
 
 [LibraryClasses.common.UEFI_DRIVER]
@@ -67,7 +74,7 @@
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15 -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
   GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a15 -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
-  GCC:*_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
+  *_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
 
 
 ################################################################################
@@ -77,6 +84,9 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|FALSE
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|TRUE
+
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|FALSE
@@ -148,6 +158,7 @@
 
 !ifdef INTEL_BDS
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
 !endif
 
 [PcdsDynamicDefault.common]
@@ -172,6 +183,11 @@
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
 
   gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod|0
+
+  gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
+  gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0
+
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
 ################################################################################
 #

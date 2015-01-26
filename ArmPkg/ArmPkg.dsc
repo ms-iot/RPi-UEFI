@@ -31,14 +31,11 @@
 
 [BuildOptions]
   XCODE:*_*_ARM_PLATFORM_FLAGS  == -arch armv7
-  XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG
-
   GCC:*_*_ARM_PLATFORM_FLAGS    == -march=armv7-a -mfpu=neon
-  GCC:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG
-
   # We use A15 to get the Secure and Virtualization extensions
   RVCT:*_*_ARM_PLATFORM_FLAGS  == --cpu Cortex-A15
-  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
+
+  RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
 [LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -78,7 +75,9 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
 
+!ifndef INTEL_BDS
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+!endif
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -111,7 +110,9 @@
   ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
   ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
+!ifndef INTEL_BDS
   ArmPkg/Library/BdsLib/BdsLib.inf
+!endif
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
   ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
@@ -129,6 +130,7 @@
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
+  ArmPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
   ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
@@ -140,7 +142,9 @@
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
+!ifndef NO_LINUX_LOADER
   ArmPkg/Application/LinuxLoader/LinuxFdtLoader.inf
+!endif
 
 [Components.ARM]
   ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
@@ -156,7 +160,9 @@
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
 
+!ifndef NO_LINUX_LOADER
   ArmPkg/Application/LinuxLoader/LinuxAtagLoader.inf
+!endif
 
 [Components.AARCH64]
   ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf

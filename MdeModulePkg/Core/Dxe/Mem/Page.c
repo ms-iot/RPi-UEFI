@@ -937,12 +937,6 @@ CoreConvertPages (
   @param  NumberOfPages          The number of pages to convert
   @param  NewAttributes          The new attributes value for the range.
 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter
-  @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified
-                                 range  or convertion not allowed.
-  @retval EFI_SUCCESS            Successfully converts the memory range to the
-                                 specified attributes.
-
 **/
 VOID
 CoreUpdateMemoryAttributes (
@@ -1405,7 +1399,7 @@ CoreFreePages (
 
   Status = CoreInternalFreePages (Memory, NumberOfPages);
   if (!EFI_ERROR (Status)) {
-    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePages, 0, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) Memory);
+    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePages, (EFI_MEMORY_TYPE) 0, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) Memory);
   }
   return Status;
 }

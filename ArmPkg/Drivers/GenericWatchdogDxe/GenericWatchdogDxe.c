@@ -27,7 +27,7 @@
 #include <Protocol/WatchdogTimer.h>
 #include <Protocol/HardwareInterrupt.h>
 
-#include <Drivers/GenericWatchdog.h>
+#include "GenericWatchdog.h"
 
 // The number of 100ns periods (the unit of time passed to these functions)
 // in a second
@@ -181,7 +181,7 @@ WatchdogSetTimerPeriod (
   IN UINT64                                   TimerPeriod   // In 100ns units
   )
 {
-  UINTN       TimerVal;
+  UINTN       SystemCount;
   EFI_STATUS  Status;
 
   // if TimerPerdiod is 0, this is a request to stop the watchdog.
@@ -210,8 +210,8 @@ WatchdogSetTimerPeriod (
       return Status;
     }
     WatchdogEnable ();
-    TimerVal = ArmGenericTimerGetTimerVal ();
-    Status = WatchdogWriteCompareRegister (TimerVal + mNumTimerTicks);
+    SystemCount = ArmGenericTimerGetSystemCount ();
+    Status      = WatchdogWriteCompareRegister (SystemCount + mNumTimerTicks);
   } else {
     Status = WatchdogWriteOffsetRegister ((UINT32)mNumTimerTicks);
     WatchdogEnable ();

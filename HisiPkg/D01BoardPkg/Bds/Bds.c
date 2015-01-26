@@ -37,6 +37,7 @@ typedef unsigned char   U8;
 #define RAM_TEST_NOWORK_TAG          (0x0A0A0A0A) 
 
 EFI_HANDLE mImageHandle;
+static int skip_enter_bootwrapper;
 
 //************************************************
 #define SEEK_SET  0
@@ -72,12 +73,6 @@ BootGo (
   );
 
 //************************************************
-//address of Linux in DDR
-#define TEXT_DDR_BASE                   0x10c00000
-#define MONITOR_DDR_BASE                0x10c08000         
-#define KERNEL_DDR_BASE                 0x10008000
-#define FILESYSTEM_DDR_BASE             0x10d00000
-
 //estimate size of Linux kernel,the size for copying file to DDR isn't bigger than this
 #define TEXT_SIZE                       0x400000
 #define MONITOR_SIZE                    0x400000
@@ -85,8 +80,8 @@ BootGo (
 #define FILESYSTEM_SIZE                 0x1800000
 
 //actual size of copying file to DDR, it should not bigger than estimate size
-#define TEXT_COPY_SIZE                  0x20000
-#define MONITOR_COPY_SIZE               0x20000
+#define TEXT_COPY_SIZE                  0x8000
+#define MONITOR_COPY_SIZE               0x8000
 #define KERNEL_COPY_SIZE                0xa00000
 #define FILESYSTEM_COPY_SIZE            0x1800000
 
@@ -555,9 +550,58 @@ EFI_STATUS CopyNandToMem(void* Dest, UINT32 StartBlockNum, UINT32 LengthCopy)
 }
 #define NANDFLASHREAD 1
 
+static void ReadBootwrapper(void)
+{
+    void *buf;
+    NAND_CMD_INFO_STRU ulNandCMDInfo = { 0 };
+    #ifdef NANDFLASHREAD
+    EFI_NAND_DRIVER_PROTOCOL *nandDriver = NULL;
+
+    gBS->LocateProtocol (&gNANDDriverProtocolGuid, NULL, (VOID *) &nandDriver);
+    ulNandCMDInfo = nandDriver->NandFlashGetCMDInfo(nandDriver);
+    #endif
+    buf = AllocatePool(ulNandCMDInfo.ulBlockSize);
+
+    (VOID)AsciiPrint("\nCopy Bootwrapper from FLASH to SRAM...");
+
+    #ifdef NANDFLASHREAD
+        CopyNandToMem(buf, TEXT_BLOCKNUM_NANDFLASH, ulNandCMDInfo.ulBlockSize);
+        memcpy((void *)TEXT_SRAM_BASE, buf, TEXT_COPY_SIZE);
+        (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
+    #else
+         /* copy.text */
+        memcpy((void *)TEXT_SRAM_BASE, (void *)TEXT_FLASH_BASE, TEXT_COPY_SIZE);
+        (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
+    #endif
+
+    #ifdef NANDFLASHREAD
+         /* copy .monitor */
+        CopyNandToMem(buf, MONITOR_BLOCKNUM_NANDFLASH, ulNandCMDInfo.ulBlockSize);
+        memcpy((void *)MONITOR_SRAM_BASE, buf, MONITOR_COPY_SIZE);
+        (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
+    #else
+         /* copy .monitor */
+        memcpy((void *)MONITOR_SRAM_BASE, (void *)MONITOR_FLASH_BASE, MONITOR_COPY_SIZE);
+        (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
+    #endif
+
+    gBS->FreePool(buf);
+}
+
+static void ReadNandFileSystem(void)
+{
+    #ifdef NANDFLASHREAD
+        CopyNandToMem((VOID *)FILESYSTEM_DDR_BASE, FILESYSTEM_BLOCKNUM_NANDFLASH, FILESYSTEM_COPY_SIZE);
+        (VOID)AsciiPrint("THE .FILESYSTEM FILE IS TRANSMITTED OK!\n");
+    #else
+        memcpy((VOID *)FILESYSTEM_DDR_BASE, (VOID *)FILESYSTEM_FLASH_BASE, FILESYSTEM_COPY_SIZE);
+        (VOID)AsciiPrint("THE .FILESYSTEM FILE IS TRANSMITTED OK!\n");
+    #endif
+}
+
 /**
-  This function uses policy data from the platform to determine what operating 
-  system or system utility should be loaded and invoked.  This function call 
+  This function uses policy data from the platform to determine what operating
+  system or system utility should be loaded and invoked.  This function call
   also optionally make the use of user input to determine the operating system 
   or system utility to be loaded and invoked.  When the DXE Core has dispatched 
   all the drivers on the dispatch queue, this function is called.  This 
@@ -683,50 +727,12 @@ BdsEntry (
         }
 
         //Status = BootMenuMain ();
-        //ASSERT_EFI_ERROR (Status);    
-        
+        //ASSERT_EFI_ERROR (Status);
+
         #if 1
+
         /*2.copy image from FLASH to DDR,and start*/
         (VOID)AsciiPrint("\nTransmit  OS from FLASH to DDR now, please wait!");
-        
-        #ifdef NANDFLASHREAD
-            CopyNandToMem((void *)TEXT_DDR_BASE, TEXT_BLOCKNUM_NANDFLASH, TEXT_COPY_SIZE);
-            (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
-        #else
-             /* copy.text */
-            memcpy((void *)TEXT_DDR_BASE, (void *)TEXT_FLASH_BASE, TEXT_COPY_SIZE);
-            (VOID)AsciiPrint("\nThe .text file is transmitted ok!\n");
-        #endif
-//        /* compare text in FLASH and the same file in DDR*/
-//        if (CompareMem((void *)TEXT_DDR_BASE, (void *)TEXT_FLASH_BASE, TEXT_COPY_SIZE) != 0)
-//        {
-//            (VOID)AsciiPrint("The .text file check fail!\n");
-//            //return;
-//        }
-//        else
-//        {
-//            (VOID)AsciiPrint("The .text file check sucess!\n");
-//        }
-         
-        #ifdef NANDFLASHREAD
-             /* copy .monitor */
-            CopyNandToMem((void *)MONITOR_DDR_BASE, MONITOR_BLOCKNUM_NANDFLASH, MONITOR_COPY_SIZE);
-            (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
-        #else
-             /* copy .monitor */
-            memcpy((void *)MONITOR_DDR_BASE, (void *)MONITOR_FLASH_BASE, MONITOR_COPY_SIZE);
-            (VOID)AsciiPrint("The .monitor file is transmitted ok!\n");
-        #endif
-//        /* compare uimage in FLASH and the same file in DDR*/
-//        if (CompareMem((void *)MONITOR_DDR_BASE, (void *)MONITOR_FLASH_BASE, MONITOR_COPY_SIZE) != 0)
-//        {
-//            (VOID)AsciiPrint("The .monitor file check fail!\n");
-//            //return;
-//        }
-//        else
-//        {
-//            (VOID)AsciiPrint("The .monitor file check sucess!\n");
-//        }
 
         #ifdef NANDFLASHREAD
              /* copy.kernel */
@@ -748,14 +754,6 @@ BdsEntry (
 //            (VOID)AsciiPrint("The .kernel file check sucess!\n\n");
 //        }
 
-        #ifdef NANDFLASHREAD
-            CopyNandToMem((void *)FILESYSTEM_DDR_BASE, FILESYSTEM_BLOCKNUM_NANDFLASH, FILESYSTEM_COPY_SIZE);
-            (VOID)AsciiPrint("The .filesystem file is transmitted ok!\n");
-        #else
-            memcpy((void *)FILESYSTEM_DDR_BASE, (void *)FILESYSTEM_FLASH_BASE, FILESYSTEM_COPY_SIZE);
-            (VOID)AsciiPrint("The .filesystem file is transmitted ok!\n");
-        #endif
-
 //        /* compare initrd in FLASH and the same file in DDR*/
 //        if (CompareMem((void *)FILESYSTEM_DDR_BASE, (void *)FILESYSTEM_FLASH_BASE, FILESYSTEM_COPY_SIZE) != 0)
 //        {
@@ -768,6 +766,7 @@ BdsEntry (
 //        }
 
         /*---------------OS-----------------*/
+        skip_enter_bootwrapper = 1;
         BootOptionList (&BootOptionsList);
         BootGo (&BootOptionsList);
         #endif
@@ -781,6 +780,58 @@ BdsEntry (
   Status = BootMenuMain ();
   ASSERT_EFI_ERROR (Status);
 
+}
+
+long bootwrapper_saved_stack;
+static void EnterBootwrapper(void)
+{
+#if !defined(__thumb__)
+#error Please compile in thumb mode
+#endif
+
+  /*
+   * This chunk of assembly enters the bootwrapper code, then
+   * immediately returns here and recovers all clobbered registers
+   */
+  asm volatile("ldr	r0, =return_from_bootwrapper	\n\
+		orr	r0, r0, #1			\n\
+		ldr	r4, =bootwrapper_saved_stack	\n\
+		str	sp, [r4]			\n\
+		b	RunBootwrapper			\n\
+		return_from_bootwrapper:		\n\
+		ldr	r4, =bootwrapper_saved_stack	\n\
+		ldr	sp, [r4]"
+		: :
+		: "cc", "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8",
+		  "r9", "r10", "r11", "r12", "r14");
+}
+
+/**
+  EFI Exit Event
+
+  Exiting EFI Boot Services can only mean we're bootstrapping into a real OS.
+  So let's copy the bootwrapper code into place to make sure the OS can use it.
+
+  @param[in]  Event   The Event that is being processed
+  @param[in]  Context Event Context
+**/
+
+static EFI_EVENT EfiExitBootServicesEvent;
+
+VOID
+EFIAPI
+ExitBootServicesEvent (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  ReadBootwrapper();
+  ReadNandFileSystem();
+
+  if (skip_enter_bootwrapper)
+    return;
+
+  EnterBootwrapper();
 }
 
 EFI_BDS_ARCH_PROTOCOL  gBdsProtocol = {
@@ -803,6 +854,10 @@ BdsInitialize (
                   &gEfiBdsArchProtocolGuid, &gBdsProtocol,
                   NULL
                   );
+  ASSERT_EFI_ERROR (Status);
+
+  // Register for an ExitBootServicesEvent
+  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY, ExitBootServicesEvent, NULL, &EfiExitBootServicesEvent);
   ASSERT_EFI_ERROR (Status);
 
   return Status;

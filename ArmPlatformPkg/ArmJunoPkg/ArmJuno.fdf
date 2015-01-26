@@ -122,7 +122,7 @@ READ_LOCK_STATUS   = TRUE
 
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  INF ArmPlatformPkg/ArmJunoPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
+  INF ArmPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
 
   # NOR Flash driver
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
@@ -178,7 +178,18 @@ READ_LOCK_STATUS   = TRUE
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+!ifdef INTEL_BDS
+  INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  INF IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+!else
   INF ArmPlatformPkg/Bds/Bds.inf
+!endif
+
+  INF MdeModulePkg/Universal/Fdt/FdtTableDxe/FdtTableDxe.inf
+  FILE FREEFORM = PCD(gEfiMdeModulePkgTokenSpaceGuid.PcdFdtImage) {
+    SECTION RAW = ArmPlatformPkg/ArmJunoPkg/dts/juno.dtb
+  }
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8

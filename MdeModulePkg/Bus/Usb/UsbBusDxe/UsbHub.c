@@ -668,7 +668,10 @@ UsbOnHubInterrupt (
   }
 
   CopyMem (HubIf->ChangeMap, Data, DataLength);
-  gBS->SignalEvent (HubIf->HubNotify);
+
+  //ARM: We do not use BS.SignalEvent in order to initialize the new device immediately
+  //gBS->SignalEvent (HubIf->HubNotify);
+  UsbHubEnumeration (HubIf->HubNotify, HubIf);
 
   return EFI_SUCCESS;
 }
@@ -1112,7 +1115,11 @@ UsbRootHubInit (
   // It should signal the event immediately here, or device detection
   // by bus enumeration might be delayed by the timer interval.
   //
-  gBS->SignalEvent (HubIf->HubNotify);
+
+  //ARM: We invoke the function directly to ensure the enumeration is
+  //     done immediately.
+  //gBS->SignalEvent (HubIf->HubNotify);
+  UsbRootHubEnumeration (NULL, HubIf);
 
   Status = gBS->SetTimer (
                   HubIf->HubNotify,

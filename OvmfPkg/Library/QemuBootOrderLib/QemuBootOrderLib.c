@@ -1,7 +1,7 @@
 /** @file
   Rewrite the BootOrder NvVar based on QEMU's "bootorder" fw_cfg file.
 
-  Copyright (C) 2012 - 2013, Red Hat, Inc.
+  Copyright (C) 2012 - 2014, Red Hat, Inc.
   Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -22,7 +22,10 @@
 #include <Library/BaseLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/QemuBootOrderLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Guid/GlobalVariable.h>
+#include <Guid/VirtioMmioTransport.h>
 
 
 /**
@@ -34,8 +37,9 @@
 /**
   Numbers of nodes in OpenFirmware device paths that are required and examined.
 **/
-#define REQUIRED_OFW_NODES 2
-#define EXAMINED_OFW_NODES 4
+#define REQUIRED_PCI_OFW_NODES  2
+#define REQUIRED_MMIO_OFW_NODES 1
+#define EXAMINED_OFW_NODES      4
 
 
 /**
@@ -127,7 +131,7 @@ SubstringEq (
 /**
 
   Parse a comma-separated list of hexadecimal integers into the elements of an
-  UINT32 array.
+  UINT64 array.
 
   Whitespace, "0x" prefixes, leading or trailing commas, sequences of commas,
   or an empty string are not allowed; they are rejected.
@@ -167,12 +171,12 @@ STATIC
 RETURN_STATUS
 ParseUnitAddressHexList (
   IN      SUBSTRING  UnitAddress,
-  OUT     UINT32     *Result,
+  OUT     UINT64     *Result,
   IN OUT  UINTN      *NumResults
   )
 {
   UINTN         Entry;    // number of entry currently being parsed
-  UINT32        EntryVal; // value being constructed for current entry
+  UINT64        EntryVal; // value being constructed for current entry
   CHAR8         PrevChr;  // UnitAddress character previously checked
   UINTN         Pos;      // current position within UnitAddress
   RETURN_STATUS Status;
@@ -192,10 +196,10 @@ ParseUnitAddressHexList (
           -1;
 
     if (Val >= 0) {
-      if (EntryVal > 0xFFFFFFF) {
+      if (EntryVal > 0xFFFFFFFFFFFFFFFull) {
         return RETURN_INVALID_PARAMETER;
       }
-      EntryVal = (EntryVal << 4) | Val;
+      EntryVal = LShiftU64 (EntryVal, 4) | Val;
     } else if (Chr == ',') {
       if (PrevChr == ',') {
         return RETURN_INVALID_PARAMETER;
@@ -538,6 +542,446 @@ ParseOfwNode (
 
 /**
 
+  Translate a PCI-like array of OpenFirmware device nodes to a UEFI device path
+  fragment.
+
+  @param[in]     OfwNode         Array of OpenFirmware device nodes to
+                                 translate, constituting the beginning of an
+                                 OpenFirmware device path.
+
+  @param[in]     NumNodes        Number of elements in OfwNode.
+
+  @param[out]    Translated      Destination array receiving the UEFI path
+                                 fragment, allocated by the caller. If the
+                                 return value differs from RETURN_SUCCESS, its
+                                 contents is indeterminate.
+
+  @param[in out] TranslatedSize  On input, the number of CHAR16's in
+                                 Translated. On RETURN_SUCCESS this parameter
+                                 is assigned the number of non-NUL CHAR16's
+                                 written to Translated. In case of other return
+                                 values, TranslatedSize is indeterminate.
+
+
+  @retval RETURN_SUCCESS           Translation successful.
+
+  @retval RETURN_BUFFER_TOO_SMALL  The translation does not fit into the number
+                                   of bytes provided.
+
+  @retval RETURN_UNSUPPORTED       The array of OpenFirmware device nodes can't
+                                   be translated in the current implementation.
+
+**/
+STATIC
+RETURN_STATUS
+TranslatePciOfwNodes (
+  IN      CONST OFW_NODE *OfwNode,
+  IN      UINTN          NumNodes,
+  OUT     CHAR16         *Translated,
+  IN OUT  UINTN          *TranslatedSize
+  )
+{
+  UINT64 PciDevFun[2];
+  UINTN  NumEntries;
+  UINTN  Written;
+
+  //
+  // Get PCI device and optional PCI function. Assume a single PCI root.
+  //
+  if (NumNodes < REQUIRED_PCI_OFW_NODES ||
+      !SubstringEq (OfwNode[0].DriverName, "pci")
+      ) {
+    return RETURN_UNSUPPORTED;
+  }
+  PciDevFun[1] = 0;
+  NumEntries = sizeof (PciDevFun) / sizeof (PciDevFun[0]);
+  if (ParseUnitAddressHexList (
+        OfwNode[1].UnitAddress,
+        PciDevFun,
+        &NumEntries
+        ) != RETURN_SUCCESS
+      ) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  if (NumNodes >= 4 &&
+      SubstringEq (OfwNode[1].DriverName, "ide") &&
+      SubstringEq (OfwNode[2].DriverName, "drive") &&
+      SubstringEq (OfwNode[3].DriverName, "disk")
+      ) {
+    //
+    // OpenFirmware device path (IDE disk, IDE CD-ROM):
+    //
+    //   /pci@i0cf8/ide@1,1/drive@0/disk@0
+    //        ^         ^ ^       ^      ^
+    //        |         | |       |      master or slave
+    //        |         | |       primary or secondary
+    //        |         PCI slot & function holding IDE controller
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path:
+    //
+    //   PciRoot(0x0)/Pci(0x1,0x1)/Ata(Primary,Master,0x0)
+    //                                                ^
+    //                                                fixed LUN
+    //
+    UINT64 Secondary;
+    UINT64 Slave;
+
+    NumEntries = 1;
+    if (ParseUnitAddressHexList (
+          OfwNode[2].UnitAddress,
+          &Secondary,
+          &NumEntries
+          ) != RETURN_SUCCESS ||
+        Secondary > 1 ||
+        ParseUnitAddressHexList (
+          OfwNode[3].UnitAddress,
+          &Slave,
+          &NumEntries // reuse after previous single-element call
+          ) != RETURN_SUCCESS ||
+        Slave > 1
+        ) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/Ata(%a,%a,0x0)",
+      PciDevFun[0],
+      PciDevFun[1],
+      Secondary ? "Secondary" : "Primary",
+      Slave ? "Slave" : "Master"
+      );
+  } else if (NumNodes >= 4 &&
+             SubstringEq (OfwNode[1].DriverName, "isa") &&
+             SubstringEq (OfwNode[2].DriverName, "fdc") &&
+             SubstringEq (OfwNode[3].DriverName, "floppy")
+             ) {
+    //
+    // OpenFirmware device path (floppy disk):
+    //
+    //   /pci@i0cf8/isa@1/fdc@03f0/floppy@0
+    //        ^         ^     ^           ^
+    //        |         |     |           A: or B:
+    //        |         |     ISA controller io-port (hex)
+    //        |         PCI slot holding ISA controller
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path:
+    //
+    //   PciRoot(0x0)/Pci(0x1,0x0)/Floppy(0x0)
+    //                                    ^
+    //                                    ACPI UID
+    //
+    UINT64 AcpiUid;
+
+    NumEntries = 1;
+    if (ParseUnitAddressHexList (
+          OfwNode[3].UnitAddress,
+          &AcpiUid,
+          &NumEntries
+          ) != RETURN_SUCCESS ||
+        AcpiUid > 1
+        ) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/Floppy(0x%Lx)",
+      PciDevFun[0],
+      PciDevFun[1],
+      AcpiUid
+      );
+  } else if (NumNodes >= 3 &&
+             SubstringEq (OfwNode[1].DriverName, "scsi") &&
+             SubstringEq (OfwNode[2].DriverName, "disk")
+             ) {
+    //
+    // OpenFirmware device path (virtio-blk disk):
+    //
+    //   /pci@i0cf8/scsi@6[,3]/disk@0,0
+    //        ^          ^  ^       ^ ^
+    //        |          |  |       fixed
+    //        |          |  PCI function corresponding to disk (optional)
+    //        |          PCI slot holding disk
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path prefix:
+    //
+    //   PciRoot(0x0)/Pci(0x6,0x0)/HD( -- if PCI function is 0 or absent
+    //   PciRoot(0x0)/Pci(0x6,0x3)/HD( -- if PCI function is present and nonzero
+    //
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/HD(",
+      PciDevFun[0],
+      PciDevFun[1]
+      );
+  } else if (NumNodes >= 4 &&
+             SubstringEq (OfwNode[1].DriverName, "scsi") &&
+             SubstringEq (OfwNode[2].DriverName, "channel") &&
+             SubstringEq (OfwNode[3].DriverName, "disk")
+             ) {
+    //
+    // OpenFirmware device path (virtio-scsi disk):
+    //
+    //   /pci@i0cf8/scsi@7[,3]/channel@0/disk@2,3
+    //        ^          ^             ^      ^ ^
+    //        |          |             |      | LUN
+    //        |          |             |      target
+    //        |          |             channel (unused, fixed 0)
+    //        |          PCI slot[, function] holding SCSI controller
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path prefix:
+    //
+    //   PciRoot(0x0)/Pci(0x7,0x0)/Scsi(0x2,0x3)
+    //                                        -- if PCI function is 0 or absent
+    //   PciRoot(0x0)/Pci(0x7,0x3)/Scsi(0x2,0x3)
+    //                                -- if PCI function is present and nonzero
+    //
+    UINT64 TargetLun[2];
+
+    TargetLun[1] = 0;
+    NumEntries = sizeof (TargetLun) / sizeof (TargetLun[0]);
+    if (ParseUnitAddressHexList (
+          OfwNode[3].UnitAddress,
+          TargetLun,
+          &NumEntries
+          ) != RETURN_SUCCESS
+        ) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/Scsi(0x%Lx,0x%Lx)",
+      PciDevFun[0],
+      PciDevFun[1],
+      TargetLun[0],
+      TargetLun[1]
+      );
+  } else {
+    //
+    // Generic OpenFirmware device path for PCI devices:
+    //
+    //   /pci@i0cf8/ethernet@3[,2]
+    //        ^              ^
+    //        |              PCI slot[, function] holding Ethernet card
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path prefix (dependent on presence of nonzero PCI function):
+    //
+    //   PciRoot(0x0)/Pci(0x3,0x0)
+    //   PciRoot(0x0)/Pci(0x3,0x2)
+    //
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)",
+      PciDevFun[0],
+      PciDevFun[1]
+      );
+  }
+
+  //
+  // There's no way to differentiate between "completely used up without
+  // truncation" and "truncated", so treat the former as the latter, and return
+  // success only for "some room left unused".
+  //
+  if (Written + 1 < *TranslatedSize) {
+    *TranslatedSize = Written;
+    return RETURN_SUCCESS;
+  }
+
+  return RETURN_BUFFER_TOO_SMALL;
+}
+
+
+//
+// A type providing easy raw access to the base address of a virtio-mmio
+// transport.
+//
+typedef union {
+  UINT64 Uint64;
+  UINT8  Raw[8];
+} VIRTIO_MMIO_BASE_ADDRESS;
+
+
+/**
+
+  Translate an MMIO-like array of OpenFirmware device nodes to a UEFI device
+  path fragment.
+
+  @param[in]     OfwNode         Array of OpenFirmware device nodes to
+                                 translate, constituting the beginning of an
+                                 OpenFirmware device path.
+
+  @param[in]     NumNodes        Number of elements in OfwNode.
+
+  @param[out]    Translated      Destination array receiving the UEFI path
+                                 fragment, allocated by the caller. If the
+                                 return value differs from RETURN_SUCCESS, its
+                                 contents is indeterminate.
+
+  @param[in out] TranslatedSize  On input, the number of CHAR16's in
+                                 Translated. On RETURN_SUCCESS this parameter
+                                 is assigned the number of non-NUL CHAR16's
+                                 written to Translated. In case of other return
+                                 values, TranslatedSize is indeterminate.
+
+
+  @retval RETURN_SUCCESS           Translation successful.
+
+  @retval RETURN_BUFFER_TOO_SMALL  The translation does not fit into the number
+                                   of bytes provided.
+
+  @retval RETURN_UNSUPPORTED       The array of OpenFirmware device nodes can't
+                                   be translated in the current implementation.
+
+**/
+STATIC
+RETURN_STATUS
+TranslateMmioOfwNodes (
+  IN      CONST OFW_NODE *OfwNode,
+  IN      UINTN          NumNodes,
+  OUT     CHAR16         *Translated,
+  IN OUT  UINTN          *TranslatedSize
+  )
+{
+  VIRTIO_MMIO_BASE_ADDRESS VirtioMmioBase;
+  CHAR16                   VenHwString[60 + 1];
+  UINTN                    NumEntries;
+  UINTN                    Written;
+
+  //
+  // Get the base address of the virtio-mmio transport.
+  //
+  if (NumNodes < REQUIRED_MMIO_OFW_NODES ||
+      !SubstringEq (OfwNode[0].DriverName, "virtio-mmio")
+      ) {
+    return RETURN_UNSUPPORTED;
+  }
+  NumEntries = 1;
+  if (ParseUnitAddressHexList (
+        OfwNode[0].UnitAddress,
+        &VirtioMmioBase.Uint64,
+        &NumEntries
+        ) != RETURN_SUCCESS
+      ) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  UnicodeSPrintAsciiFormat (VenHwString, sizeof VenHwString,
+    "VenHw(%g,%02X%02X%02X%02X%02X%02X%02X%02X)", &gVirtioMmioTransportGuid,
+    VirtioMmioBase.Raw[0], VirtioMmioBase.Raw[1], VirtioMmioBase.Raw[2],
+    VirtioMmioBase.Raw[3], VirtioMmioBase.Raw[4], VirtioMmioBase.Raw[5],
+    VirtioMmioBase.Raw[6], VirtioMmioBase.Raw[7]);
+
+  if (NumNodes >= 2 &&
+      SubstringEq (OfwNode[1].DriverName, "disk")) {
+    //
+    // OpenFirmware device path (virtio-blk disk):
+    //
+    //   /virtio-mmio@000000000a003c00/disk@0,0
+    //                ^                     ^ ^
+    //                |                     fixed
+    //                base address of virtio-mmio register block
+    //
+    // UEFI device path prefix:
+    //
+    //   <VenHwString>/HD(
+    //
+    Written = UnicodeSPrintAsciiFormat (
+                Translated,
+                *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+                "%s/HD(",
+                VenHwString
+                );
+  } else if (NumNodes >= 3 &&
+             SubstringEq (OfwNode[1].DriverName, "channel") &&
+             SubstringEq (OfwNode[2].DriverName, "disk")) {
+    //
+    // OpenFirmware device path (virtio-scsi disk):
+    //
+    //   /virtio-mmio@000000000a003a00/channel@0/disk@2,3
+    //                ^                        ^      ^ ^
+    //                |                        |      | LUN
+    //                |                        |      target
+    //                |                        channel (unused, fixed 0)
+    //                base address of virtio-mmio register block
+    //
+    // UEFI device path prefix:
+    //
+    //   <VenHwString>/Scsi(0x2,0x3)
+    //
+    UINT64 TargetLun[2];
+
+    TargetLun[1] = 0;
+    NumEntries = sizeof (TargetLun) / sizeof (TargetLun[0]);
+    if (ParseUnitAddressHexList (
+          OfwNode[2].UnitAddress,
+          TargetLun,
+          &NumEntries
+          ) != RETURN_SUCCESS
+        ) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    Written = UnicodeSPrintAsciiFormat (
+                Translated,
+                *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+                "%s/Scsi(0x%Lx,0x%Lx)",
+                VenHwString,
+                TargetLun[0],
+                TargetLun[1]
+                );
+  } else if (NumNodes >= 2 &&
+             SubstringEq (OfwNode[1].DriverName, "ethernet-phy")) {
+    //
+    // OpenFirmware device path (virtio-net NIC):
+    //
+    //   /virtio-mmio@000000000a003e00/ethernet-phy@0
+    //                ^                             ^
+    //                |                             fixed
+    //                base address of virtio-mmio register block
+    //
+    // UEFI device path prefix (dependent on presence of nonzero PCI function):
+    //
+    //   <VenHwString>/MAC(
+    //
+    Written = UnicodeSPrintAsciiFormat (
+                Translated,
+                *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+                "%s/MAC(",
+                VenHwString
+                );
+  } else {
+    return RETURN_UNSUPPORTED;
+  }
+
+  //
+  // There's no way to differentiate between "completely used up without
+  // truncation" and "truncated", so treat the former as the latter, and return
+  // success only for "some room left unused".
+  //
+  if (Written + 1 < *TranslatedSize) {
+    *TranslatedSize = Written;
+    return RETURN_SUCCESS;
+  }
+
+  return RETURN_BUFFER_TOO_SMALL;
+}
+
+
+/**
+
   Translate an array of OpenFirmware device nodes to a UEFI device path
   fragment.
 
@@ -577,228 +1021,21 @@ TranslateOfwNodes (
   IN OUT  UINTN          *TranslatedSize
   )
 {
-  UINT32 PciDevFun[2];
-  UINTN  NumEntries;
-  UINTN  Written;
+  RETURN_STATUS Status;
 
-  //
-  // Get PCI device and optional PCI function. Assume a single PCI root.
-  //
-  if (NumNodes < REQUIRED_OFW_NODES ||
-      !SubstringEq (OfwNode[0].DriverName, "pci")
-      ) {
-    return RETURN_UNSUPPORTED;
+  Status = RETURN_UNSUPPORTED;
+
+  if (FeaturePcdGet (PcdQemuBootOrderPciTranslation)) {
+    Status = TranslatePciOfwNodes (OfwNode, NumNodes, Translated,
+               TranslatedSize);
   }
-  PciDevFun[1] = 0;
-  NumEntries = sizeof (PciDevFun) / sizeof (PciDevFun[0]);
-  if (ParseUnitAddressHexList (
-        OfwNode[1].UnitAddress,
-        PciDevFun,
-        &NumEntries
-        ) != RETURN_SUCCESS
-      ) {
-    return RETURN_UNSUPPORTED;
+  if (Status == RETURN_UNSUPPORTED &&
+      FeaturePcdGet (PcdQemuBootOrderMmioTranslation)) {
+    Status = TranslateMmioOfwNodes (OfwNode, NumNodes, Translated,
+               TranslatedSize);
   }
-
-  if (NumNodes >= 4 &&
-      SubstringEq (OfwNode[1].DriverName, "ide") &&
-      SubstringEq (OfwNode[2].DriverName, "drive") &&
-      SubstringEq (OfwNode[3].DriverName, "disk")
-      ) {
-    //
-    // OpenFirmware device path (IDE disk, IDE CD-ROM):
-    //
-    //   /pci@i0cf8/ide@1,1/drive@0/disk@0
-    //        ^         ^ ^       ^      ^
-    //        |         | |       |      master or slave
-    //        |         | |       primary or secondary
-    //        |         PCI slot & function holding IDE controller
-    //        PCI root at system bus port, PIO
-    //
-    // UEFI device path:
-    //
-    //   PciRoot(0x0)/Pci(0x1,0x1)/Ata(Primary,Master,0x0)
-    //                                                ^
-    //                                                fixed LUN
-    //
-    UINT32 Secondary;
-    UINT32 Slave;
-
-    NumEntries = 1;
-    if (ParseUnitAddressHexList (
-          OfwNode[2].UnitAddress,
-          &Secondary,
-          &NumEntries
-          ) != RETURN_SUCCESS ||
-        Secondary > 1 ||
-        ParseUnitAddressHexList (
-          OfwNode[3].UnitAddress,
-          &Slave,
-          &NumEntries // reuse after previous single-element call
-          ) != RETURN_SUCCESS ||
-        Slave > 1
-        ) {
-      return RETURN_UNSUPPORTED;
-    }
-
-    Written = UnicodeSPrintAsciiFormat (
-      Translated,
-      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)/Ata(%a,%a,0x0)",
-      PciDevFun[0],
-      PciDevFun[1],
-      Secondary ? "Secondary" : "Primary",
-      Slave ? "Slave" : "Master"
-      );
-  } else if (NumNodes >= 4 &&
-             SubstringEq (OfwNode[1].DriverName, "isa") &&
-             SubstringEq (OfwNode[2].DriverName, "fdc") &&
-             SubstringEq (OfwNode[3].DriverName, "floppy")
-             ) {
-    //
-    // OpenFirmware device path (floppy disk):
-    //
-    //   /pci@i0cf8/isa@1/fdc@03f0/floppy@0
-    //        ^         ^     ^           ^
-    //        |         |     |           A: or B:
-    //        |         |     ISA controller io-port (hex)
-    //        |         PCI slot holding ISA controller
-    //        PCI root at system bus port, PIO
-    //
-    // UEFI device path:
-    //
-    //   PciRoot(0x0)/Pci(0x1,0x0)/Floppy(0x0)
-    //                                    ^
-    //                                    ACPI UID
-    //
-    UINT32 AcpiUid;
-
-    NumEntries = 1;
-    if (ParseUnitAddressHexList (
-          OfwNode[3].UnitAddress,
-          &AcpiUid,
-          &NumEntries
-          ) != RETURN_SUCCESS ||
-        AcpiUid > 1
-        ) {
-      return RETURN_UNSUPPORTED;
-    }
-
-    Written = UnicodeSPrintAsciiFormat (
-      Translated,
-      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)/Floppy(0x%x)",
-      PciDevFun[0],
-      PciDevFun[1],
-      AcpiUid
-      );
-  } else if (NumNodes >= 3 &&
-             SubstringEq (OfwNode[1].DriverName, "scsi") &&
-             SubstringEq (OfwNode[2].DriverName, "disk")
-             ) {
-    //
-    // OpenFirmware device path (virtio-blk disk):
-    //
-    //   /pci@i0cf8/scsi@6[,3]/disk@0,0
-    //        ^          ^  ^       ^ ^
-    //        |          |  |       fixed
-    //        |          |  PCI function corresponding to disk (optional)
-    //        |          PCI slot holding disk
-    //        PCI root at system bus port, PIO
-    //
-    // UEFI device path prefix:
-    //
-    //   PciRoot(0x0)/Pci(0x6,0x0)/HD( -- if PCI function is 0 or absent
-    //   PciRoot(0x0)/Pci(0x6,0x3)/HD( -- if PCI function is present and nonzero
-    //
-    Written = UnicodeSPrintAsciiFormat (
-      Translated,
-      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)/HD(",
-      PciDevFun[0],
-      PciDevFun[1]
-      );
-  } else if (NumNodes >= 4 &&
-             SubstringEq (OfwNode[1].DriverName, "scsi") &&
-             SubstringEq (OfwNode[2].DriverName, "channel") &&
-             SubstringEq (OfwNode[3].DriverName, "disk")
-             ) {
-    //
-    // OpenFirmware device path (virtio-scsi disk):
-    //
-    //   /pci@i0cf8/scsi@7[,3]/channel@0/disk@2,3
-    //        ^          ^             ^      ^ ^
-    //        |          |             |      | LUN
-    //        |          |             |      target
-    //        |          |             channel (unused, fixed 0)
-    //        |          PCI slot[, function] holding SCSI controller
-    //        PCI root at system bus port, PIO
-    //
-    // UEFI device path prefix:
-    //
-    //   PciRoot(0x0)/Pci(0x7,0x0)/Scsi(0x2,0x3)
-    //                                        -- if PCI function is 0 or absent
-    //   PciRoot(0x0)/Pci(0x7,0x3)/Scsi(0x2,0x3)
-    //                                -- if PCI function is present and nonzero
-    //
-    UINT32 TargetLun[2];
-
-    TargetLun[1] = 0;
-    NumEntries = sizeof (TargetLun) / sizeof (TargetLun[0]);
-    if (ParseUnitAddressHexList (
-          OfwNode[3].UnitAddress,
-          TargetLun,
-          &NumEntries
-          ) != RETURN_SUCCESS
-        ) {
-      return RETURN_UNSUPPORTED;
-    }
-
-    Written = UnicodeSPrintAsciiFormat (
-      Translated,
-      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)/Scsi(0x%x,0x%x)",
-      PciDevFun[0],
-      PciDevFun[1],
-      TargetLun[0],
-      TargetLun[1]
-      );
-  } else {
-    //
-    // Generic OpenFirmware device path for PCI devices:
-    //
-    //   /pci@i0cf8/ethernet@3[,2]
-    //        ^              ^
-    //        |              PCI slot[, function] holding Ethernet card
-    //        PCI root at system bus port, PIO
-    //
-    // UEFI device path prefix (dependent on presence of nonzero PCI function):
-    //
-    //   PciRoot(0x0)/Pci(0x3,0x0)
-    //   PciRoot(0x0)/Pci(0x3,0x2)
-    //
-    Written = UnicodeSPrintAsciiFormat (
-      Translated,
-      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)",
-      PciDevFun[0],
-      PciDevFun[1]
-      );
-  }
-
-  //
-  // There's no way to differentiate between "completely used up without
-  // truncation" and "truncated", so treat the former as the latter, and return
-  // success only for "some room left unused".
-  //
-  if (Written + 1 < *TranslatedSize) {
-    *TranslatedSize = Written;
-    return RETURN_SUCCESS;
-  }
-
-  return RETURN_BUFFER_TOO_SMALL;
+  return Status;
 }
-
 
 /**
 
@@ -1016,7 +1253,7 @@ Exit:
 
   This function should accommodate any further policy changes in "boot option
   survival". Currently we're adding back everything that starts with neither
-  PciRoot() nor HD().
+  PciRoot() nor HD() nor a virtio-mmio VenHw() node.
 
   @param[in,out] BootOrder     The structure holding the boot order to
                                complete. The caller is responsible for
@@ -1082,9 +1319,23 @@ BootOrderComplete (
           if ((Acpi->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST &&
               EISA_ID_TO_NUM (Acpi->HID) == 0x0a03) {
             //
-            // drop PciRoot()
+            // drop PciRoot() if we enabled the user to select PCI-like boot
+            // options, by providing translation for such OFW device path
+            // fragments
             //
-            Keep = FALSE;
+            Keep = !FeaturePcdGet (PcdQemuBootOrderPciTranslation);
+          }
+        } else if (DevicePathType(FirstNode) == HARDWARE_DEVICE_PATH &&
+                   DevicePathSubType(FirstNode) == HW_VENDOR_DP) {
+          VENDOR_DEVICE_PATH *VenHw;
+
+          VenHw = (VENDOR_DEVICE_PATH *)FirstNode;
+          if (CompareGuid (&VenHw->Guid, &gVirtioMmioTransportGuid)) {
+            //
+            // drop virtio-mmio if we enabled the user to select boot options
+            // referencing such device paths
+            //
+            Keep = !FeaturePcdGet (PcdQemuBootOrderMmioTranslation);
           }
         }
 

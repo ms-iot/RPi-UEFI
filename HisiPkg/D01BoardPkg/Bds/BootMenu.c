@@ -772,16 +772,37 @@ BootLinuxAtagLoader (
 
 EFI_STATUS LoadLinuxAtSecEnd()
 {
-    LinuxEntry entry = (LinuxEntry)(0x10c00000);
+    LinuxEntry entry = (LinuxEntry)(TEXT_SRAM_BASE);
     EFI_STATUS Status = EFI_SUCCESS;
     ArmDisableDataCache();
     ArmCleanInvalidateDataCache();
     ArmDisableInstructionCache ();
     ArmInvalidateInstructionCache ();
     ArmDisableMmu();
-    DEBUG(( EFI_D_ERROR, "MOVE PC 0x10c00000\n"));
+    DEBUG(( EFI_D_ERROR, "MOVE PC TEXT_SRAM_BASE\n"));
     (void)entry();
     return Status;
+}
+
+EFI_STATUS RunBootwrapper(unsigned long kernel_entry)
+{
+  EFI_STATUS Status;
+
+  *(UINTN*)(UINTN)(0xe302b000 + 0x18) = 0;
+  *(UINTN*)(UINTN)(0xe302b000 + 0x1c) = 0;
+
+  *(volatile UINT32 *)(0xe0000000 + 0x100) = TEXT_SRAM_BASE;
+  *(volatile UINT32 *)(TEXT_SRAM_BASE + 0x800) = kernel_entry;
+
+  ArmCleanDataCache();
+  *(UINT8*)(0xf4007000) = 'G';
+  Status = LoadLinuxAtSecEnd();
+  if (EFI_ERROR(Status))
+  {
+      (VOID)AsciiPrint ("GoCmd error!\n");
+  }
+
+  return Status;
 }
 
 EFI_STATUS
@@ -795,18 +816,8 @@ BootGo (
   if(EFI_ERROR(Status)) {
   DEBUG((EFI_D_ERROR,"ERROR: Can not shutdown UEFI boot services. Status=0x%X\n", Status));
   }
-  
-  *(UINTN*)(UINTN)(0xe302b000 + 0x18) = 0;
-  *(UINTN*)(UINTN)(0xe302b000 + 0x1c) = 0;
-  
-  *(volatile UINT32 *)(0xe0000000 + 0x100) = 0x10c00000;
-  ArmCleanDataCache();
-  *(UINT8*)(0xf4007000) = 'G';
-  Status = LoadLinuxAtSecEnd();
-  if (EFI_ERROR(Status))
-  {
-      (VOID)AsciiPrint ("GoCmd error!\n");
-  }
+
+  Status = RunBootwrapper(KERNEL_DDR_BASE);
 
   return Status;
 }
