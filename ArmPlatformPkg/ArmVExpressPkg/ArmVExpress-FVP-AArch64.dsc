@@ -21,7 +21,11 @@
   PLATFORM_GUID                  = 0de70077-9b3b-43bf-ba38-0ea37d77141b
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
+!ifdef $(EDK2_OUT_DIR)
+  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)
+!else
   OUTPUT_DIRECTORY               = Build/ArmVExpress-FVP-AArch64
+!endif
   SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -171,12 +175,17 @@
   # ARM OS Loader
   #
   # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux:
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from SemiHosting"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linaro disk image on virtio"
+!ifdef $(EDK2_USE_ANDROID_CONFIG)
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/kernel"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/ramdisk.img"
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fvp-base-gicv2-psci.dtb"
+!else
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/Image"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/filesystem.cpio.gz"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0 earlyprintk=pl011,0x1c090000 debug user_debug=31 loglevel=9"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0 earlyprintk=pl011,0x1c090000 debug user_debug=31 loglevel=9 root=/dev/vda2"
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/fdt.dtb"
+!endif
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
