@@ -1,0 +1,71 @@
+/** @file
+  
+  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+[Defines]
+  INF_VERSION                     = 0x00010005
+  BASE_NAME                       = XGeneSataController
+  FILE_GUID                       = 5B58C218-35FD-410D-AAB0-2B269EB69876
+  MODULE_TYPE                     = DXE_DRIVER
+  VERSION_STRING                  = 1.0
+
+  ENTRY_POINT                     = SataEntryPoint
+
+[Sources.common]
+  PciRootBridgeIo.c
+  SataController.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/APMXGenePkg/APMXGene.dec
+
+[LibraryClasses]
+  BaseLib
+  DxeServicesTableLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  IoLib
+  TimerLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  XGenePHYLib
+  
+[Protocols]
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiPciHostBridgeResourceAllocationProtocolGuid
+  gEfiPciIoProtocolGuid
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdSataControllerMask
+  gArmPlatformTokenSpaceGuid.PcdAHCI1RegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSata1SerdesRegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSata1GenMax
+  gArmPlatformTokenSpaceGuid.PcdSata1Irq
+  gArmPlatformTokenSpaceGuid.PcdAHCI2RegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSata2SerdesRegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSata2GenMax
+  gArmPlatformTokenSpaceGuid.PcdSata2Irq
+  gArmPlatformTokenSpaceGuid.PcdAHCI3RegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSata3SerdesRegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSata3GenMax
+  gArmPlatformTokenSpaceGuid.PcdSata3Irq
+
+[Depex]
+  TRUE

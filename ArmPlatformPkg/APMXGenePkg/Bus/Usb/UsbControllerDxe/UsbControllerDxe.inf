@@ -1,0 +1,75 @@
+/** @file
+  
+  Copyright (c) 2013, Applied Micro Circuit Corporation. All rights reserved.<BR>
+
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+[Defines]
+  INF_VERSION                     = 0x00010005
+  BASE_NAME                       = UsbController
+  FILE_GUID                       = 9731048F-43BE-4942-9CE3-234AA2EFAB0C
+  MODULE_TYPE                     = DXE_DRIVER
+  VERSION_STRING                  = 1.0
+
+  ENTRY_POINT                     = PciUsbEmulationEntryPoint
+
+[Sources.common]
+  PciRootBridgeIo.c
+  UsbController.c
+  XGeneUsb.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/APMXGenePkg/APMXGene.dec
+
+[LibraryClasses]
+  BaseLib
+  DxeServicesTableLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  TimerLib
+  IoLib
+  DmaLib
+  UefiUsbLib
+  XGenePHYLib
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdUsbControllerMask
+  gArmPlatformTokenSpaceGuid.PcdXHCI2RegisterBase
+  gArmPlatformTokenSpaceGuid.PcdUsb2CsrRegisterBase
+  gArmPlatformTokenSpaceGuid.PcdUsb2Irq
+  gArmPlatformTokenSpaceGuid.PcdUsb2ClkSel
+  gArmPlatformTokenSpaceGuid.PcdUsb2OvrcurEn
+  gArmPlatformTokenSpaceGuid.PcdUsb2OvrcurIvrt
+  gArmPlatformTokenSpaceGuid.PcdXHCI1RegisterBase
+  gArmPlatformTokenSpaceGuid.PcdUsb1CsrRegisterBase
+  gArmPlatformTokenSpaceGuid.PcdUsb1Irq
+  gArmPlatformTokenSpaceGuid.PcdUsb1ClkSel
+  gArmPlatformTokenSpaceGuid.PcdUsb1OvrcurEn
+  gArmPlatformTokenSpaceGuid.PcdUsb1OvrcurIvrt
+
+[Protocols]
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiPciHostBridgeResourceAllocationProtocolGuid
+  gEfiPciIoProtocolGuid
+
+[Depex]
+	TRUE
+/*
+  gEfiMetronomeArchProtocolGuid AND 
+  gEmbeddedExternalDeviceProtocolGuid
+*/

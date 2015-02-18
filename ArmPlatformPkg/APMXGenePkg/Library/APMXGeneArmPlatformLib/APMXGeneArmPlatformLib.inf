@@ -1,0 +1,65 @@
+##
+#  Copyright (c) 2013, AppliedMicro Corp. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = APMXGeneArmPlatformLib
+  FILE_GUID                      = b3a280fe-4c7a-46ef-a89e-04cc255e65cd 
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/APMXGenePkg/APMXGene.dec
+
+[LibraryClasses]
+  IoLib
+  ArmLib
+  PcdLib
+  SerialPortLib
+  APMXGeneMemcLib
+  SlimproLib
+
+[Sources.common]
+  APMXGeneArmPlatformLib.c
+
+[Sources.ARM]
+
+[Sources.AARCH64]
+  APMXGeneArmPlatformLibMemory.c
+  APMXGeneClock.c
+  APMXGeneArmPlatformHelper.S
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdCacheEnable
+  gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
+  gArmPlatformTokenSpaceGuid.PcdStandalone
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmPlatformTokenSpaceGuid.PcdMemSizeAddr
+  
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmPlatformTokenSpaceGuid.PcdTTBBaseAddr
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
