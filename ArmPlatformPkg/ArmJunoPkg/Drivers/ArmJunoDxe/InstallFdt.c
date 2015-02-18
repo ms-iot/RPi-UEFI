@@ -19,8 +19,8 @@
 #include <Protocol/DriverBinding.h>
 #include <Protocol/SimpleFileSystem.h>
 
+#include <Library/ArmBdsHelperLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/BdsLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
