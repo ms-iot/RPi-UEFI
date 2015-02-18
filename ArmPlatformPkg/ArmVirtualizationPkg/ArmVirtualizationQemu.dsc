@@ -22,7 +22,11 @@
   PLATFORM_GUID                  = 37d7e986-f7e9-45c2-8067-e371421a626c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
+!ifdef EDK2_OUT_DIR
+  OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)-$(ARCH)
+!else
   OUTPUT_DIRECTORY               = Build/ArmVirtualizationQemu-$(ARCH)
+!endif
   SUPPORTED_ARCHITECTURES        = AARCH64|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
