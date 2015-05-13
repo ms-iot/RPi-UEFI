@@ -1,0 +1,3 @@
+[submodule "OpenPlatformPkg"]
+	path = OpenPlatformPkg
+	url = https://git.linaro.org/uefi/OpenPlatformPkg.git
