@@ -1,0 +1,6 @@
+[submodule "LinaroPkg"]
+	path = LinaroPkg
+	url = https://git.linaro.org/uefi/LinaroPkg.git
+[submodule "OpenPlatformPkg"]
+	path = OpenPlatformPkg
+	url = https://git.linaro.org/uefi/OpenPlatformPkg.git
