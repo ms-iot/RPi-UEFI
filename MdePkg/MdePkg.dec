@@ -6,6 +6,7 @@
 #
 # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -625,6 +626,13 @@
 
   ## Include/Guid/FdtTable.h
   gEfiFdtTableGuid                     = { 0xb1b621d5, 0xf19c, 0x41a5, {0x83, 0x0b, 0xd9, 0x15, 0x2c, 0x69, 0xaa, 0xe0 }}
+
+  #
+  # GUID that is not define in specification
+  #
+
+  ## Include/Protocol/WinSecureBoot.h
+  gEfiSecureBootPrivateVariableGuid = { 0x77fa9abd, 0x0359, 0x4d32, { 0xbd, 0x60, 0x28, 0xf4, 0xe7, 0x8f, 0x78, 0x4b }}
 
 [Guids.IA32, Guids.X64]
   ## Include/Guid/Cper.h

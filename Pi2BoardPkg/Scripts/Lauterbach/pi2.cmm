@@ -1,0 +1,92 @@
+; --------------------------------------------------------------------------------
+; @Title: Demo for Debugging RaspberryPi2 EDK2 UEFI
+; @Description:
+;   This script attaches to RaspberryPi, loads TianoCore debugging support,
+;   loads symbols and sets a couple of OnChip breakpoints
+; @Keywords: UEFI, EDK2, RaspberryPi
+; @Board: RaspberryPi
+; @Copyright: (C) Microsoft. All rights reserved.
+; --------------------------------------------------------------------------------
+
+; Declare directories of EDK2 and build
+ &edk2dir="C:\Dev\Microsoft\EDK2"
+ &builddir="&edk2dir\Build\Pi2Board\DEBUG_ARMGCC"
+
+ print "EDK2 Demo for Debugging RaspberryPi2 EDK2 UEFI"
+
+; IMPORTANT when using GCC on ARM:
+; The ELF->COFF converter (GenFw) may spoil the debug information
+; when using several text/data sections (check with "-v").
+; The linker must combine all sections into one text section
+; and one data section. Check the file edk2/Conf/tools_def.txt
+; and the template edk2/BaseTools/Conf/tools_def.template,
+; and add the following switch to the _ARMGCC_ARM_DLINK_FLAGS:
+; --script=$(EDK_TOOLS_PATH)/Scripts/gcc4.4-ld-script
+
+; Debugger Reset
+
+ winpage.reset
+ WinCLEAR
+
+ print "Resetting..."
+
+ RESet
+
+; Initializing JTAG Debugger
+
+ SYStem.JTAGCLOCK 12MHz
+ SYStem.CPU CortexA7MPCore
+ SYStem.CONFIG CoreNumber 4.
+ CORE.ASSIGN 1. 2. 3. 4.
+ SYStem.CONFIG DEBUGACCESSPORT 0.
+ SYStem.CONFIG.COREDEBUG.Base 0x80010000 0x80012000 0x80014000 0x80016000
+ SYStem.CONFIG.BMC.Base 0x80011000 0x80013000 0x80015000 0x80017000
+
+ &msgA="Power OFF board and press OK."
+ &msgB="Waiting for board to power up..."
+ &msgC="Board is now powered up again."
+
+; Prompt for board power-off while power is on
+
+ while STATE.POWER()
+    DIALOG.OK "&msgA"
+
+ print "&msgB"
+
+; On power-on, attach and break
+ wait STATE.POWER()
+ wait 1.5s
+
+ System.Mode Attach
+ Break
+
+; Open some windows
+ WinCLEAR
+ WinPOS 0% 0% 50% 50%
+ List.auto
+ WinPOS 0% 50% 50% 50%
+ Frame /Locals /Caller
+ WinPOS 50% 50% 50% 50%
+ PER.view
+ WinPOS 50% 0% 50% 50%
+ Register.view /SpotLight
+
+ print "Initializing UEFI support..."
+
+; Specify the memory base address and size, see Pi2BoardPkg/Pi2BoardDsc.dsc:
+ &PcdSystemMemoryBase=0x00200000
+ &PcdSystemMemorySize=0x3CE00000
+; Load extension and tiano menu
+ EXTension.CONFIG ~~/demo/arm/uefi/tiano/tiano.t32 &PcdSystemMemoryBase &PcdSystemMemorySize
+ MENU.ReProgram ~~/demo/arm/uefi/tiano/tiano.men
+
+; Load SEC, PEI and DXE symbols for debugging
+ Data.Load.elf "&builddir\ARM\ArmPlatformPkg\Sec\Sec\DEBUG\ArmPlatformSec.dll" 0x0000008184 /nocode /noclear
+ Data.Load.elf "&builddir\ARM\ArmPlatformPkg\PrePi\PeiMPCoreMPPP\DEBUG\ArmPlatformPrePiMPCore.dll" 0x0000020184 /nocode /noclear
+
+; Set OnChip breakpoints
+ break.set PrimaryMain /Program /OnChip
+
+ Go
+
+ENDDO

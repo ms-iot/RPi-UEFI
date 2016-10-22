@@ -1,0 +1,41 @@
+#/** @file
+# Pi3 board package.
+#
+#  Copyright (c), Microsoft Corporation. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = Pi3BoardPkg
+  PACKAGE_GUID                   = 62605B98-2D10-48F4-805F-A98CB6443463
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[LibraryClasses]
+  ##  @libraryclass  Abstract location of the LED driver
+  ##
+  LedLib|Pi2BoardPkg/Include/LedLib.h
+
+[Guids.common]
+  gPi3BoardTokenSpaceGuid    =  { 0x2e30c1f5, 0x43d6, 0x4d3d, { 0xbe, 0x99, 0xc6, 0x78, 0xa3, 0x19, 0x2d, 0x6 } }
+

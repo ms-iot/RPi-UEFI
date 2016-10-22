@@ -1,6 +1,7 @@
 #/** @file
 #
 #  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#  Copyright (c) Microsoft Corporation. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -88,6 +89,12 @@
   # Size to reserve in the primary core stack for SEC Global Variables
   gArmPlatformTokenSpaceGuid.PcdSecGlobalVariableSize|0x0|UINT32|0x00000031
 
+  # Mailbox base for the Multi-Processor Parking Protocol
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresMPPPMailboxBase|0|UINT32|0x0000003E
+  # Mailbox size (per mailbox/core) for the Multi-Processor Parking Protocol.
+  # The spec requires 4Kb per mailbox.
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresMPPPMailboxSize|0x1000|UINT32|0x0000003F
+
   # Boot Monitor FileSystem
   gArmPlatformTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L""|VOID*|0x0000003A
 
@@ -122,6 +129,13 @@
   gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x00000000|UINT32|0x00000028
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x00000000|UINT32|0x00000029
 
+  ## WOA Entries start at 0x00000040 ##
+  gArmPlatformTokenSpaceGuid.PcdCpuParkedAddress|0x00000000|UINT64|0x00000042
+  gArmPlatformTokenSpaceGuid.PcdParkingMailboxSize|0x00010000|UINT64|0x00000452
+  gArmPlatformTokenSpaceGuid.PcdBootMonCpuMailboxAddress|0|UINT32|0x00000049
+  gArmPlatformTokenSpaceGuid.PcdRestrictCoreCount|0|UINT32|0x0000004A
+  gArmPlatformTokenSpaceGuid.PcdRestrictClusters|0|UINT32|0x0000004B
+
   #
   # BDS - Boot Manager
   #
@@ -143,6 +157,13 @@
 
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L""|VOID*|0x0000001B
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L""|VOID*|0x0000001C
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootAppPath|L""|VOID*|0x00000040
+  gArmPlatformTokenSpaceGuid.PcdPreBootAppPath|L""|VOID*|0x00000041
+  
+  gArmPlatformTokenSpaceGuid.PcdEmbeddedAutomaticBootTimeOut|0xffff|UINT16|0x0000002E
+
+  # Secure boot GUID. Include/Guid/WinSecureBoot.h
+  gArmPlatformTokenSpaceGuid.PcdSecureBootPolicy|{ 0xdb,0xda,0xa0,0x2c,0x3e,0xa1,0x4e,0x21,0xa4,0x54,0x80,0xd4,0x7c,0xa6,0x95,0xcf }|VOID*|0
 
 [PcdsFixedAtBuild.common,PcdsDynamic.common]
   ## PL031 RealTimeClock
@@ -160,4 +181,7 @@
   # and PcdCPUCoreSecSecondaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x0|UINT32|0x00000008
+  
+[PcdsDynamic, PcdsDynamicEx]
+  gArmPlatformTokenSpaceGuid.PcdBootOptionSelected|1|UINT32|0x00000444
 

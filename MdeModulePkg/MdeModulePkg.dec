@@ -4,6 +4,8 @@
 # and libraries instances, which are used for those modules.
 #
 # Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation. All rights reserved.<BR>
+#
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -689,6 +691,10 @@
   ## Maximum PPI count is supported by PeiCore's PPI database.
   # @Prompt Maximum PPI count supported by PeiCore.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported|64|UINT32|0x00010033
+
+  ## This PCD specified the default ACPI spec revision used.
+  # @Prompt The ACPI table revision to use for ACPI table generation.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiRevision|0x20|UINT32|0x0001006d
 
   ## The maximum size of a single non-HwErr type variable.
   # @Prompt Maximum variable size.

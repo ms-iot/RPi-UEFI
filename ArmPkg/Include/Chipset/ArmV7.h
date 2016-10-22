@@ -2,6 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -24,6 +25,7 @@
 
 // ID_PFR1 - ARM Processor Feature Register 1 definitions
 #define ARM_PFR1_SEC        (0xFUL << 4)
+#define ARM_PFR1_VIRT       (0xFUL << 12)
 #define ARM_PFR1_TIMER      (0xFUL << 16)
 #define ARM_PFR1_GIC        (0xFUL << 28)
 

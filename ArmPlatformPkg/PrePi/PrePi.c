@@ -1,6 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) Microsoft Corporation. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -30,8 +31,8 @@
 #include "PrePi.h"
 #include "LzmaDecompress.h"
 
-#define IS_XIP() (((UINT32)FixedPcdGet32 (PcdFdBaseAddress) > (UINT32)(FixedPcdGet64 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize))) || \
-                  ((FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < FixedPcdGet64 (PcdSystemMemoryBase)))
+#define IS_XIP() (((UINT32)FixedPcdGet32 (PcdFdBaseAddress) > (UINT32)(PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize))) || \
+                  ((FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < PcdGet64 (PcdSystemMemoryBase)))
 
 // Not used when PrePi in run in XIP mode
 UINTN mGlobalVariableBase = 0;
@@ -108,8 +109,8 @@ PrePiMain (
 
   // If ensure the FD is either part of the System Memory or totally outside of the System Memory (XIP)
   ASSERT (IS_XIP() ||
-          ((FixedPcdGet32 (PcdFdBaseAddress) >= FixedPcdGet64 (PcdSystemMemoryBase)) &&
-           ((UINT32)(FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= (UINT32)(FixedPcdGet64 (PcdSystemMemoryBase) + FixedPcdGet64 (PcdSystemMemorySize)))));
+          ((FixedPcdGet32 (PcdFdBaseAddress) >= PcdGet64 (PcdSystemMemoryBase)) &&
+          ((UINT32)(FixedPcdGet32(PcdFdBaseAddress) + FixedPcdGet32(PcdFdSize)) <= (UINT32)(PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize)))));
 
   // Initialize the architecture specific bits
   ArchInitialize ();

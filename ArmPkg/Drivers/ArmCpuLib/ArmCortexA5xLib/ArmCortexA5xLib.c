@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+  Copyright (c) Microsoft Corporation. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -27,12 +28,12 @@ ArmCpuSetup (
   )
 {
   // Check if Architectural Timer frequency is valid number (should not be 0)
-  ASSERT (PcdGet32 (PcdArmArchTimerFreqInHz));
+  ASSERT (FixedPcdGet32 (PcdArmArchTimerFreqInHz));
   ASSERT (ArmIsArchTimerImplemented () != 0);
 
   // Note: System Counter frequency can only be set in Secure privileged mode,
   // if security extensions are implemented.
-  ArmGenericTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
+  ArmGenericTimerSetTimerFreq (FixedPcdGet32 (PcdArmArchTimerFreqInHz));
 
   if (ArmIsMpCore ()) {
     // Turn on SMP coherency
@@ -40,13 +41,20 @@ ArmCpuSetup (
   }
 
   //
-  // If CPU is CortexA57 r0p0 apply Errata: 806969
-  //
+  // If CPU is CortexA57 r0p0 apply Errata
+  // TODO: Port the Cortex-A57 errata fix below to AArch32 by implementing
+  // ArmSetCpuActlrBit for AArch32
+  ASSERT ((ArmReadMidr() & ((ARM_CPU_TYPE_MASK << 4) | ARM_CPU_REV_MASK)) !=
+    ((ARM_CPU_TYPE_A57 << 4) | ARM_CPU_REV(0, 0)));
+  /*
   if ((ArmReadMidr () & ((ARM_CPU_TYPE_MASK << 4) | ARM_CPU_REV_MASK)) ==
-                         ((ARM_CPU_TYPE_A57 << 4) | ARM_CPU_REV(0,0))) {
-    // DisableLoadStoreWB
-    ArmSetCpuActlrBit (1ULL << 49);
+                        ((ARM_CPU_TYPE_A57  << 4) | ARM_CPU_REV(0,0))) {
+    // Errata 806969: DisableLoadStoreWB (1ULL << 49) 
+    // Errata 813420: Execute Data Cache clean as Data Cache clean/invalidate  (1ULL << 44)
+    // Errata 814670: disable DMB nullification (1ULL << 58)
+    ArmSetCpuActlrBit ((1ULL << 49) | (1ULL << 44) | (1ULL << 58));
   }
+  */
 }
 
 VOID

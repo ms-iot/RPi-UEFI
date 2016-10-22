@@ -1,4 +1,5 @@
 /** @file
+
   Provides services to print debug and assert messages to a debug output device.
   
   The Debug library supports debug print and asserts based on a combination of macros and code.
@@ -8,14 +9,16 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  This program and the accompanying materials are licensed and made available under 
+  the terms and conditions of the BSD License that accompanies this distribution.  
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -44,15 +47,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define DEBUG_INFO      0x00000040  // Informational debug messages
 #define DEBUG_DISPATCH  0x00000080  // PEI/DXE/SMM Dispatchers
 #define DEBUG_VARIABLE  0x00000100  // Variable
+#define DEBUG_TIMER_INT 0x00000200  // Timer & Interrupt Drivers
 #define DEBUG_BM        0x00000400  // Boot Manager
 #define DEBUG_BLKIO     0x00001000  // BlkIo Driver
 #define DEBUG_NET       0x00004000  // SNI Driver
+#define DEBUG_MMCHOST_SD 0x00008000  // XxxSigMMCHost Miniport Driver
 #define DEBUG_UNDI      0x00010000  // UNDI Driver
 #define DEBUG_LOADFILE  0x00020000  // UNDI Driver
+#define DEBUG_OPTEE     0x00040000  // Optee Pkg Debug Tracing
 #define DEBUG_EVENT     0x00080000  // Event messages
 #define DEBUG_GCD       0x00100000  // Global Coherency Database changes
 #define DEBUG_CACHE     0x00200000  // Memory range cachability changes
 #define DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may significantly impact boot performance
+#define DEBUG_ACPI      0x00800000  // ACPI table errors
 #define DEBUG_ERROR     0x80000000  // Error
 
 //
@@ -72,6 +79,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_D_NET       DEBUG_NET
 #define EFI_D_UNDI      DEBUG_UNDI
 #define EFI_D_LOADFILE  DEBUG_LOADFILE
+#define EFI_D_ACPI      DEBUG_ACPI
 #define EFI_D_EVENT     DEBUG_EVENT
 #define EFI_D_VERBOSE   DEBUG_VERBOSE
 #define EFI_D_ERROR     DEBUG_ERROR

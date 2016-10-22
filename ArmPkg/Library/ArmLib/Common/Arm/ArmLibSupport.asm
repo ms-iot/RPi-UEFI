@@ -1,7 +1,8 @@
 //------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-// Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+// Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.<BR>
+// Copyright (c) Microsoft Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -29,6 +30,7 @@
     EXPORT ArmGetFiqState
     EXPORT ArmGetTTBR0BaseAddress
     EXPORT ArmSetTTBR0
+    EXPORT ArmSetTTBCR
     EXPORT ArmSetDomainAccessControl
     EXPORT CPSRMaskInsert
     EXPORT CPSRRead
@@ -117,6 +119,11 @@ ArmSetTTBR0
   isb
   bx      lr
 
+ArmSetTTBCR
+  mcr     p15,0,r0,c2,c0,2
+  isb
+  bx      lr
+
 ArmGetTTBR0BaseAddress
   mrc     p15,0,r0,c2,c0,0
   LoadConstantToReg(0xFFFFC000, r1)
@@ -153,6 +160,7 @@ ArmReadScr
 
 ArmWriteScr
   mcr     p15, 0, r0, c1, c1, 0
+  isb
   bx      lr
 
 ArmReadHVBar

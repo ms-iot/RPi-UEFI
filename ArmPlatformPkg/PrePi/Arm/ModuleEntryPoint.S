@@ -1,5 +1,6 @@
 //
 //  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+//  Copyright (c) Microsoft Corporation. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -49,9 +50,21 @@ _SetSVCMode:
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
 // at the top of the DRAM)
 _SetupStackPosition:
-  // Compute Top of System Memory
   LoadConstantToReg (FixedPcdGet64 (PcdSystemMemoryBase), r1)
+
+  // PcdSystemMemoryBase is declared as both Fixed and Dynamic in the Arm package dec file
+  // The default is Fixed unless a UEFI package redeclare its dsc as Dynamic
+  // If PcdSystemMemorySize is used in its default fixed form, then use that, otherwise
+  // call a platform specific implementation which knows how to compute dynamic system
+  // memory size. Most of the time it will be a platform specific dynamic PcdGet64
+  // NOTE: ArmPlatformGetSystemMemorySize implementation should assume that no stack is 
+  // setup and may need to work around this limitation.
+.ifdef FixedPcdGet64 (PcdSystemMemorySize)
   LoadConstantToReg (FixedPcdGet64 (PcdSystemMemorySize), r2)
+.else
+  bl    ASM_PFX(ArmPlatformGetSystemMemorySize)
+  mov   r2, r0
+.endif
   sub   r2, r2, #1
   add   r1, r1, r2      // r1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
 
@@ -114,6 +127,30 @@ _GetStackBase:
   mul   r1, r1, r0
   sub   r10, r10, r1
 
+// Check to see if a PcdCPUCoresStackBase value was provided (none-zero) and if so use that
+// as the base for the CPU core stacks. This is *required* to be used for the Multi-Processor
+// Parking Protocol as used by Windows because the secondary cores are started after
+// ExitBootServices such that UEFI memory has already been released. Therefore, the memory
+// represented by PcdCPUCoresStackBase *must* be outside of the System Memory declared to
+// UEFI such that it's always available for use at any time.
+//
+// NOTE: This only applies to the secondary cores that will end up parked.
+//
+_CheckForExplictStack:
+  // Is it the Primary Core ?
+  mov   r0, r8
+  bl    ASM_PFX(ArmPlatformIsPrimaryCore)
+  cmp   r0, #1
+  beq   _PlatformStackSet
+
+  LoadConstantToReg (FixedPcdGet32 (PcdCPUCoresStackBase), r0)
+  cmp   r0, #0
+  beq   _PlatformStackSet
+
+  // Use the explicit stack address instead.
+  mov   r10, r0
+
+_PlatformStackSet:
   // r10 = The base of the MpCore Stacks (primary stack & secondary stacks)
   mov   r0, r10
   mov   r1, r8

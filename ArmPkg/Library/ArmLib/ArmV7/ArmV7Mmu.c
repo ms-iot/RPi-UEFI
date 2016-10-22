@@ -2,6 +2,7 @@
 *  File managing the MMU for ARMv7 architecture
 *
 *  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) Microsoft Corporation. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -278,6 +279,12 @@ ArmConfigureMmu (
   ArmInvalidateInstructionCache ();
 
   ArmSetTTBR0 ((VOID *)(UINTN)(((UINTN)TranslationTable & ~TRANSLATION_TABLE_SECTION_ALIGNMENT_MASK) | (TTBRAttributes & 0x7F)));
+
+  //
+  // Initialize TTBCR to set 32-bit translation system with the Short-descriptor translation table format,
+  // and perform translation table walks using TTBR0
+  //
+  ArmSetTTBCR (0);
 
   ArmSetDomainAccessControl (DOMAIN_ACCESS_CONTROL_NONE(15) |
                              DOMAIN_ACCESS_CONTROL_NONE(14) |

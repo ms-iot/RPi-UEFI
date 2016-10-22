@@ -1,0 +1,68 @@
+#/** @file
+# Pi2 board package.
+#
+#  Copyright (c), Microsoft Corporation. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = Pi2BoardPkg
+  PACKAGE_GUID                   = 6eba6648-d853-4eb3-9761-528b82d5ab04
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[LibraryClasses]
+  ##  @libraryclass  Abstract location of the basic LED driver
+  ##
+  LedLib|Include/LedLib.h
+
+[Guids.common]
+  gPi2BoardTokenSpaceGuid    =  { 0x24b09abe, 0x4e47, 0x481c, { 0xa9, 0xad, 0xce, 0xf1, 0x2c, 0x39, 0x23, 0x27} }
+
+[PcdsFixedAtBuild.common]
+  gPi2BoardTokenSpaceGuid.PcdArasanSDCardMBRGPTWorkaroundEnabled|0|BOOLEAN|0x0000020A
+  gPi2BoardTokenSpaceGuid.PcdArasanSDCardMBRGPTWorkaroundGPTOffsetLba|0x00000000|UINT32|0x0000020B
+
+  #  PcdJtagEnabled side effects are:
+  # - On very early boot GPIO pins 22,23,24,25,26,27 are configured for JTAG
+  # - If PcdJtagLedBlinkOnConfig is set, then green LED blinks directly after enabling 
+  #    JTAG for a couple of seconds to give enough time to attach JTAG debugger
+  # - If PcdJtagPrimaryCoreDeadLoopPostConfig is set, then the primary core will enter
+  #   a dead loop after blinking, untill a JTAG debugger attaches and manually move PC 
+  #   beyond that dead loop for the core to continue UEFI execution
+  # - GPIO pins 20 and 21 are not pin-muxed and are left in their default ALT func
+  # These flags should be only used for bring-up and UEFI debugging purposes only
+  #
+  gPi2BoardTokenSpaceGuid.PcdJtagEnabled|FALSE|BOOLEAN|0x0000020C
+  gPi2BoardTokenSpaceGuid.PcdJtagLedBlinkOnConfig|TRUE|BOOLEAN|0x0000020D
+  gPi2BoardTokenSpaceGuid.PcdJtagPrimaryCoreDeadLoopPostConfig|FALSE|BOOLEAN|0x0000020E
+  
+  gPi2BoardTokenSpaceGuid.PcdCoresClusterId|0|UINT32|0x0000020F
+  gPi2BoardTokenSpaceGuid.PcdBootRegionBase|0|UINT32|0x00000210
+  gPi2BoardTokenSpaceGuid.PcdBootRegionSize|0|UINT32|0x00000220
+  
+  gPi2BoardTokenSpaceGuid.PcdRuntimeMuxingEnabled|FALSE|BOOLEAN|0x00000221
+
+[PcdsDynamic.common]
+  gPi2BoardTokenSpaceGuid.PcdGpuMemorySize|0|UINT64|0x00000230
+

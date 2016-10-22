@@ -2,6 +2,7 @@
   Definition of the MMC Host Protocol
 
   Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+  Copyright (c) Microsoft Corporation. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -49,6 +50,7 @@ typedef UINT32 MMC_CMD;
 #define MMC_CMD2              (MMC_INDX(2) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_LONG_RESPONSE)
 #define MMC_CMD3              (MMC_INDX(3) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD5              (MMC_INDX(5) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_NO_CRC_RESPONSE)
+#define MMC_CMD6              (MMC_INDX(6) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_NO_CRC_RESPONSE)
 #define MMC_CMD7              (MMC_INDX(7) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD8              (MMC_INDX(8) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD9              (MMC_INDX(9) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_LONG_RESPONSE)
@@ -62,6 +64,7 @@ typedef UINT32 MMC_CMD;
 #define MMC_CMD23             (MMC_INDX(23) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD24             (MMC_INDX(24) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD55             (MMC_INDX(55) | MMC_CMD_WAIT_RESPONSE)
+#define MMC_ACMD6             (MMC_INDX(6) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_NO_CRC_RESPONSE)
 #define MMC_ACMD41            (MMC_INDX(41) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_NO_CRC_RESPONSE)
 
 // Valid responses for CMD1 in eMMC

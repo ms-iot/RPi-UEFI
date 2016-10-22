@@ -1,6 +1,6 @@
 #/* @file
 #  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
-#
+#  Copyright (c) Microsoft Corporation. All rights reserved.
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -33,6 +33,10 @@
 
 [Sources.AARCH64]
   AArch64/ArmCortexA5xHelper.S | GCC
+
+[Sources.ARM]
+  Arm/ArmCortexA5xHelper.S   | GCC
+  Arm/ArmCortexA5xHelper.asm | RVCT
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz

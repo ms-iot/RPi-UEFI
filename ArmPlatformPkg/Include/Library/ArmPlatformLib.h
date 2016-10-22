@@ -1,6 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) Microsoft Corporation. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -166,4 +167,33 @@ ArmPlatformGetPlatformPpiList (
   OUT EFI_PEI_PPI_DESCRIPTOR  **PpiList
   );
 
+//
+// Helper functions for adding GIC information in ACPI Tables
+//
+
+UINT32
+ArmPlatformGetGicId (
+  VOID
+  );
+
+UINT32
+ArmPlatformGetCpuCount (
+  VOID
+  );
+
+/**
+  Returns EFI_SUCCESS or EFI_INVALID_PARAMETER
+
+  This function the returns the CPU GicID
+
+  @param[in]    ClusterId    The cluster Id
+  @param[in]    CoreId       The core Id
+  @param[out]   GicId        GicID
+**/
+EFI_STATUS
+ArmPlatformGetCpuGicId (
+    IN UINT32    ClusterId,
+    IN UINT32    CoreId,
+    OUT UINT32  *GicId
+  );
 #endif
