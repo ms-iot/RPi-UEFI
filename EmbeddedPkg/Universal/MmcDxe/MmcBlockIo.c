@@ -17,9 +17,13 @@
 #include <Library/TimerLib.h>
 
 #include "Mmc.h"
-#define MAX_RETRY_COUNT  1000
-#define CMD_RETRY_COUNT  20
-#define MULTI_BLK_XFER_MAX_BLK_CNT 10000
+#define MAX_RETRY_COUNT                     1000
+#define MULTI_BLK_XFER_MAX_BLK_CNT          10000
+// Perform Integer division DIVIDEND/DIVISOR and return the result rounded up or down
+// to the nearest integer, where 3.5 and 3.75 are near 4, while 3.25 is near 3.
+#define INT_DIV_ROUND(DIVIDEND, DIVISOR)    (((DIVIDEND) + ((DIVISOR) / 2)) / (DIVISOR))
+#define MMCI0_BLOCKLEN                      512
+#define MMCI0_TIMEOUT                       10000
 
 EFI_STATUS
 MmcNotifyState (
@@ -212,7 +216,7 @@ MmcIdentificationMode (
     return Status;
   }
   MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_CID, Response);
-  PrintCID (Response);
+  PrintCID ((CID*)Response);
 
   Status = MmcNotifyState (MmcHostInstance, MmcIdentificationState);
   if (EFI_ERROR (Status)) {
@@ -258,9 +262,10 @@ EFI_STATUS InitializeMmcDevice (
 {
   UINT32                  Response[4];
   EFI_STATUS              Status;
-  UINTN                   CardSize, NumBlocks, BlockSize, CmdArg;
+  UINT64                  DeviceSize, NumBlocks, CardSizeBytes, CardSizeGB;
+  UINT32                  CmdArg;
   EFI_MMC_HOST_PROTOCOL   *MmcHost;
-  UINTN                   BlockCount;
+  UINT32                  BlockCount;
   UINT32                  ECSD[128];
 
   BlockCount = 1;
@@ -277,29 +282,34 @@ EFI_STATUS InitializeMmcDevice (
   }
   //Read Response
   MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_CSD, Response);
-  PrintCSD (Response);
 
+  PrintCSD((CSD*)Response);
+  
   if (MmcHostInstance->CardInfo.CardType == SD_CARD_2_HIGH) {
-    CardSize = HC_MMC_CSD_GET_DEVICESIZE (Response);
-    NumBlocks = ((CardSize + 1) * 1024);
-    BlockSize = 1 << MMC_CSD_GET_READBLLEN (Response);
+      CSD_2* Csd2 = (CSD_2*)Response;
+      DeviceSize = Csd2 ->C_SIZE;
+      CardSizeBytes = (UINT64)(DeviceSize + 1) * 512llu * 1024llu;
   } else {
-    CardSize = MMC_CSD_GET_DEVICESIZE (Response);
-    NumBlocks = (CardSize + 1) * (1 << (MMC_CSD_GET_DEVICESIZEMULT (Response) + 2));
-    BlockSize = 1 << MMC_CSD_GET_READBLLEN (Response);
+      CSD* Csd = (CSD*)Response;
+      DeviceSize = ((Csd->C_SIZEHigh10 << 2) | Csd->C_SIZELow2);
+      UINT32 BLOCK_LEN = 1 << Csd->READ_BL_LEN;
+      UINT32 MULT = 1 << (Csd->C_SIZE_MULT + 2);
+      UINT32 BLOCKNR = (DeviceSize + 1) * MULT;
+      CardSizeBytes = BLOCKNR * BLOCK_LEN;
   }
 
-  DEBUG((EFI_D_ERROR, "CardSize: %d, NumBlocks: %d, BlockSize: %d\n", CardSize, NumBlocks, BlockSize));
-
-  //For >=2G card, BlockSize may be 1K, but the transfer size is 512 bytes.
-  if (BlockSize > 512) {
-    NumBlocks = MultU64x32 (NumBlocks, BlockSize/512);
-    BlockSize = 512;
-  }
-
-  MmcHostInstance->BlockIo.Media->LastBlock    = (NumBlocks - 1);
-  MmcHostInstance->BlockIo.Media->BlockSize    = BlockSize;
-  MmcHostInstance->BlockIo.Media->ReadOnly     = MmcHost->IsReadOnly (MmcHost);
+  NumBlocks = (CardSizeBytes / MMCI0_BLOCKLEN);
+  CardSizeGB = INT_DIV_ROUND(CardSizeBytes, (UINT64)(1024llu * 1024llu * 1024llu));
+  DEBUG((
+      EFI_D_INIT,
+      "MmcDxe: CardSize: %ldGB, NumBlocks: %ld assuming BlockSize: %d\n",
+      (UINT64)CardSizeGB,
+      (UINT64)NumBlocks,
+      MMCI0_BLOCKLEN));
+  
+  MmcHostInstance->BlockIo.Media->LastBlock = (NumBlocks - 1);
+  MmcHostInstance->BlockIo.Media->BlockSize = MMCI0_BLOCKLEN;
+  MmcHostInstance->BlockIo.Media->ReadOnly = MmcHost->IsReadOnly(MmcHost);
   MmcHostInstance->BlockIo.Media->MediaPresent = TRUE;
   MmcHostInstance->BlockIo.Media->MediaId++;
 
@@ -412,9 +422,6 @@ MmcStopTransmission (
   }
   return Status;
 }
-
-#define MMCI0_BLOCKLEN 512
-#define MMCI0_TIMEOUT  10000
 
 EFI_STATUS
 MmcIoBlocks (

@@ -75,15 +75,14 @@ SerialPortInitialize (
     //
     // Setup the UART
     //
-    
+
     //
     // UART clock:
     // UART1 uses core clock, so we query the clock frequency
     // to setup the UART baud rate.
     //
     {
-        // Ensure 16 byte alignment
-        MAILBOX_GET_CLOCK_RATE MbGcr __attribute__((aligned(16)));
+        MAILBOX_GET_CLOCK_RATE MbGcr;
 
         ZeroMem((void*)&MbGcr, sizeof(MbGcr));
         MbGcr.Header.BufferSize = sizeof(MbGcr);
@@ -139,7 +138,7 @@ SerialPortInitialize (
     // Parity
     {
         UINT32 IsParityCheckNone = FixedPcdGet8(PcdUartDefaultParity);
-        
+
         //
         // Mini UART does not provide interface for settings
         // parity check to other than 'none'.
@@ -195,7 +194,7 @@ SerialPortWrite (
 {
     UINTN   Count;
 
-    for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) 
+    for (Count = 0; Count < NumberOfBytes; Count++, Buffer++)
     {
 
         /* Wait for space in the FIFO */
@@ -230,7 +229,7 @@ SerialPortRead (
 {
     UINTN   Count;
 
-    for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) 
+    for (Count = 0; Count < NumberOfBytes; Count++, Buffer++)
     {
 
         /* Wait for character in the FIFO */
@@ -255,11 +254,11 @@ SerialPortPoll (
   VOID
   )
 {
-    if ((MmioRead32(AUX_MU_STAT_REG) & 0x01) != 0) 
+    if ((MmioRead32(AUX_MU_STAT_REG) & 0x01) != 0)
     {
         return TRUE;
-    } 
-    else 
+    }
+    else
     {
         return FALSE;
     }

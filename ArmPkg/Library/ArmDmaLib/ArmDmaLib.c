@@ -31,7 +31,11 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS      DeviceAddress;
   UINTN                     NumberOfBytes;
   DMA_MAP_OPERATION         Operation;
-  BOOLEAN                   DoubleBuffer;
+  UINT64                    OriginalMemoryAttributes;
+  struct {
+    UINTN                   DoubleBuffer : 1;
+    UINTN                   RestoreMemoryAttributes : 1;
+  } Flags;
 } MAP_INFO_INSTANCE;
 
 
@@ -92,14 +96,16 @@ DmaMap (
 
   *Mapping = Map;
 
+  // Get the cacheability of the region
+  Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
   if ((((UINTN)HostAddress & (gCacheAlignment - 1)) != 0) ||
       ((*NumberOfBytes % gCacheAlignment) != 0)) {
 
-    // Get the cacheability of the region
-    Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
-    if (EFI_ERROR(Status)) {
-      return Status;
-    }
+    Map->Flags.RestoreMemoryAttributes = FALSE;
 
     // If the mapped buffer is not an uncached buffer
     if ( (GcdDescriptor.Attributes != EFI_MEMORY_WC) &&
@@ -109,7 +115,7 @@ DmaMap (
       // If the buffer does not fill entire cache lines we must double buffer into
       // uncached memory. Device (PCI) address becomes uncached page.
       //
-      Map->DoubleBuffer  = TRUE;
+      Map->Flags.DoubleBuffer  = TRUE;
       Status = DmaAllocateBuffer (EfiBootServicesData, EFI_SIZE_TO_PAGES (*NumberOfBytes), &Buffer);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -121,10 +127,10 @@ DmaMap (
 
       *DeviceAddress = (PHYSICAL_ADDRESS)(UINTN)Buffer;
     } else {
-      Map->DoubleBuffer  = FALSE;
+      Map->Flags.DoubleBuffer  = FALSE;
     }
   } else {
-    Map->DoubleBuffer  = FALSE;
+    Map->Flags.DoubleBuffer  = FALSE;
 
     // Flush the Data Cache (should not have any effect if the memory region is uncached)
     gCpu->FlushDataCache (gCpu, *DeviceAddress, *NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
@@ -133,13 +139,20 @@ DmaMap (
       // In case the buffer is used for instance to send command to a PCI controller, we must ensure the memory is uncached
       Status = gDS->SetMemorySpaceAttributes (*DeviceAddress & ~(BASE_4KB - 1), ALIGN_VALUE (*NumberOfBytes, BASE_4KB), EFI_MEMORY_WC);
       ASSERT_EFI_ERROR (Status);
+
+      //
+      // Since we're modifying the attributes of memory we do not own,
+      // we need to return it to the owner in the state we found it.
+      //
+      Map->Flags.RestoreMemoryAttributes = TRUE;
     }
   }
 
-  Map->HostAddress   = (UINTN)HostAddress;
-  Map->DeviceAddress = *DeviceAddress;
-  Map->NumberOfBytes = *NumberOfBytes;
-  Map->Operation     = Operation;
+  Map->HostAddress              = (UINTN)HostAddress;
+  Map->DeviceAddress            = *DeviceAddress;
+  Map->NumberOfBytes            = *NumberOfBytes;
+  Map->Operation                = Operation;
+  Map->OriginalMemoryAttributes = GcdDescriptor.Attributes;
 
   return EFI_SUCCESS;
 }
@@ -161,6 +174,7 @@ DmaUnmap (
   IN  VOID                         *Mapping
   )
 {
+  EFI_STATUS Status;
   MAP_INFO_INSTANCE *Map;
 
   if (Mapping == NULL) {
@@ -170,7 +184,7 @@ DmaUnmap (
 
   Map = (MAP_INFO_INSTANCE *)Mapping;
 
-  if (Map->DoubleBuffer) {
+  if (Map->Flags.DoubleBuffer) {
     if ((Map->Operation == MapOperationBusMasterWrite) || (Map->Operation == MapOperationBusMasterCommonBuffer)) {
       CopyMem ((VOID *)(UINTN)Map->HostAddress, (VOID *)(UINTN)Map->DeviceAddress, Map->NumberOfBytes);
     }
@@ -184,6 +198,18 @@ DmaUnmap (
       //
       gCpu->FlushDataCache (gCpu, Map->HostAddress, Map->NumberOfBytes, EfiCpuFlushTypeInvalidate);
     }
+  }
+
+  //
+  // Restore the original memory attributes of the buffer if we need to
+  //
+  if (Map->Flags.RestoreMemoryAttributes) {
+      Status = gDS->SetMemorySpaceAttributes (
+        Map->DeviceAddress & ~(BASE_4KB - 1),
+        ALIGN_VALUE (Map->NumberOfBytes, BASE_4KB),
+        Map->OriginalMemoryAttributes);
+
+      ASSERT_EFI_ERROR (Status);
   }
 
   FreePool (Map);

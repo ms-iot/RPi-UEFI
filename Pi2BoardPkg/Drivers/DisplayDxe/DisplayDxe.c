@@ -63,26 +63,26 @@ DISPLAY_DEVICE_PATH gDisplayDevicePath =
 #define PI2_COLOUR_BITS_PER_PIXEL       (24)
 #define PI2_COLOUR_BYTES_PER_PIXEL      (PI2_COLOUR_BITS_PER_PIXEL / 8)
 
-
-// Ensure 16 byte alignment
-volatile MAILBOX_FRAMEBUFFER MbFb __attribute__ ((aligned (16)));
-volatile MAILBOX_PHYSICAL_SIZE MbFbSize __attribute__((aligned(16)));
-
 //
 // Use the mailbox framebuffer channel mechanism to request a frame buffer
 // Return non-zero for success
 //
 UINT32
 MailboxTransactFrameBuffer(
-    volatile PMAILBOX_FRAMEBUFFER pMbFb
+    PMAILBOX_FRAMEBUFFER pMbFb
     )
 {
+    // Ensure 64-byte alignment and padding
+    static UINT8 SharedMem[(sizeof(MAILBOX_FRAMEBUFFER) + 63) & ~63]
+        __attribute__((aligned(64)));
+
     UINT32 MBStatus = 0;
-    UINT32 MBData = ((UINT32)pMbFb) | UNCACHED_ADDRESS_MASK;
+    UINT32 MBData = ((UINT32)SharedMem) | UNCACHED_ADDRESS_MASK;
 
     DEBUG((EFI_D_INIT, "DisplayDxe writing 0x%8.8X to Mailbox\n", MBData));
 
-    WriteBackInvalidateDataCacheRange((void*)pMbFb, sizeof(*pMbFb));
+    CopyMem(SharedMem, pMbFb, sizeof(*pMbFb));
+    WriteBackInvalidateDataCacheRange(SharedMem, sizeof(*pMbFb));
     if (!BcmMailboxWrite(MAILBOX_CHANNEL_FRAMEBUFFER, MBData))
     {
         DEBUG((DEBUG_ERROR, "Failed to write FB info\n"));
@@ -98,7 +98,8 @@ MailboxTransactFrameBuffer(
 
     DEBUG((EFI_D_INIT, "DisplayDxe Final MBStatus = 0x%8.8X\n", MBStatus));
 
-    WriteBackInvalidateDataCacheRange((void*)pMbFb, sizeof(*pMbFb));
+    InvalidateDataCacheRange(SharedMem, sizeof(*pMbFb));
+    CopyMem(pMbFb, SharedMem, sizeof(*pMbFb));
 
     DEBUG((EFI_D_INIT, "DisplayDxe FrameBuffer       = 0x%8.8X\n", pMbFb->mbf_framebuf_addr));
     DEBUG((EFI_D_INIT, "DisplayDxe FrameBuffer Size  = %d\n", pMbFb->mbf_framebuf_size));
@@ -351,7 +352,8 @@ DisplayDxeInitialize (
 
         ZeroMem(gDisplay.Mode->Info,sizeof(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
     }
-        
+
+    MAILBOX_PHYSICAL_SIZE MbFbSize;
     ZeroMem((void*)&MbFbSize, sizeof(MbFbSize));
     MbFbSize.Header.BufferSize = sizeof(MbFbSize);
     MbFbSize.Header.TagID = TAG_GET_PHYSICAL_SIZE;
@@ -364,6 +366,7 @@ DisplayDxeInitialize (
     }
     DEBUG((EFI_D_INIT, "Mailbox Display Size  %d x %d\n", MbFbSize.Width, MbFbSize.Height));
 
+    MAILBOX_FRAMEBUFFER MbFb;
     ZeroMem((void*)&MbFb, sizeof(MAILBOX_FRAMEBUFFER));
     MbFb.mbf_phys_width = MbFb.mbf_virt_width = MbFbSize.Width;
     MbFb.mbf_phys_height = MbFb.mbf_virt_height = MbFbSize.Height;
@@ -371,7 +374,7 @@ DisplayDxeInitialize (
 
     // Request a frame buffer allocation so we can retrive
     // frame buffer address
-    MailboxTransactFrameBuffer((PMAILBOX_FRAMEBUFFER)&MbFb);
+    MailboxTransactFrameBuffer(&MbFb);
 
     if ((MbFb.mbf_framebuf_addr != 0) && (MbFb.mbf_framebuf_size != 0))
     {
@@ -392,7 +395,7 @@ DisplayDxeInitialize (
 
         // NOTE: Windows REQUIRES BGR in 32 or 24 bit format.
         // TODO: Figure out a way in GOP driver to set the display controller
-        //       to the appropriate pixel format instead of relying on 
+        //       to the appropriate pixel format instead of relying on
         //       framebuffer_ignore_alpha and framebuffer_swap
         gDisplay.Mode->Info->PixelFormat = PixelBlueGreenRedReserved8BitPerColor;
         gDisplay.Mode->Info->PixelsPerScanLine = MbFb.mbf_pitch / PI2_BYTES_PER_PIXEL;;

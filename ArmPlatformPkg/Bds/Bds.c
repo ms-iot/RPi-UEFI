@@ -627,8 +627,8 @@ FindFileFullDevicePath (
         FilePathDevicePath = (FILEPATH_DEVICE_PATH*)RemainingDevicePath;
 
         Status = gBS->HandleProtocol (
-            Handle, 
-            &gEfiSimpleFileSystemProtocolGuid, 
+            Handle,
+            &gEfiSimpleFileSystemProtocolGuid,
             (VOID **)&Volume
             );
         if (EFI_ERROR (Status)) {
@@ -641,10 +641,10 @@ FindFileFullDevicePath (
         }
 
         Status = Root->Open (
-            Root, 
-            &ThisFile, 
-            FilePathDevicePath->PathName, 
-            EFI_FILE_MODE_READ, 
+            Root,
+            &ThisFile,
+            FilePathDevicePath->PathName,
+            EFI_FILE_MODE_READ,
             0
             );
         if (EFI_ERROR (Status)) {

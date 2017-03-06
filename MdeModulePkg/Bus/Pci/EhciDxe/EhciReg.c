@@ -624,9 +624,22 @@ EhcInitHC (
   //
   // 3. Power up all ports if EHCI has Port Power Control (PPC) support
   //
+  //    Note:
+  //        When turning on port power we need to make sure we do not ACK any
+  //        un-handled status bits like CSC, etc.
+  //
   if (Ehc->HcStructParams & HCSP_PPC) {
     for (Index = 0; Index < (UINT8) (Ehc->HcStructParams & HCSP_NPORTS); Index++) {
-      EhcSetOpRegBit (Ehc, (UINT32) (EHC_PORT_STAT_OFFSET + (4 * Index)), PORTSC_POWER);
+      UINT32 StatRegData;
+      UINT32 StatRegOffset;
+
+      StatRegOffset = (UINT32) (EHC_PORT_STAT_OFFSET + (4 * Index));
+
+      StatRegData = EhcReadOpReg (Ehc, StatRegOffset);
+      StatRegData &= ~PORTSC_CHANGE_MASK;   // Do not ACK any un-handled status bits
+      StatRegData |= PORTSC_POWER;          // Turn on port power
+
+      EhcWriteOpReg (Ehc, StatRegOffset, StatRegData);
     }
   }
 

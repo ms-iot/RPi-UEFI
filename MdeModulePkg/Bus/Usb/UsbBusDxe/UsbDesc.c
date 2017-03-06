@@ -200,7 +200,7 @@ UsbCreateDesc (
   }
 
   if ((Len <= Offset)      || (Len < Offset + DescLen) ||
-      (Head->Type != Type) || (Head->Len != DescLen)) {
+      (Head->Type != Type) || (Head->Len < DescLen)) {
     DEBUG (( EFI_D_ERROR, "UsbCreateDesc: met mal-format descriptor\n"));
     return NULL;
   }

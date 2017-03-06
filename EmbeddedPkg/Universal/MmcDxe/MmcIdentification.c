@@ -144,7 +144,7 @@ InitializeSdMmcDevice (
     DEBUG((EFI_D_ERROR, "InitializeSdMmcDevice(): Failed to receive CSD, Status=%r\n", Status));
     return Status;
   }
-  PrintCSD (Response);
+  PrintCSD ((CSD*)Response);
 
   if (MmcHostInstance->CardInfo.CardType == SD_CARD_2_HIGH) {
     CardSize = HC_MMC_CSD_GET_DEVICESIZE (Response);
@@ -361,7 +361,7 @@ MmcIdentificationMode (
     return Status;
   }
 
-  PrintCID (Response);
+  PrintCID ((CID*)Response);
 
   Status = MmcHost->NotifyState (MmcHost, MmcIdentificationState);
   if (EFI_ERROR (Status)) {

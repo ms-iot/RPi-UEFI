@@ -76,7 +76,7 @@ LibResetSystem (
   UINT32 Rstc;
   UINT32 Rsts = 0;
 
-  switch(ResetType) 
+  switch(ResetType)
   {
   case EfiResetShutdown:
       // For shut down we stup RSTS so bootcode is aware to halt the boot process.
@@ -101,7 +101,7 @@ LibResetSystem (
       MmioWrite32(gPrcmBaseAddress + PRCM_WDOG_OFF, (PRCM_PASSWORD | 10));
       MmioWrite32(gPrcmBaseAddress + PRCM_RSTC_OFF, (PRCM_PASSWORD | Rstc));
       break;
-      
+
   }
   
   // Spin to wait for the end.

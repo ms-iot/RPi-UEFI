@@ -39,6 +39,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
   Pi2BoardPkg/Pi2BoardPkg.dec
 
 [LibraryClasses]
@@ -52,6 +53,7 @@
   IoLib
   CacheMaintenanceLib
   BcmMailboxLib
+  ArmPlatformStackLib
 
 [Protocols]
   gEfiSmbiosProtocolGuid                        # PROTOCOL SOMETIMES_CONSUMED
@@ -60,3 +62,6 @@
 
 [Depex]
   gEfiSmbiosProtocolGuid
+ 
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemorySize

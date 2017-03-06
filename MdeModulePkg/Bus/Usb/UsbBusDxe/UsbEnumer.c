@@ -282,7 +282,14 @@ UsbConnectDriver (
       OldTpl            = UsbGetCurrentTpl ();
       DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d, %p\n", (UINT32)OldTpl, UsbIf->Handle));
 
-      gBS->RestoreTPL (TPL_CALLBACK);
+      //
+      // Set TPL to CALLBACK level
+      //
+      if (OldTpl > TPL_CALLBACK) {
+        gBS->RestoreTPL (TPL_CALLBACK);
+      } else if (OldTpl < TPL_CALLBACK) {
+        gBS->RaiseTPL (TPL_CALLBACK);
+      }
 
       Status            = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
       UsbIf->IsManaged  = (BOOLEAN)!EFI_ERROR (Status);
@@ -290,7 +297,14 @@ UsbConnectDriver (
       DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl()));
       ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
 
-      gBS->RaiseTPL (OldTpl);
+      //
+      // Reset TPL to where it was
+      //
+      if (OldTpl > TPL_CALLBACK) {
+        gBS->RaiseTPL (OldTpl);
+      } else if (OldTpl < TPL_CALLBACK) {
+        gBS->RestoreTPL (OldTpl);
+      }
     }
   }
 

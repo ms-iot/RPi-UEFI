@@ -389,10 +389,10 @@ SMBIOS_TABLE_TYPE16 mPhyMemArrayInfoType16 = {
   MemoryArrayLocationSystemBoard, // Location;                       ///< The enumeration value from MEMORY_ARRAY_LOCATION.
   MemoryArrayUseSystemMemory,     // Use;                            ///< The enumeration value from MEMORY_ARRAY_USE.
   MemoryErrorCorrectionUnknown,   // MemoryErrorCorrection;          ///< The enumeration value from MEMORY_ERROR_CORRECTION.
-  0x80000000,                     // MaximumCapacity;
+  0x40000000,                     // MaximumCapacity;
   0xFFFE,                         // MemoryErrorInformationHandle;
   1,                              // NumberOfMemoryDevices;
-  0x3fffffffffffffffULL,          // ExtendedMaximumCapacity;
+  0x40000000ULL,                  // ExtendedMaximumCapacity;
 };
 CHAR8 *mPhyMemArrayInfoType16Strings[] = {
   NULL
@@ -403,11 +403,12 @@ CHAR8 *mPhyMemArrayInfoType16Strings[] = {
 ************************************************************************/
 SMBIOS_TABLE_TYPE17 mMemDevInfoType17 = {
   { EFI_SMBIOS_TYPE_MEMORY_DEVICE, sizeof (SMBIOS_TABLE_TYPE17), 0 },
-  0,          // MemoryArrayHandle;
+  0,          // MemoryArrayHandle; // Should match SMBIOS_TABLE_TYPE16.Handle, initialized at runtime, refer to PhyMemArrayInfoUpdateSmbiosType16()
   0xFFFE,     // MemoryErrorInformationHandle;
   0xFFFF,     // TotalWidth;
   0xFFFF,     // DataWidth;
-  0xFFFF,     // Size;
+  0x0400,     // Size; // When bit 15 is 0: Size in MB
+              // When bit 15 is 1: Size in KB, and continues in ExtendedSize
   MemoryFormFactorUnknown, // FormFactor;                     ///< The enumeration value from MEMORY_FORM_FACTOR.
   0xff,       // DeviceSet;
   1,          // DeviceLocator String
@@ -503,15 +504,18 @@ CHAR8 *mBootInfoType32Strings[] = {
     );
 
   @param  Template    Fixed SMBIOS structure, required.
-  @param  StringArray Array of strings to convert to an SMBIOS string pack.
+  @param  StringPack  Array of strings to convert to an SMBIOS string pack.
                       NULL is OK.
+  @param  DataSmbiosHande  The new SMBIOS record handle .
+                      NULL is OK.                      
 **/
 
 EFI_STATUS
 EFIAPI
 LogSmbiosData (
   IN  EFI_SMBIOS_TABLE_HEADER *Template,
-  IN  CHAR8                   **StringPack
+  IN  CHAR8                   **StringPack,
+  OUT EFI_SMBIOS_HANDLE       *DataSmbiosHande
   )
 {
   EFI_STATUS                Status;
@@ -577,6 +581,10 @@ LogSmbiosData (
                      Record
                      );
 
+  if ((Status == EFI_SUCCESS) && (DataSmbiosHande != NULL)) {
+      *DataSmbiosHande = SmbiosHandle;
+  }
+                     
   ASSERT_EFI_ERROR (Status);
   FreePool (Record);
   return Status;
@@ -590,7 +598,7 @@ BIOSInfoUpdateSmbiosType0 (
   VOID
   )
 {
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mBIOSInfoType0, mBIOSInfoType0Strings);
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mBIOSInfoType0, mBIOSInfoType0Strings, NULL);
 }
 
 /***********************************************************************
@@ -673,13 +681,15 @@ SysInfoUpdateSmbiosType1 (
     
          mSysInfoType1.Uuid.Data4[7-k]=(UINT8)(BoardSerial>>(k*8));
       };
-// example of GUID created 52706932-0000-0000-0000-0000096554c1
-
-// option: compute SHA1 hash of string from GUID constructed and use it as Uuid
-// 
+      
+      //
+      // example of GUID created 52706932-0000-0000-0000-0000096554c1 
+      //
+      // option: compute SHA1 hash of string from GUID constructed and use it as Uuid
+      // 
   }
 
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mSysInfoType1, mSysInfoType1Strings);
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mSysInfoType1, mSysInfoType1Strings, NULL);
 }
 
 /***********************************************************************
@@ -690,7 +700,7 @@ BoardInfoUpdateSmbiosType2 (
   VOID
   )
 {
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mBoardInfoType2, mBoardInfoType2Strings);
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mBoardInfoType2, mBoardInfoType2Strings, NULL);
 }
 
 /***********************************************************************
@@ -701,7 +711,7 @@ EnclosureInfoUpdateSmbiosType3 (
   VOID
   )
 {
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mEnclosureInfoType3, mEnclosureInfoType3Strings);
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mEnclosureInfoType3, mEnclosureInfoType3Strings, NULL);
 }
 
 /***********************************************************************
@@ -716,7 +726,7 @@ ProcessorInfoUpdateSmbiosType4 (
   mProcessorInfoType4.EnabledCoreCount = (UINT8) MaxCpus;
   mProcessorInfoType4.ThreadCount      = (UINT8) MaxCpus;
 
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mProcessorInfoType4, mProcessorInfoType4Strings);
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mProcessorInfoType4, mProcessorInfoType4Strings, NULL);
 }
 
 /***********************************************************************
@@ -727,7 +737,7 @@ CacheInfoUpdateSmbiosType7 (
   VOID
   )
 {
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mCacheInfoType7, mCacheInfoType7Strings);
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mCacheInfoType7, mCacheInfoType7Strings, NULL);
 }
 
 /***********************************************************************
@@ -738,7 +748,7 @@ SysSlotInfoUpdateSmbiosType9 (
   VOID
   )
 {
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mSysSlotInfoType9, mSysSlotInfoType9Strings);
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mSysSlotInfoType9, mSysSlotInfoType9Strings, NULL);
 }
 
 /***********************************************************************
@@ -749,7 +759,14 @@ PhyMemArrayInfoUpdateSmbiosType16 (
   VOID
   )
 {
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mPhyMemArrayInfoType16, mPhyMemArrayInfoType16Strings);
+  EFI_SMBIOS_HANDLE MemArraySmbiosHande;
+    
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mPhyMemArrayInfoType16, mPhyMemArrayInfoType16Strings, &MemArraySmbiosHande);
+  
+  //
+  // Update the memory device information
+  //
+  mMemDevInfoType17.MemoryArrayHandle = MemArraySmbiosHande;
 }
 
 /***********************************************************************
@@ -760,7 +777,7 @@ MemDevInfoUpdateSmbiosType17 (
   VOID
   )
 {
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mMemDevInfoType17, mMemDevInfoType17Strings);
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mMemDevInfoType17, mMemDevInfoType17Strings, NULL);
 }
 
 /***********************************************************************
@@ -771,7 +788,10 @@ MemArrMapInfoUpdateSmbiosType19 (
   VOID
   )
 {
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mMemArrMapInfoType19, mMemArrMapInfoType19Strings);
+  mMemArrMapInfoType19.StartingAddress = 0x00000000;
+  mMemArrMapInfoType19.EndingAddress = 0x00000000 + PcdGet64 (PcdSystemMemorySize) - 1;
+  
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mMemArrMapInfoType19, mMemArrMapInfoType19Strings, NULL);
 }
 
 
@@ -783,7 +803,7 @@ BootInfoUpdateSmbiosType32 (
   VOID
   )
 {
-  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mBootInfoType32, mBootInfoType32Strings);
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mBootInfoType32, mBootInfoType32Strings, NULL);
 }
 
 /***********************************************************************

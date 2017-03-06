@@ -59,7 +59,8 @@ _SetupStackPosition:
   // memory size. Most of the time it will be a platform specific dynamic PcdGet64
   // NOTE: ArmPlatformGetSystemMemorySize implementation should assume that no stack is 
   // setup and may need to work around this limitation.
-.ifdef FixedPcdGet64 (PcdSystemMemorySize)
+
+.if (PcdToken (PcdSystemMemorySize) != 1)
   LoadConstantToReg (FixedPcdGet64 (PcdSystemMemorySize), r2)
 .else
   bl    ASM_PFX(ArmPlatformGetSystemMemorySize)

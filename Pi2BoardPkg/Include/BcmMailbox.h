@@ -31,7 +31,7 @@ BOOLEAN BcmMailboxWrite(
 
 EFI_STATUS MailboxProperty(
     IN UINT32 Channel,
-    volatile MAILBOX_HEADER *pMbProperty
+    MAILBOX_HEADER *pMbProperty
     );
 
 #endif // __BCMMAILBOXLIB_H__

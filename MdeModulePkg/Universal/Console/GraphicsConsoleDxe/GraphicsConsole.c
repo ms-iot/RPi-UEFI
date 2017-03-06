@@ -571,11 +571,12 @@ GraphicsConsoleControllerDriverStart (
   //
   Private->SimpleTextOutputMode.MaxMode = (INT32) MaxMode;
 
+  Status = GraphicsConsoleConOutSetMode (&Private->SimpleTextOutput, 0);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
   DEBUG_CODE_BEGIN ();
-    Status = GraphicsConsoleConOutSetMode (&Private->SimpleTextOutput, 0);
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
     Status = GraphicsConsoleConOutOutputString (&Private->SimpleTextOutput, (CHAR16 *)L"Graphics Console Started\n\r");
     if (EFI_ERROR (Status)) {
       goto Error;

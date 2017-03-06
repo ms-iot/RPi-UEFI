@@ -17,58 +17,79 @@
 #if !defined(MDEPKG_NDEBUG)
 CONST CHAR8* mStrUnit[] = { "100kbit/s", "1Mbit/s", "10Mbit/s", "100MBit/s",
                             "Unknown", "Unknown", "Unknown", "Unknown" };
-CONST CHAR8* mStrValue[] = { "1.0", "1.2", "1.3", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0",
+CONST CHAR8* mStrValue[] = { "UNDEF", "1.0", "1.2", "1.3", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0",
                              "Unknown", "Unknown", "Unknown", "Unknown" };
 #endif
 
 VOID
-PrintCID (
-  IN UINT32* Cid
-  )
+PrintCID(
+    IN CID* Cid
+    )
 {
-  DEBUG ((EFI_D_ERROR, "- PrintCID\n"));
-  DEBUG ((EFI_D_ERROR, "\t- Manufacturing date: %d/%d\n", (Cid[0] >> 8) & 0xF, (Cid[0] >> 12) & 0xFF));
-  DEBUG ((EFI_D_ERROR, "\t- Product serial number: 0x%X%X\n", Cid[1] & 0xFFFFFF, (Cid[0] >> 24) & 0xFF));
-  DEBUG ((EFI_D_ERROR, "\t- Product revision: %d\n", Cid[1] >> 24));
-  //DEBUG ((EFI_D_ERROR, "\t- Product name: %s\n", (char*)(Cid + 2)));
-  DEBUG ((EFI_D_ERROR, "\t- OEM ID: %c%c\n", (Cid[3] >> 8) & 0xFF, (Cid[3] >> 16) & 0xFF));
+    DEBUG((EFI_D_BLKIO, "- PrintCID\n"));
+    DEBUG((EFI_D_BLKIO,
+        "\t- Manufacturing date: %d/%d\n",
+        (UINT32)Cid->MDT & 0xF,
+        (UINT32)((Cid->MDT >> 4) & 0xFF)));
+    DEBUG((EFI_D_BLKIO, "\t- Product serial number: 0x%X\n", (UINT32)Cid->PSN));
+    DEBUG((EFI_D_BLKIO, "\t- Product revision: %d\n", (UINT32)Cid->PRV));
+
+    DEBUG((
+        EFI_D_ERROR,
+        "\t- Product name: %c%c%c%c%c\n",
+        Cid->PNM[4],
+        Cid->PNM[3],
+        Cid->PNM[2],
+        Cid->PNM[1],
+        Cid->PNM[0]));
+
+    DEBUG((EFI_D_BLKIO, "\t- OEM ID: 0x%x\n", (UINT32)Cid->OID));
 }
 
-
 VOID
-PrintCSD (
-  IN UINT32* Csd
-  )
+PrintCSD(
+    IN CSD* Csd
+    )
 {
-  UINTN Value;
-
-  if (((Csd[2] >> 30) & 0x3) == 0) {
-    DEBUG ((EFI_D_ERROR, "- PrintCSD Version 1.01-1.10/Version 2.00/Standard Capacity\n"));
-  } else if (((Csd[2] >> 30) & 0x3) == 1) {
-    DEBUG ((EFI_D_ERROR, "- PrintCSD Version 2.00/High Capacity\n"));
-  } else {
-    DEBUG ((EFI_D_ERROR, "- PrintCSD Version Higher than v3.3\n"));
-  }
-
-  DEBUG ((EFI_D_ERROR, "\t- Supported card command class: 0x%X\n", MMC_CSD_GET_CCC (Csd)));
-  DEBUG ((EFI_D_ERROR, "\t- Speed: %a %a\n",mStrValue[(MMC_CSD_GET_TRANSPEED (Csd) >> 3) & 0xF],mStrUnit[MMC_CSD_GET_TRANSPEED (Csd) & 7]));
-  DEBUG ((EFI_D_ERROR, "\t- Maximum Read Data Block: %d\n",2 << (MMC_CSD_GET_READBLLEN (Csd)-1)));
-  DEBUG ((EFI_D_ERROR, "\t- Maximum Write Data Block: %d\n",2 << (MMC_CSD_GET_WRITEBLLEN (Csd)-1)));
-
-  if (!MMC_CSD_GET_FILEFORMATGRP (Csd)) {
-    Value = MMC_CSD_GET_FILEFORMAT (Csd);
-    if (Value == 0) {
-      DEBUG ((EFI_D_ERROR, "\t- Format (0): Hard disk-like file system with partition table\n"));
-    } else if (Value == 1) {
-      DEBUG ((EFI_D_ERROR, "\t- Format (1): DOS FAT (floppy-like) with boot sector only (no partition table)\n"));
-    } else if (Value == 2) {
-      DEBUG ((EFI_D_ERROR, "\t- Format (2): Universal File Format\n"));
+    if (Csd->CSD_STRUCTURE == 0) {
+        DEBUG((EFI_D_BLKIO, "- PrintCSD Version 1.01-1.10/Version 2.00/Standard Capacity\n"));
+    } else if (Csd->CSD_STRUCTURE == 1) {
+        DEBUG((EFI_D_BLKIO, "- PrintCSD Version 2.00/High Capacity\n"));
     } else {
-      DEBUG ((EFI_D_ERROR, "\t- Format (3): Others/Unknown\n"));
+        DEBUG((EFI_D_BLKIO, "- PrintCSD Version Higher than v3.3\n"));
     }
-  } else {
-    DEBUG ((EFI_D_ERROR, "\t- Format: Reserved\n"));
-  }
+
+    DEBUG((EFI_D_BLKIO, "\t- Supported card command class: 0x%X\n", (UINT32)Csd->CCC));
+
+    DEBUG((
+        EFI_D_BLKIO, "\t- Speed: %a %a (TRAN_SPEED:%x)\n",
+        mStrValue[(Csd->TRAN_SPEED >> 3) & 0xF],
+        mStrUnit[Csd->TRAN_SPEED & 7],
+        (UINT32)Csd->TRAN_SPEED));
+
+    DEBUG((
+        EFI_D_BLKIO, "\t- Maximum Read Data Block: %d (READ_BL_LEN:%x)\n",
+        (UINT32)(1 << Csd->READ_BL_LEN),
+        (UINT32)Csd->READ_BL_LEN));
+
+    DEBUG((
+        EFI_D_BLKIO, "\t- Maximum Write Data Block: %d (WRITE_BL_LEN:%x)\n",
+        (UINT32)(1 << Csd->WRITE_BL_LEN),
+        (UINT32)Csd->WRITE_BL_LEN));
+
+    if (!Csd->FILE_FORMAT_GRP) {
+        if (Csd->FILE_FORMAT == 0) {
+            DEBUG((EFI_D_BLKIO, "\t- Format (0): Hard disk-like file system with partition table\n"));
+        } else if (Csd->FILE_FORMAT == 1) {
+            DEBUG((EFI_D_BLKIO, "\t- Format (1): DOS FAT (floppy-like) with boot sector only (no partition table)\n"));
+        } else if (Csd->FILE_FORMAT == 2) {
+            DEBUG((EFI_D_BLKIO, "\t- Format (2): Universal File Format\n"));
+        } else {
+            DEBUG((EFI_D_BLKIO, "\t- Format (3): Others/Unknown\n"));
+        }
+    } else {
+        DEBUG((EFI_D_BLKIO, "\t- Format: Reserved\n"));
+    }
 }
 
 VOID

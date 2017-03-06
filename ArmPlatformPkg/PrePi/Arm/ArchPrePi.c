@@ -26,4 +26,3 @@ ArchInitialize (
     ArmEnableVFP ();
   }
 }
-

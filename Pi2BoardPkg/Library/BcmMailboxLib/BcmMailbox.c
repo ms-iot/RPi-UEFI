@@ -18,6 +18,7 @@
 #include <Bcm2836.h>
 #include <Bcm2836Mailbox.h>
 #include <Library/CacheMaintenanceLib.h>
+#include <Library/BaseMemoryLib.h>
 
 BOOLEAN BcmMailboxRead(
     IN UINT32 Channel,
@@ -31,8 +32,6 @@ BOOLEAN BcmMailboxRead(
     {
         return FALSE;
     }
-    
-    DEBUG((EFI_D_VERBOSE, "BcmMailboxRead waiting for Mailbox\n"));
 
     MBStatus = MmioRead32(MAILBOX_STATUS_REG);
     while (MBStatus & MAILBOX_STATUS_EMPTY)
@@ -49,7 +48,6 @@ BOOLEAN BcmMailboxRead(
     do
     {
         *Value = MmioRead32(MAILBOX_READ_REG);
-        DEBUG((DEBUG_INFO, "BcmMailboxRead *Value = 0x%8.8X\n", *Value));
         if (count > MAILBOX_MAX_POLL)
         {
             return FALSE;
@@ -57,7 +55,6 @@ BOOLEAN BcmMailboxRead(
     } while ((*Value & MAILBOX_CHANNEL_MASK) != Channel);
 
     *Value &= ~MAILBOX_CHANNEL_MASK;
-    DEBUG((EFI_D_VERBOSE, "BcmMailboxRead read Value : %x\n", *Value));
 
     return TRUE;
 }
@@ -70,8 +67,6 @@ BOOLEAN BcmMailboxWrite(
     UINT32 count = 0;
     UINT32 MBStatus = MAILBOX_STATUS_FULL;
 
-    DEBUG((EFI_D_VERBOSE, "BcmMailboxWrite waiting for Mailbox\n"));
-
     // Wait until there is available free buffer for use
     while (MBStatus & MAILBOX_STATUS_FULL)
     {
@@ -83,8 +78,6 @@ BOOLEAN BcmMailboxWrite(
         }
     }
 
-    DEBUG((EFI_D_VERBOSE, "BcmMailboxWrite writing value : %x to Channel : %x\n", Value, Channel));
-
     MmioWrite32(MAILBOX_WRITE_REG, (Value & ~MAILBOX_CHANNEL_MASK) | Channel);
 
     return TRUE;
@@ -93,26 +86,49 @@ BOOLEAN BcmMailboxWrite(
 EFI_STATUS
 MailboxProperty(
     IN UINT32 Channel,
-    volatile MAILBOX_HEADER *pMbProperty
+    MAILBOX_HEADER *pMbProperty
     )
 {
     UINT32 MBStatus = 0;
-    UINT32 MBData = ((UINT32)pMbProperty) | UNCACHED_ADDRESS_MASK;
+    UINT32 MBData;
+    UINT32 BufferSize;
 
-    WriteBackInvalidateDataCacheRange((void*)pMbProperty, pMbProperty->BufferSize);
+    //
+    // Cannot allocate memory from the heap because memory allocation
+    // services may not be available yet, for example when this is
+    // called by SerialPortInitialize() early in SEC phase.
+    // This memory must be cache-size aligned, which on Pi is 64 bytes.
+    // This is static because stack size is limited and the mailbox
+    // is non-reentrant.
+    //
+    static UINT8 SharedMem[2048] __attribute__((aligned(64)));
+
+    BufferSize = pMbProperty->BufferSize;
+    if (BufferSize > sizeof(SharedMem))
+    {
+        //
+        // Cannot debug print here as serial port may not be initialized yet
+        //
+        return EFI_OUT_OF_RESOURCES;
+    }
+
+    CopyMem(SharedMem, pMbProperty, BufferSize);
+    WriteBackInvalidateDataCacheRange(SharedMem, BufferSize);
+    MBData = ((UINT32)SharedMem) | UNCACHED_ADDRESS_MASK;
+
     if(!BcmMailboxWrite(Channel, MBData))
     {
-        DEBUG((DEBUG_ERROR, "Failed to write MailboxProperty MBStatus 0x%x\n", MBStatus));
         return EFI_DEVICE_ERROR;
     }
 
     // Wait for the completion on the ARM to GPU channel
     if(!BcmMailboxRead(Channel, &MBStatus))
     {
-        DEBUG((DEBUG_ERROR, "FB info update fail to complete MBStatus 0x%x\n", MBStatus));
         return EFI_DEVICE_ERROR;
     }
-    WriteBackInvalidateDataCacheRange((void*)pMbProperty, pMbProperty->BufferSize);
+
+    InvalidateDataCacheRange(SharedMem, BufferSize);
+    CopyMem(pMbProperty, SharedMem, BufferSize);
 
     return EFI_SUCCESS;
 }

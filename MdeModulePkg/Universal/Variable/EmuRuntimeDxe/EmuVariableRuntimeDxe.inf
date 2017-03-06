@@ -70,6 +70,8 @@
   ## SOMETIMES_CONSUMES   ## HOB
   ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiVariableGuid
+  gEfiImageSecurityDatabaseGuid
+  gEfiSecureBootPrivateVariableGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved      ## CONSUMES

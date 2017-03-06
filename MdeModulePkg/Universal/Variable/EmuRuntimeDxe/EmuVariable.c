@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Variable.h"
+#include <Guid/ImageAuthentication.h>
+#include <Guid/WinSecureBoot.h>
 
 ///
 /// Don't use module globals after the SetVirtualAddress map is signaled
@@ -1193,10 +1195,32 @@ EmuGetVariable (
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
     goto Done;
   }
+
   //
   // Get data size
   //
   VarDataSize = Variable.CurrPtr->DataSize;
+
+  //
+  // Image security and secure bootrelated reads have variable size 
+  // so allow caller to query for variable size by calling with NULL 
+  // Data pointer. 
+  //
+  // Another thing to note in regards to image security. Image security
+  // variable writes involves verification on incoming data  and then only
+  // save actual data without the certification header. Read to secure boot
+  // variables only return actual data. For more information refer to 
+  // SecurityPkg/VariableAuthenticated/RuntimeDxe/AuthService.c. Since
+  // this is emulated variable do not do any security related processing.
+  //
+  if((Data == NULL) &&
+     (CompareGuid(VendorGuid, &gEfiImageSecurityDatabaseGuid) || 
+      CompareGuid(VendorGuid, &gEfiSecureBootPrivateVariableGuid))) {
+      *DataSize = VarDataSize;
+      Status = EFI_BUFFER_TOO_SMALL;
+      goto Done;
+  }
+
   if (*DataSize >= VarDataSize) {
     if (Data == NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -1208,6 +1232,15 @@ EmuGetVariable (
     CopyMem (Data, VariableDataPtr, VarDataSize);
     if (Attributes != NULL) {
       *Attributes = Variable.CurrPtr->Attributes;
+    }
+
+    //
+    // Secure boot variable is expected to reside in non volatile memory.
+    // This is obviously not supported since this emulated in RAM but
+    // to be compatible return secure boot read as non volatile
+    //
+    if(CompareGuid(VendorGuid, &gEfiSecureBootPrivateVariableGuid)) {
+        *Attributes = (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS);
     }
 
     *DataSize = VarDataSize;
@@ -1402,7 +1435,7 @@ EmuSetVariable (
   if ((UINTN)(~0) - DataSize < StrSize(VariableName)){
     //
     // Prevent whole variable size overflow 
-    // 
+    //
     return EFI_INVALID_PARAMETER;
   }
 
