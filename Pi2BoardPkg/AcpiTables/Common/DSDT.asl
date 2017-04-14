@@ -452,6 +452,21 @@ DefinitionBlock ("DSDT.aml", "DSDT", 5, "MSFT", "EDK2", 2)
             }
         }
 
+        //
+        // Description: Boot Volume Sentinel Driver
+        //
+
+        Device (DSEN)
+        {
+            Name (_HID, "DSN3832")
+            Name (_CID, "ACPI\DSN3832")
+            Name (_UID, 0)
+            Method (_STA)
+            {
+                Return(0xf)
+            }
+        }
+
         include("Uart.asl")
         include("Rhpx.asl")
     }
