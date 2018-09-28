@@ -19,12 +19,13 @@
 
 #include <BcmMailbox.h>
 
-volatile MAILBOX_GET_GPIO_VIRT_ADDR MbGetGpiovirtAddr __attribute__((aligned(16)));
+//volatile MAILBOX_GET_GPIO_VIRT_ADDR MbGetGpiovirtAddr __attribute__((aligned(16)));
 
 VOID
 LedInit (
   )
 {
+    /*
     EFI_STATUS Status;
 
     ZeroMem((void*)&MbGetGpiovirtAddr, sizeof(MbGetGpiovirtAddr));
@@ -48,6 +49,7 @@ LedInit (
     MbGetGpiovirtAddr.GpioVirtAddr -= 0xC0000000;
 
     DEBUG((DEBUG_INIT, "GPIO virt address 0x%08x\n", MbGetGpiovirtAddr.GpioVirtAddr));
+    */
 }
 
 VOID
@@ -55,6 +57,7 @@ LedSetOk (
   IN  BOOLEAN On
   )
 {
+    /*
     UINT32 GpioCurrentState = MmioRead32(MbGetGpiovirtAddr.GpioVirtAddr);
     UINT16 EnableCount = GpioCurrentState >> 16;
     UINT16 DisableCount = (UINT16)(GpioCurrentState & 0xFFFF);
@@ -86,6 +89,7 @@ LedSetOk (
     }
 
     ASSERT((EnableCount == DisableCount) || ((EnableCount - DisableCount) == 1));
+    */
 }
 
 VOID
