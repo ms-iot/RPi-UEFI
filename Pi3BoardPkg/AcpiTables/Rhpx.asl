@@ -158,6 +158,83 @@ Device(RHPX)
         // GPIO 27
         GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 27 }
         GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 27 }
+	
+//symbol CM_IO_BOARD is used to add extended GPIO pins for Compute Module IO Board, you can define at here or from -D command line option
+//#define CM_IO_BOARD 
+#ifdef CM_IO_BOARD
+		
+		// GPIO 28
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 28 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 28 }
+		
+		// GPIO 29
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 29 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 29 }
+		
+		// GPIO 30
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 30 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 30 }
+		
+		// GPIO 31
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 31 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 31 }
+		
+		// GPIO 32
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 32 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 32 }
+		
+		// GPIO 33
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 33 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 33 }
+		
+		// GPIO 34
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 34 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 34 }
+		
+		// GPIO 35
+        GpioIO(Shared, PullUp, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , )   { 35 }
+        GpioInt(Edge, ActiveBoth, Shared, PullUp, 0, "\\_SB.GPI0",)                              { 35 }
+		
+		// GPIO 36
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 36 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 36 }
+		
+		// GPIO 37
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 37 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 37 }
+		
+		// GPIO 38
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 38 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 38 }
+		
+		// GPIO 39
+        GpioIO(Shared, PullDown, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , ) { 39 }
+        GpioInt(Edge, ActiveBoth, Shared, PullDown, 0, "\\_SB.GPI0",)                            { 39 }
+		
+		// GPIO 40
+        GpioIO(Shared, PullUp, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , )   { 40 }
+        GpioInt(Edge, ActiveBoth, Shared, PullUp, 0, "\\_SB.GPI0",)                              { 40 }
+		
+		// GPIO 41
+        GpioIO(Shared, PullUp, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , )   { 41 }
+        GpioInt(Edge, ActiveBoth, Shared, PullUp, 0, "\\_SB.GPI0",)                              { 41 }
+		
+		// GPIO 42
+        GpioIO(Shared, PullUp, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , )   { 42 }
+        GpioInt(Edge, ActiveBoth, Shared, PullUp, 0, "\\_SB.GPI0",)                              { 42 }
+		
+		// GPIO 43
+        GpioIO(Shared, PullUp, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , )   { 43 }
+        GpioInt(Edge, ActiveBoth, Shared, PullUp, 0, "\\_SB.GPI0",)                              { 43 }
+		
+		// GPIO 44
+        GpioIO(Shared, PullUp, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , )   { 44 }
+        GpioInt(Edge, ActiveBoth, Shared, PullUp, 0, "\\_SB.GPI0",)                              { 44 }
+		
+        // GPIO 45
+        GpioIO(Shared, PullUp, 0, 0, IoRestrictionNone, "\\_SB.GPI0", 0, ResourceConsumer, , )   { 45 }
+        GpioInt(Edge, ActiveBoth, Shared, PullUp, 0, "\\_SB.GPI0",)                              { 45 }
+#endif
     })
 
     Name(_DSD, Package()
