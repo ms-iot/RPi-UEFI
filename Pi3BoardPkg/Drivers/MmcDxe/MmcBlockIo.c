@@ -514,6 +514,7 @@ EFI_STATUS InitializeMmcDevice(
 
     if (MmcHostInstance->CardInfo.CardType == MMC_CARD) {
         // Fetch ECSD
+        CmdArg = 0;
         Status = MmcHost->SendCommand(MmcHost, MMC_CMD8, CmdArg);
         if (EFI_ERROR(Status)) {
             DEBUG((EFI_D_ERROR, "MmcDxe: InitializeMmcDevice(): ECSD fetch error, Status=%r.\n", Status));
