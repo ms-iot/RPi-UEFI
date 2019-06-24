@@ -144,8 +144,8 @@ READ_LOCK_STATUS   = TRUE
   #
   # MMC/SD
   #
-  INF Pi2BoardPkg/Drivers/MmcDxe/MmcDxe.inf
-  INF Pi2BoardPkg/Drivers/SdHostDxe/SdHostDxe.inf
+  INF Pi3BoardPkg/Drivers/MmcDxe/MmcDxe.inf
+  INF Pi3BoardPkg/Drivers/SdHostDxe/SdHostDxe.inf
 
   #
   # ACPI
