@@ -15,6 +15,7 @@
 
 #include <PiDxe.h>
 
+#include <limits.h>
 #include <BcmMailbox.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -218,7 +219,52 @@ DisplayBlt(
     )
 {
     UINT8 *VidBuf, *BltBuf, *VidBuf1;
+    EFI_STATUS Status = EFI_SUCCESS;
     UINTN i, j;
+
+    UINT32 GopWidth = This->Mode->Info->HorizontalResolution;
+    UINT32 GopHeight = This->Mode->Info->VerticalResolution;
+
+    if (    EfiBltVideoFill == BltOperation
+            || EfiBltBufferToVideo == BltOperation
+            || EfiBltVideoToVideo == BltOperation) {
+
+        if (    UINT_MAX - Width < DestinationX
+                || UINT_MAX - Height < DestinationY) {
+
+            DEBUG((DEBUG_ERROR, "DisplayDxe: Arithmetic overflow detected. Blitting operation was omitted.\n"));
+            Status = EFI_INVALID_PARAMETER;
+            goto Exit;
+        }
+
+        if (    DestinationX + Width > GopWidth
+                || DestinationY + Height > GopHeight) {
+
+            DEBUG((DEBUG_ERROR, "DisplayDxe: Console resolution is higher than current GOP resolution. Blitting operation was omitted.\n"));
+            Status = EFI_INVALID_PARAMETER;
+            goto Exit;
+        }
+    }
+
+    if (    EfiBltVideoToBltBuffer == BltOperation
+            || EfiBltVideoToVideo == BltOperation) {
+
+        if (    UINT_MAX - Width < SourceX
+                || UINT_MAX - Height < SourceY) {
+
+            DEBUG((DEBUG_ERROR, "DisplayDxe: Arithmetic overflow detected. Blitting operation was omitted.\n"));
+                Status = EFI_INVALID_PARAMETER;
+                goto Exit;
+        }
+
+        if (    SourceX + Width > GopWidth
+                || SourceY + Height > GopHeight) {
+
+            DEBUG((DEBUG_ERROR, "DisplayDxe: Console resolution is higher than current GOP resolution. Blitting operation was omitted.\n"));
+            Status = EFI_INVALID_PARAMETER;
+            goto Exit;
+        }
+    }
 
     switch(BltOperation) {
     case EfiBltVideoFill:
@@ -293,11 +339,11 @@ DisplayBlt(
         break;
 
     default:
-        ASSERT_EFI_ERROR(EFI_SUCCESS);
         break;
     }
 
-    return EFI_SUCCESS;
+Exit:
+    return Status;
 }
 
 
