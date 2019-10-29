@@ -152,7 +152,15 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+!if $(CONFIG_TPM_ENABLE)
+!if $(CONFIG_USE_DTPM)
+  INF RuleOverride=ACPITABLE Pi3BoardPkg/AcpiTables/AcpiTablesWithDTpm.inf
+!else
+  INF RuleOverride=ACPITABLE Pi3BoardPkg/AcpiTables/AcpiTablesWithSTpm.inf
+!endif
+!else
   INF RuleOverride=ACPITABLE Pi3BoardPkg/AcpiTables/AcpiTables.inf
+!endif
 
   #
   # ARM GIC+GIT Drivers

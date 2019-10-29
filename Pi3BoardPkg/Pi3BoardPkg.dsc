@@ -29,6 +29,8 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = Pi3BoardPkg/Pi3BoardPkg.fdf
 
+  DEFINE CONFIG_TPM_ENABLE       = FALSE
+  DEFINE CONFIG_USE_DTPM         = FALSE
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
@@ -548,8 +550,8 @@
 
 [PcdsPatchableInModule]
   # Console Resolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|1024
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|768
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0
 
 
 ################################################################################
@@ -669,7 +671,15 @@
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+!if $(CONFIG_TPM_ENABLE)
+!if $(CONFIG_USE_DTPM)
+  Pi3BoardPkg/AcpiTables/AcpiTablesWithDTpm.inf
+!else
+  Pi3BoardPkg/AcpiTables/AcpiTablesWithSTpm.inf
+!endif
+!else
   Pi3BoardPkg/AcpiTables/AcpiTables.inf
+!endif
 
   #
   # SMBIOS Support
